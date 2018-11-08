@@ -1,0 +1,127 @@
+{
+  "PolicyDataSets": [
+    {
+      "Grouper2": {
+        "PrivRights": [
+          {
+            "searchString": "SeTrustedCredManAccessPrivilege",
+            "msDesc": null,
+            "humanDesc": null,
+            "goodValue": null,
+            "badValue": null,
+            "interestLevel": null,
+            "remotelyExploitable": false
+          },
+          {
+            "searchString": "SeTcbPrivilege",
+            "msDesc": null,
+            "humanDesc": null,
+            "goodValue": null,
+            "badValue": null,
+            "interestLevel": null,
+            "remotelyExploitable": false
+          },
+          {
+            "searchString": "SeMachineAccountPrivilege",
+            "msDesc": null,
+            "humanDesc": null,
+            "goodValue": null,
+            "badValue": null,
+            "interestLevel": null,
+            "remotelyExploitable": false
+          },
+          {
+            "searchString": "SeBackupPrivilege",
+            "msDesc": null,
+            "humanDesc": null,
+            "goodValue": null,
+            "badValue": null,
+            "interestLevel": null,
+            "remotelyExploitable": false
+          },
+          {
+            "searchString": "SeCreateTokenPrivilege",
+            "msDesc": null,
+            "humanDesc": null,
+            "goodValue": null,
+            "badValue": null,
+            "interestLevel": null,
+            "remotelyExploitable": false
+          },
+          {
+            "searchString": "SeAssignPrimaryTokenPrivilege",
+            "msDesc": null,
+            "humanDesc": null,
+            "goodValue": null,
+            "badValue": null,
+            "interestLevel": null,
+            "remotelyExploitable": false
+          },
+          {
+            "searchString": "SeRestorePrivilege",
+            "msDesc": null,
+            "humanDesc": null,
+            "goodValue": null,
+            "badValue": null,
+            "interestLevel": null,
+            "remotelyExploitable": false
+          },
+          {
+            "searchString": "SeDebugPrivilege",
+            "msDesc": null,
+            "humanDesc": null,
+            "goodValue": null,
+            "badValue": null,
+            "interestLevel": null,
+            "remotelyExploitable": false
+          },
+          {
+            "searchString": "SeTakeOwnershipPrivilege",
+            "msDesc": null,
+            "humanDesc": null,
+            "goodValue": null,
+            "badValue": null,
+            "interestLevel": null,
+            "remotelyExploitable": false
+          },
+          {
+            "searchString": "SeLoadDriverPrivilege",
+            "msDesc": null,
+            "humanDesc": null,
+            "goodValue": null,
+            "badValue": null,
+            "interestLevel": null,
+            "remotelyExploitable": false
+          },
+          {
+            "searchString": "SeRemoteInteractiveLogonRight",
+            "msDesc": null,
+            "humanDesc": null,
+            "goodValue": null,
+            "badValue": null,
+            "interestLevel": null,
+            "remotelyExploitable": false
+          }
+        ]
+        "RegKeys": {
+          null
+        }
+      }
+    }
+  ]
+  "Misc": [
+    {
+      "WellKnownSIDS": [
+        {
+          "S-1-0": "Null Authority",
+          "S-1-0-0": "Nobody",
+          "S-1-1": "World Authority",
+          "S-1-1-0": "Everyone",
+          "S-1-2": "Local Authority",
+          "S-1-2-0": "Local",
+          "S-1-2-1": "Console Logon",
+        }
+        ]
+    }
+  ]
+}

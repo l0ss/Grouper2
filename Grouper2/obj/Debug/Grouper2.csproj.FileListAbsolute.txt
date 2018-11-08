@@ -1,0 +1,10 @@
+Z:\transfer\Grouper2\Grouper2\obj\Debug\Grouper2.csprojAssemblyReference.cache
+Z:\transfer\Grouper2\Grouper2\obj\Debug\Grouper2.csproj.CoreCompileInputs.cache
+Z:\transfer\Grouper2\Grouper2\bin\Debug\Grouper2.exe.config
+Z:\transfer\Grouper2\Grouper2\bin\Debug\Grouper2.exe
+Z:\transfer\Grouper2\Grouper2\bin\Debug\Grouper2.pdb
+Z:\transfer\Grouper2\Grouper2\obj\Debug\Grouper2.exe
+Z:\transfer\Grouper2\Grouper2\obj\Debug\Grouper2.pdb
+Z:\transfer\Grouper2\Grouper2\bin\Debug\Newtonsoft.Json.dll
+Z:\transfer\Grouper2\Grouper2\bin\Debug\Newtonsoft.Json.xml
+Z:\transfer\Grouper2\Grouper2\obj\Debug\Grouper2.csproj.CopyComplete
