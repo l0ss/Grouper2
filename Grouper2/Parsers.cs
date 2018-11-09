@@ -5,14 +5,21 @@ using System.Collections.Generic;
 
 namespace Grouper2
 {
-
     public class ParsedInf : Dictionary<string, Dictionary<string, string[]>>
     {
         //WHAT AM I DOIN HERE?
     }
 
+
+    public class ParsedXml : Dictionary<string, Dictionary<string, string[]>>
+    {
+        //WHAT AM I DOIN HERE EITHER?
+    }
+
     class Parsers
     {
+        
+
         static public ParsedInf ParseInf(string infFile)
         {
             //define what a heading looks like
@@ -25,7 +32,6 @@ namespace Grouper2
             int i = 0;
             foreach (string infLine in infContent)
             {
-
                 Match headingMatch = headingRegex.Match(infLine);
                 if (headingMatch.Success)
                 {
@@ -36,15 +42,6 @@ namespace Grouper2
                 }
                 i++;
             }
-
-            //Console.WriteLine("");
-            //Console.WriteLine("Contents of File:");
-
-            //Console.Write(infRaw);
-            //Console.WriteLine("");
-
-            //Console.WriteLine("Sections Identified: ");
-
             // make a dictionary with K/V = start/end of each section
             Dictionary<int, int> sectionSlices = new Dictionary<int, int>();
             int fuck = 0;
@@ -65,15 +62,7 @@ namespace Grouper2
                     break;
                 }
             }
-
-            // debug shit, can del.
-            /*
-            Console.WriteLine("Debug content of sectionSlices");
-            foreach (KeyValuePair<int, int> kvp in sectionSlices)
-            {
-                Console.WriteLine("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
-            }*/
-
+            
             // define dict that we're going to put all this in and return at the end
             ParsedInf infResults = new ParsedInf();
 
@@ -84,22 +73,16 @@ namespace Grouper2
                 {
                     //get the section heading
                     string sectionHeading = infContent[sectionSlice.Key];
-                    //Utility.DebugWrite("This section's heading is:" + sectionHeading);
                     //get the line where the section content starts by adding one to the heading's line
                     int startSection = (sectionSlice.Key + 1);
-                    //Console.WriteLine("This section starts at: " + startSection);
                     //get the end line of the section
                     int nextSection = sectionSlice.Value;
-                    //Console.WriteLine("The next section starts at: " + nextSection);
                     //subtract one from the other to get the section length, without the heading.
                     int sectionLength = (nextSection - startSection);
-                    //Console.WriteLine("This section is " + sectionLength + " lines long.");
                     //get an arraysegment with the lines
-
                     ArraySegment<string> sectionContent = new ArraySegment<string>(infContent, startSection, sectionLength);
                     //Console.WriteLine("This section contains: ");               
                     //Utility.PrintIndexAndValues(sectionContent);
-
                     //create the dictionary that we're going to put the lines into.
                     Dictionary<string, string[]> SectionDict = new Dictionary<string, string[]>();
                     //iterate over the lines in the section
@@ -107,27 +90,16 @@ namespace Grouper2
                     for (int b = sectionContent.Offset; b < (sectionContent.Offset + sectionContent.Count); b++)
                         {
                         string line = sectionContent.Array[b];
-
                         // split the line into the key (before the =) and the values (after it)
                         string[] SplitLine = line.Split('=');
                         string LineKey = (SplitLine[0]).Trim();
-                        // debug writes
-                        //Console.WriteLine("LineKey = " + LineKey);
                         // then get the values
                         string LineValues = (SplitLine[1]).Trim();
                         // and split them into an array on ","
                         string[] SplitValues = LineValues.Split(',');
-                        // debug writes
-                        /*
-                        foreach (string SplitValue in SplitValues)
-                        {
-                            Console.WriteLine("SplitValue = " + SplitValue);
-                        }
-                        */
                         //Add the restructured line into the dictionary.
                        SectionDict.Add(LineKey, SplitValues);
                     }
-
                     //put the results into the dictionary we're gonna return
                     infResults.Add(sectionHeading, SectionDict);
                 }
@@ -138,5 +110,14 @@ namespace Grouper2
             }
             return infResults;
         }
+
+        
+
+        static public ParsedXml ParseXml(string xmlFile)
+        {
+            return null;
+        }
     }
+
+    
 }

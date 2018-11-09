@@ -2,38 +2,36 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.IO;
+using Newtonsoft.Json.Linq;
 
 namespace Grouper2
 {
+
     class Assess
     {
-
-        //remove once json parsing is in
-        static Dictionary<String, String> intPrivRights = new Dictionary<string, string>
-        {
-            { "SeTrustedCredManAccessPrivilege","Description of this Privilege" },
-            { "SeTcbPrivilege","Description of this Privilege" },
-            { "SeMachineAccountPrivilege","Description of this Privilege" },
-            { "SeBackupPrivilege","Description of this Privilege" },
-            { "SeCreateTokenPrivilege","Description of this Privilege" },
-            { "SeAssignPrimaryTokenPrivilege","Description of this Privilege" },
-            { "SeRestorePrivilege","Description of this Privilege" },
-            { "SeDebugPrivilege","Description of this Privilege" },
-            { "SeTakeOwnershipPrivilege","Description of this Privilege" },
-            { "SeLoadDriverPrivilege","Description of this Privilege" },
-            { "SeRemoteInteractiveLogonRight","Description of this Privilege" }
-        };
-
-
+        static readonly string JsonDataFile = File.ReadAllText("PolData.Json");
+        static readonly JObject JsonData = JObject.Parse(JsonDataFile);
+             
         public static void AssessGPTmpl(ParsedInf InfToAssess)
         {
+            var IntPrivRights =
+                from r in JsonData["privRights"]["item"]
+                select (string)r["searchString"];
+
+            var IntRegKeys =
+                from r in JsonData["regKeys"]["item"]
+                select (string)r["regKey"];
+                      
+            //JArray PrivRightsJson = (JArray)JsonData["privRights"]["item"]["searchstring"];
+            //Console.WriteLine(PrivRightsJson);
+            
             // Checks for interesting priv assignments.
             if (InfToAssess.ContainsKey("[Privilege Rights]")) {
                 Dictionary<string, string[]> privRights = InfToAssess["[Privilege Rights]"];
                 //look at each value
                 foreach (KeyValuePair<string, string[]> privRight in privRights)
                 {
-                    if (intPrivRights.Keys.Contains(privRight.Key))
+                    if (IntPrivRights.Contains(privRight.Key))
                     {
                         Console.WriteLine("Interesting privilege " + privRight.Key + " is granted to:");
                         Utility.PrintIndexAndValues(privRight.Value);
@@ -45,21 +43,24 @@ namespace Grouper2
                 Dictionary<string, string[]> RegVals = InfToAssess["[Registry Values]"];
                 foreach (KeyValuePair<string, string[]> RegVal in RegVals)
                 {
-                    string PrintKey = RegVal.Key;
-                    Utility.DebugWrite("Key: ");
-                    Console.WriteLine(PrintKey);
-                    Utility.DebugWrite("Values: ");
-                    // the first value in these looks like a 'type' code.
-                    // looks like they work like this:
-                    // 4 = Int, but where it's 1 or 0 they use it as a bool
-                    // 1 = String in double quotes, some of which are numbers
-                    // 7 = Array
-                    foreach (string value in RegVals[RegVal.Key])
-                    {
-                        Console.WriteLine(value);
+                    if (IntRegKeys.Contains(RegVal.Key)) {
+                        string PrintKey = RegVal.Key;
+                        Utility.DebugWrite("Key: ");
+                        Console.WriteLine(PrintKey);
+                        Utility.DebugWrite("Values: ");
+                        // the first value in these looks like a 'type' code.
+                        // looks like they work like this:
+                        // 4 = Int, but where it's 1 or 0 they use it as a bool
+                        // 1 = String in double quotes, some of which are numbers
+                        // 7 = Array
+                        foreach (string value in RegVals[RegVal.Key])
+                        {
+                            Console.WriteLine(value);
+                        }
                     }
                 }
             }
+            
 
             /* skeleton to just read out all the values
             if (InfToAssess.ContainsKey("[Registry Values]"))

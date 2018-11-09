@@ -8,3 +8,14 @@ Z:\transfer\Grouper2\Grouper2\obj\Debug\Grouper2.pdb
 Z:\transfer\Grouper2\Grouper2\bin\Debug\Newtonsoft.Json.dll
 Z:\transfer\Grouper2\Grouper2\bin\Debug\Newtonsoft.Json.xml
 Z:\transfer\Grouper2\Grouper2\obj\Debug\Grouper2.csproj.CopyComplete
+Z:\Grouper2\Grouper2\bin\Debug\Grouper2.exe.config
+Z:\Grouper2\Grouper2\bin\Debug\Grouper2.exe
+Z:\Grouper2\Grouper2\bin\Debug\Grouper2.pdb
+Z:\Grouper2\Grouper2\bin\Debug\Newtonsoft.Json.dll
+Z:\Grouper2\Grouper2\bin\Debug\Newtonsoft.Json.xml
+Z:\Grouper2\Grouper2\obj\Debug\Grouper2.csprojAssemblyReference.cache
+Z:\Grouper2\Grouper2\obj\Debug\Grouper2.csproj.CoreCompileInputs.cache
+Z:\Grouper2\Grouper2\obj\Debug\Grouper2.csproj.CopyComplete
+Z:\Grouper2\Grouper2\obj\Debug\Grouper2.exe
+Z:\Grouper2\Grouper2\obj\Debug\Grouper2.pdb
+Z:\Grouper2\Grouper2\bin\Debug\PolData.json

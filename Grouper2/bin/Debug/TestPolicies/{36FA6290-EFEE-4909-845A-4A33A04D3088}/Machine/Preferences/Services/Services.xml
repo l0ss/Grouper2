@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NTServices clsid="{2CFB484A-4E96-4b5d-A0B6-093D2F91E6AE}"><NTService clsid="{AB6F0B67-341F-4e51-92F9-005FBFBA1A43}" name="derp" image="3" changed="2018-11-06 05:41:27" uid="{C870768C-AEB5-48EC-A0A0-F74629602675}"><Properties startupType="MANUAL" serviceName="derp" serviceAction="STOP" timeout="30"/></NTService>
+</NTServices>
