@@ -11,7 +11,8 @@ namespace Grouper2
     {
         static readonly string JsonDataFile = File.ReadAllText("PolData.Json");
         static readonly JObject JsonData = JObject.Parse(JsonDataFile);
-             
+        
+        // Assesses the contents of a GPTmpl
         public static void AssessGPTmpl(ParsedInf InfToAssess)
         {
             var IntPrivRights =
@@ -45,9 +46,11 @@ namespace Grouper2
                 {
                     if (IntRegKeys.Contains(RegVal.Key)) {
                         string PrintKey = RegVal.Key;
+
+
                         Utility.DebugWrite("Key: ");
                         Console.WriteLine(PrintKey);
-                        Utility.DebugWrite("Values: ");
+                        Utility.DebugWrite("Actual Values: ");
                         // the first value in these looks like a 'type' code.
                         // looks like they work like this:
                         // 4 = Int, but where it's 1 or 0 they use it as a bool
@@ -55,8 +58,10 @@ namespace Grouper2
                         // 7 = Array
                         foreach (string value in RegVals[RegVal.Key])
                         {
-                            Console.WriteLine(value);
+                            Console.Write(value);
+                            Console.WriteLine("");
                         }
+                        
                     }
                 }
             }

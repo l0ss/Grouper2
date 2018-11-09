@@ -107,309 +107,560 @@
 
   "trustees": {
 
-    "Item": [
+    "item": [
       {
-        "SID": "S-1-1-0",
+        "SID": "S-1-5-2",
         "RID": null,
-        "friendlyName": "Everyone",
-        "displayName": "Everyone",
+        "friendlyName": null,
+        "displayName": "Network",
         "domainTrustee": null,
         "localTrustee": null,
-        "description": null,
-        "highPriv": null,
-        "lowPriv": true,
-        "isGroup": true
-      },
-      {
-        "SID": "S-1-0",
-        "RID": null,
-        "friendlyName": "Null Authority",
-        "displayName": "Null Authority",
-        "domainTrustee": null,
-        "localTrustee": null,
-        "description": null,
-        "highPriv": null,
-        "lowPriv": true,
-        "isGroup": true
-      },
-      {
-        "SID": "S-1-0-0",
-        "RID": null,
-        "friendlyName": "Nobody",
-        "displayName": "Nobody",
-        "domainTrustee": null,
-        "localTrustee": null,
-        "description": null,
-        "highPriv": null,
-        "lowPriv": true,
-        "isGroup": true
-      },
-      {
-        "SID": "S-1-1",
-        "RID": null,
-        "friendlyName": "World Authority",
-        "displayName": "World Authority",
-        "domainTrustee": null,
-        "localTrustee": null,
-        "description": null,
-        "highPriv": null,
-        "lowPriv": true,
-        "isGroup": true
-      },
-      {
-        "SID": "S-1-2",
-        "RID": null,
-        "friendlyName": "Local Authority",
-        "displayName": "Local Authority",
-        "domainTrustee": null,
-        "localTrustee": null,
-        "description": null,
+        "description": "A group that includes all users that have logged on through a network connection. Membership is controlled by the operating system.",
         "highPriv": null,
         "lowPriv": null,
-        "isGroup": true
+        "isGroup": null
       },
       {
-        "SID": "S-1-2-0",
+        "SID": "S-1-5-6",
         "RID": null,
-        "friendlyName": "Local",
-        "displayName": "Local",
+        "friendlyName": null,
+        "displayName": "Service",
         "domainTrustee": null,
         "localTrustee": null,
-        "description": null,
-        "highPriv": null,
-        "lowPriv": true,
-        "isGroup": true
-      },
-      {
-        "SID": "S-1-2-1",
-        "RID": null,
-        "friendlyName": "Console Logon",
-        "displayName": "Console Logon",
-        "domainTrustee": null,
-        "localTrustee": null,
-        "description": null,
+        "description": "A group that includes all security principals that have logged on as a service. Membership is controlled by the operating system.",
         "highPriv": null,
         "lowPriv": null,
-        "isGroup": true
+        "isGroup": null
       },
       {
-        "SID": null,
+        "SID": "S-1-5-9",
         "RID": null,
-        "friendlyName": "Authenticated Users",
+        "friendlyName": null,
+        "displayName": "Enterprise Domain Controllers",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A group that includes all domain controllers in a forest that uses an Active Directory directory service. Membership is controlled by the operating system.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-11",
+        "RID": null,
+        "friendlyName": null,
         "displayName": "Authenticated Users",
         "domainTrustee": null,
         "localTrustee": null,
-        "description": null,
-        "highPriv": null,
-        "lowPriv": true,
-        "isGroup": true
-      },
-      {
-        "SID": null,
-        "RID": null,
-        "friendlyName": "Local Administrators",
-        "displayName": "Administrators",
-        "domainTrustee": false,
-        "localTrustee": true,
-        "description": "The local built-in Administrators group",
-        "highPriv": true,
-        "lowPriv": null,
-        "isGroup": true
-      },
-      {
-        "SID": null,
-        "RID": null,
-        "friendlyName": "Local Backup Operators",
-        "displayName": "Backup Operators",
-        "DomainAccount": false,
-        "LocalAccount": true,
-        "description": null,
-        "highPriv": true,
-        "lowPriv": false,
-        "isGroup": true
-      },
-      {
-        "SID": null,
-        "RID": null,
-        "friendlyName": "Local Hyper-V Administrators",
-        "displayName": "Hyper-V Administrators",
-        "domainTrustee": false,
-        "localTrustee": true,
-        "description": null,
-        "highPriv": true,
-        "lowPriv": false,
-        "isGroup": true
-      },
-      {
-        "SID": null,
-        "RID": null,
-        "friendlyName": "Local Power Users",
-        "displayName": "Power Users",
-        "domainTrustee": false,
-        "localTrustee": true,
-        "description": null,
+        "description": "A group that includes all users whose identities were authenticated when they logged on. Membership is controlled by the operating system.",
         "highPriv": null,
         "lowPriv": null,
         "isGroup": null
       },
       {
-        "SID": null,
+        "SID": "S-1-5-18",
         "RID": null,
-        "friendlyName": "Local Print Operators",
-        "displayName": "Print Operators",
-        "domainTrustee": false,
-        "localTrustee": true,
-        "description": null,
-        "highPriv": null,
-        "lowPriv": null,
-        "isGroup": null
-      },
-      {
-        "SID": null,
-        "RID": null,
-        "friendlyName": "Local Remote Desktop Users",
-        "displayName": "Remote Desktop Users",
-        "domainTrustee": false,
-        "localTrustee": true,
-        "description": null,
-        "highPriv": null,
-        "lowPriv": null,
-        "isGroup": null
-      },
-      {
-        "SID": null,
-        "RID": null,
-        "friendlyName": "Local Remote Management Users",
-        "displayName": "Remote Management Users",
+        "friendlyName": null,
+        "displayName": "Local System",
         "domainTrustee": null,
         "localTrustee": null,
-        "description": null,
+        "description": "A service account that is used by the operating system.",
         "highPriv": null,
         "lowPriv": null,
         "isGroup": null
       },
       {
-        "SID": null,
+        "SID": "S-1-5-19",
         "RID": null,
-        "friendlyName": "Local Users",
-        "displayName": "Users",
-        "domainTrustee": false,
-        "localTrustee": true,
-        "description": null,
-        "highPriv": false,
-        "lowPriv": true,
-        "isGroup": true
+        "friendlyName": null,
+        "displayName": "NT Authority",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "Local Service",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
       },
       {
-        "SID": null,
+        "SID": "S-1-5-20",
         "RID": null,
-        "friendlyName": "The domain's built-in Administrators group",
-        "displayName": "Administrators",
-        "domainTrustee": true,
-        "localTrustee": false,
-        "description": null,
-        "highPriv": true,
-        "lowPriv": false,
-        "isGroup": true
+        "friendlyName": null,
+        "displayName": "NT Authority",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "Network Service",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
       },
       {
-        "SID": null,
+        "SID": "S-1-5-113",
         "RID": null,
-        "friendlyName": "Domain Admins",
+        "friendlyName": null,
+        "displayName": "LOCAL_ACCOUNT",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A local account",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-114",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "LOCAL ACCOUNT_AND_MEMBER_OF_ADMINISTRATORS_GROUP",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "Pretty much what it says on the tin.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21<DOMAIN>-500",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Administrator",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A user account for the system administrator. By default, it is the only user account that is given full control over the system.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21<DOMAIN>-501",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Guest",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A user account for people who do not have individual accounts. This user account does not require a password. By default, the Guest account is disabled.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21<DOMAIN>-502",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "KRBTGT",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A service account that is used by the Key Distribution Center (KDC) service.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21<DOMAIN>-512",
+        "RID": null,
+        "friendlyName": null,
         "displayName": "Domain Admins",
-        "domainTrustee": true,
-        "localTrustee": false,
-        "description": null,
-        "highPriv": true,
-        "lowPriv": false,
-        "isGroup": true
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A global group whose members are authorized to administer the domain. By default, the Domain Admins group is a member of the Administrators group on all computers that have joined a domain, including the domain controllers. Domain Admins is the default owner of any object that is created by any member of the group.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
       },
       {
-        "SID": null,
+        "SID": "S-1-5-21<DOMAIN>-513",
         "RID": null,
-        "friendlyName": "Enterprise Admins",
-        "displayName": "Enterprise Admins",
-        "domainTrustee": true,
-        "localTrustee": false,
-        "description": null,
-        "highPriv": true,
-        "lowPriv": false,
-        "isGroup": true
-      },
-      {
-        "SID": null,
-        "RID": null,
-        "friendlyName": "Schema Admins",
-        "displayName": "Schema Admins",
-        "domainTrustee": true,
-        "localTrustee": false,
-        "description": null,
-        "highPriv": true,
-        "lowPriv": false,
-        "isGroup": true
-      },
-      {
-        "SID": null,
-        "RID": null,
-        "friendlyName": "DNS Admins",
-        "displayName": "DNS Admins",
-        "domainTrustee": true,
-        "localTrustee": false,
-        "description": null,
-        "highPriv": true,
-        "lowPriv": false,
-        "isGroup": true
-      },
-      {
-        "SID": null,
-        "RID": null,
-        "friendlyName": "Domain Backup Operators",
-        "displayName": "Backup Operators",
-        "domainTrustee": true,
-        "localTrustee": false,
-        "description": null,
-        "highPriv": true,
-        "lowPriv": false,
-        "isGroup": true
-      },
-      {
-        "SID": null,
-        "RID": null,
-        "friendlyName": "Server Operators",
-        "displayName": "Server Operators",
-        "domainTrustee": true,
-        "localTrustee": false,
-        "description": null,
-        "highPriv": true,
-        "lowPriv": false,
-        "isGroup": true
-      },
-      {
-        "SID": null,
-        "RID": null,
-        "friendlyName": "Account Operators",
-        "displayName": "Account Operators",
-        "domainTrustee": true,
-        "localTrustee": false,
-        "description": null,
-        "highPriv": true,
-        "lowPriv": false,
-        "isGroup": true
-      },
-      {
-        "SID": null,
-        "RID": null,
-        "friendlyName": "Domain Users",
+        "friendlyName": null,
         "displayName": "Domain Users",
-        "domainTrustee": true,
-        "localTrustee": false,
-        "description": null,
-        "highPriv": false,
-        "lowPriv": true,
-        "isGroup": true
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A global group that, by default, includes all user accounts in a domain. When you create a user account in a domain, it is added to this group by default.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21<DOMAIN>-514",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Domain Guests",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A global group that, by default, has only one member, the domain’s built-in Guest account.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21<DOMAIN>-515",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Domain Computers",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A global group that includes all clients and servers that have joined the domain.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21<DOMAIN>-516",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Domain Controllers",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A global group that includes all domain controllers in the domain. New domain controllers are added to this group by default.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5- 21<DOMAIN>-498",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Enterprise Read-only Domain Controllers",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A Universal group. Members of this group are Read-Only Domain Controllers in the enterprise",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5- 21<DOMAIN>-521",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Read-only Domain Controllers",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A Global group. Members of this group are Read-Only Domain Controllers in the domain",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21<DOMAIN>-517",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Cert Publishers",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A global group that includes all computers that are running an enterprise certification authority. Cert Publishers are authorized to publish certificates for User objects in Active Directory.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21<ROOTDOMAIN>-518",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Schema Admins",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A universal group in a native-mode domain; a global group in a mixed-mode domain. The group is authorized to make schema changes in Active Directory. By default, the only member of the group is the Administrator account for the forest root domain.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21<ROOTDOMAIN>-519",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Enterprise Admins",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A universal group in a native-mode domain; a global group in a mixed-mode domain. The group is authorized to make forest-wide changes in Active Directory, such as adding child domains. By default, the only member of the group is the Administrator account for the forest root domain.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21<DOMAIN>-520",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Group Policy Creator Owners",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A global group that is authorized to create new Group Policy objects in Active Directory. By default, the only member of the group is Administrator.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-544",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Administrators",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A built-in group. After the initial installation of the operating system, the only member of the group is the Administrator account. When a computer joins a domain, the Domain Admins group is added to the Administrators group. When a server becomes a domain controller, the Enterprise Admins group also is added to the Administrators group.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-545",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Users",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A built-in group. After the initial installation of the operating system, the only member is the Authenticated Users group. When a computer joins a domain, the Domain Users group is added to the Users group on the computer.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-546",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Guests",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A built-in group. By default, the only member is the Guest account. The Guests group allows occasional or one-time users to log on with limited privileges to a computer’s built-in Guest account.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-548",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Account Operators",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A built-in group that exists only on domain controllers. By default, the group has no members. By default, Account Operators have permission to create, modify, and delete accounts for users, groups, and computers in all containers and organizational units of Active Directory except the Builtin container and the Domain Controllers OU. Account Operators do not have permission to modify the Administrators and Domain Admins groups, nor do they have permission to modify the accounts for members of those groups.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-549",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Server Operators",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A built-in group that exists only on domain controllers. By default, the group has no members. Server Operators can log on to a server interactively; create and delete network shares; start and stop services; back up and restore files; format the hard disk of the computer; and shut down the computer.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-550",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Print Operators",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A built-in group that exists only on domain controllers. By default, the only member is the Domain Users group. Print Operators can manage printers and document queues.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-551",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Backup Operators",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A built-in group. By default, the group has no members. Backup Operators can back up and restore all files on a computer, regardless of the permissions that protect those files. Backup Operators also can log on to the computer and shut it down.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-552",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Replicators",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A built-in group that is used by the File Replication service on domain controllers. By default, the group has no members. Do not add users to this group",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-557",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "BUILTIN\\Incoming Forest Trust Builders",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "An alias. Members of this group can create incoming, one-way trusts to this forest.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-569",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "BUILTIN\\Cryptographic Operators",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A Builtin Local group. Members are authorized to perform cryptographic operations.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21<DOMAIN>-571",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Allowed RODC Password Replication Group",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A Domain Local group. Members in this group can have their passwords replicated to all read-only domain controllers in the domain.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21<DOMAIN>-572",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Denied RODC Password Replication Group",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A Domain Local group. Members in this group cannot have their passwords replicated to any read-only domain controllers in the domain",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-573",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "BUILTIN\\Event Log Readers",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A Builtin Local group. Members of this group can read event logs from local machine.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-574",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "BUILTIN\\Certificate Service DCOM Access",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A Builtin Local group. Members of this group are allowed to connect to Certification Authorities in the enterprise.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21-<DOMAIN>–522",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Cloneable Domain Controllers",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A Global group. Members of this group that are domain controllers may be cloned.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-578",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "BUILTIN\\Hyper-V Administrators",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A Builtin Local group. Members of this group have complete and unrestricted access to all features of Hyper-V.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-579",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "BUILTIN\\Access Control Assistance Operators",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A Builtin Local group. Members of this group can remotely query authorization attributes and permissions for resources on this computer.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-580",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "BUILTIN\\Remote Management Users",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A Builtin Local group. Members of this group can access WMI resources over management protocols (such as WS-Management via the Windows Remote Management service). This applies only to WMI namespaces that grant access to the user.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-64-10",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "NTLM Authentication",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A SID that is used when the NTLM authentication package authenticated the client",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-64-14",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "SChannel Authentication",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A SID that is used when the SChannel authentication package authenticated the client.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-64-21",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Digest Authentication",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A SID that is used when the Digest authentication package authenticated the client.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-80",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "NT Service",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "An NT Service account prefix",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-80-0",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "NT SERVICES\\ALL SERVICES",
+        "FriendlyName": "All Services",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A group that includes all service processes that are configured on the system. Membership is controlled by the operating system."
       }
     ]
   },
+
 
   "regKeys": {
     "item": [
@@ -862,28 +1113,31 @@
       }
     ]
   },
-  "OtherSettings": [
-    {
-      "searchString": "EnableGuestAccount",
-      "intValue": "1"
-    },
-    {
-      "searchString": "EnableAdminAccount",
-      "intValue": "1"
-    },
-    {
-      "searchString": "LSAAnonymousNameLookup",
-      "intValue": "1"
-    },
-    {
-      "searchString": "NewAdministratorName",
-      "intValue": null
-    },
-    {
-      "searchString": "NewGuestName",
-      "intValue": null
-    }
-  ],
+
+  "OtherSettings": {
+    "item": [
+      {
+        "searchString": "EnableGuestAccount",
+        "intValue": "1"
+      },
+      {
+        "searchString": "EnableAdminAccount",
+        "intValue": "1"
+      },
+      {
+        "searchString": "LSAAnonymousNameLookup",
+        "intValue": "1"
+      },
+      {
+        "searchString": "NewAdministratorName",
+        "intValue": null
+      },
+      {
+        "searchString": "NewGuestName",
+        "intValue": null
+      }
+    ]
+  },
   "InterestingWords": [
     "vnc",
     "vpn",
