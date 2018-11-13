@@ -2,7 +2,7 @@
   "privRights": {
     "item": [
       {
-        "searchString": "SeTrustedCredManAccessPrivilege",
+        "privRight": "SeTrustedCredManAccessPrivilege",
         "msDesc": null,
         "humanDesc": null,
         "goodValue": null,
@@ -11,7 +11,7 @@
         "remotelyExploitable": null
       },
       {
-        "searchString": "SeTcbPrivilege",
+        "privRight": "SeTcbPrivilege",
         "msDesc": null,
         "humanDesc": null,
         "goodValue": null,
@@ -20,7 +20,7 @@
         "remotelyExploitable": null
       },
       {
-        "searchString": "SeMachineAccountPrivilege",
+        "privRight": "SeMachineAccountPrivilege",
         "msDesc": null,
         "humanDesc": null,
         "goodValue": null,
@@ -29,7 +29,7 @@
         "remotelyExploitable": null
       },
       {
-        "searchString": "SeBackupPrivilege",
+        "privRight": "SeBackupPrivilege",
         "msDesc": null,
         "humanDesc": null,
         "goodValue": null,
@@ -38,7 +38,7 @@
         "remotelyExploitable": null
       },
       {
-        "searchString": "SeCreateTokenPrivilege",
+        "privRight": "SeCreateTokenPrivilege",
         "msDesc": null,
         "humanDesc": null,
         "goodValue": null,
@@ -47,7 +47,7 @@
         "remotelyExploitable": null
       },
       {
-        "searchString": "SeAssignPrimaryTokenPrivilege",
+        "privRight": "SeAssignPrimaryTokenPrivilege",
         "msDesc": null,
         "humanDesc": null,
         "goodValue": null,
@@ -56,7 +56,7 @@
         "remotelyExploitable": null
       },
       {
-        "searchString": "SeRestorePrivilege",
+        "privRight": "SeRestorePrivilege",
         "msDesc": null,
         "humanDesc": null,
         "goodValue": null,
@@ -65,7 +65,7 @@
         "remotelyExploitable": null
       },
       {
-        "searchString": "SeDebugPrivilege",
+        "privRight": "SeDebugPrivilege",
         "msDesc": null,
         "humanDesc": null,
         "goodValue": null,
@@ -74,7 +74,7 @@
         "remotelyExploitable": null
       },
       {
-        "searchString": "SeTakeOwnershipPrivilege",
+        "privRight": "SeTakeOwnershipPrivilege",
         "msDesc": null,
         "humanDesc": null,
         "goodValue": null,
@@ -83,7 +83,7 @@
         "remotelyExploitable": null
       },
       {
-        "searchString": "SeLoadDriverPrivilege",
+        "privRight": "SeLoadDriverPrivilege",
         "msDesc": null,
         "humanDesc": null,
         "goodValue": null,
@@ -92,7 +92,7 @@
         "remotelyExploitable": null
       },
       {
-        "searchString": "SeRemoteInteractiveLogonRight",
+        "privRight": "SeRemoteInteractiveLogonRight",
         "msDesc": null,
         "humanDesc": null,
         "goodValue": null,
@@ -103,10 +103,7 @@
     ]
   },
 
-
-
   "trustees": {
-
     "item": [
       {
         "SID": "S-1-5-2",
@@ -313,7 +310,7 @@
         "isGroup": null
       },
       {
-        "SID": "S-1-5- 21<DOMAIN>-498",
+        "SID": "S-1-5-21<DOMAIN>-498",
         "RID": null,
         "friendlyName": null,
         "displayName": "Enterprise Read-only Domain Controllers",
@@ -325,7 +322,7 @@
         "isGroup": null
       },
       {
-        "SID": "S-1-5- 21<DOMAIN>-521",
+        "SID": "S-1-5-21<DOMAIN>-521",
         "RID": null,
         "friendlyName": null,
         "displayName": "Read-only Domain Controllers",
@@ -660,7 +657,6 @@
       }
     ]
   },
-
 
   "regKeys": {
     "item": [
@@ -1114,7 +1110,7 @@
     ]
   },
 
-  "OtherSettings": {
+  "Other Settings": {
     "item": [
       {
         "searchString": "EnableGuestAccount",
@@ -1138,6 +1134,7 @@
       }
     ]
   },
+
   "InterestingWords": [
     "vnc",
     "vpn",

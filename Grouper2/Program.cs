@@ -17,8 +17,8 @@ namespace Grouper2
             {
                 { "First", "{31B2F340-016D-11D2-945F-00C04FB984F9}" },
                 { "Second", "{36FA6290-EFEE-4909-845A-4A33A04D3088}" },
-                { "Third", "{6AC1786C-016F-11D2-945F-00C04fB984F9}" }
-                //{ "Fourth", "{F1EB7588-E641-4676-B2A5-C706B671368A}" }
+                { "Third", "{6AC1786C-016F-11D2-945F-00C04fB984F9}" },
+                { "Fourth", "{F1EB7588-E641-4676-B2A5-C706B671368A}" }
             };
                                   
             foreach (KeyValuePair<string, string> policy in policies)
