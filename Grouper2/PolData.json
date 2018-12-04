@@ -92,6 +92,51 @@
         "remotelyExploitable": null
       },
       {
+        "privRight": "SeImpersonatePrivilege",
+        "msDesc": null,
+        "humanDesc": null,
+        "goodValue": null,
+        "badValue": null,
+        "interestLevel": null,
+        "remotelyExploitable": null
+      },
+      {
+        "privRight": "SeSecurityPrivilege",
+        "msDesc": null,
+        "humanDesc": null,
+        "goodValue": null,
+        "badValue": null,
+        "interestLevel": null,
+        "remotelyExploitable": null
+      },
+      {
+        "privRight": "SeNetworkLogonRight",
+        "msDesc": null,
+        "humanDesc": null,
+        "goodValue": null,
+        "badValue": null,
+        "interestLevel": null,
+        "remotelyExploitable": null
+      },
+      {
+        "privRight": "SeDenyNetworkLogonRight",
+        "msDesc": null,
+        "humanDesc": null,
+        "goodValue": null,
+        "badValue": null,
+        "interestLevel": null,
+        "remotelyExploitable": null
+      },
+      {
+        "privRight": "SeDelegateSessionUserImpersonatePrivilege",
+        "msDesc": null,
+        "humanDesc": null,
+        "goodValue": null,
+        "badValue": null,
+        "interestLevel": null,
+        "remotelyExploitable": null
+      },
+      {
         "privRight": "SeRemoteInteractiveLogonRight",
         "msDesc": null,
         "humanDesc": null,
@@ -105,6 +150,7 @@
 
   "trustees": {
     "item": [
+
       {
         "SID": "S-1-5-2",
         "RID": null,
@@ -169,7 +215,7 @@
         "SID": "S-1-5-19",
         "RID": null,
         "friendlyName": null,
-        "displayName": "NT Authority",
+        "displayName": "NT Authority Local Service",
         "domainTrustee": null,
         "localTrustee": null,
         "description": "Local Service",
@@ -181,7 +227,7 @@
         "SID": "S-1-5-20",
         "RID": null,
         "friendlyName": null,
-        "displayName": "NT Authority",
+        "displayName": "NT Authorit Network Service",
         "domainTrustee": null,
         "localTrustee": null,
         "description": "Network Service",
@@ -1110,6 +1156,97 @@
     ]
   },
 
+  "EnvironmentVariables": {
+    "item": [
+      {
+        "searchString": "Thing1",
+        "intValue": "1"
+      },
+      {
+        "searchString": "Thing2",
+        "intValue": "2"
+      }
+    ]
+  },
+
+  "NTServices": {
+    "item": [
+      {
+        "searchString": "Thing1",
+        "intValue": "1"
+      },
+      {
+        "searchString": "Thing2",
+        "intValue": "2"
+      }
+    ]
+  },
+
+  "Folders": {
+    "item": [
+      {
+        "searchString": "Thing1",
+        "intValue": "1"
+      },
+      {
+        "searchString": "Thing2",
+        "intValue": "2"
+      }
+    ]
+  },
+
+  "Files": {
+    "item": [
+      {
+        "searchString": "Thing1",
+        "intValue": "1"
+      },
+      {
+        "searchString": "Thing2",
+        "intValue": "2"
+      }
+    ]
+  },
+
+  "ScheduledTasks": {
+    "item": [
+      {
+        "searchString": "Thing1",
+        "intValue": "1"
+      },
+      {
+        "searchString": "Thing2",
+        "intValue": "2"
+      }
+    ]
+  },
+
+  "NetworkOptions": {
+    "item": [
+      {
+        "searchString": "Thing1",
+        "intValue": "1"
+      },
+      {
+        "searchString": "Thing2",
+        "intValue": "2"
+      }
+    ]
+  },
+
+  "Groups": {
+    "item": [
+      {
+        "searchString": "Thing1",
+        "intValue": "1"
+      },
+      {
+        "searchString": "Thing2",
+        "intValue": "2"
+      }
+    ]
+  },
+
   "Other Settings": {
     "item": [
       {
@@ -1133,6 +1270,51 @@
         "intValue": null
       }
     ]
+  },
+
+  "Output Skeleton": {
+    "GPO Name": "blank",
+    "GPO UID": "blank",
+    "GPO File Path": "blank",
+    "GPO Enabled Status": false,
+    "GPO linked in": [
+      "blank"
+    ],
+    "GPO ACLs": {
+      "GPO Owner Name": "blank",
+      "GPO Owner SID": "blank",
+      "GPO Permissions": [
+        {
+          "Trustee Name": "blank",
+          "Trustee SID": "blank",
+          "Trustee Access": "blank"
+        }
+      ]
+    },
+    "Findings": [
+      {
+        "Finding Type": "blank",
+        "Finding Rating": "blank",
+        "Finding Details": {
+          "Finding Title": "blank",
+          "Finding Description": "blank",
+          "Finding Details": []
+        }
+      }
+    ],
+    "infdata": {
+      "sectionHeading": "funtimes",
+      "sectionContent": [
+        {
+          "LineKey": "thing",
+          "LineValues": [
+            "thing",
+            "thing2",
+            "thing3"
+          ]
+        }
+      ]
+    }
   },
 
   "InterestingWords": [
