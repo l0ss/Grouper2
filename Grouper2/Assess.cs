@@ -1,4 +1,14 @@
-﻿using System;
+﻿/***
+ *      .,-:::::/  :::::::..       ...      ...    :::::::::::::. .,::::::  :::::::..     .:::.  
+ *    ,;;-'````'   ;;;;``;;;;   .;;;;;;;.   ;;     ;;; `;;;```.;;;;;;;''''  ;;;;``;;;;   ,;'``;. 
+ *    [[[   [[[[[[/ [[[,/[[['  ,[[     \[[,[['     [[[  `]]nnn]]'  [[cccc    [[[,/[[['   ''  ,[['
+ *    "$$c.    "$$  $$$$$$c    $$$,     $$$$$      $$$   $$$""     $$""""    $$$$$$c     .c$$P'  
+ *     `Y8bo,,,o88o 888b "88bo,"888,_ _,88P88    .d888   888o      888oo,__  888b "88bo,d88 _,oo,
+ *       `'YMUP"YMM MMMM   "W"   "YMMMMMP"  "YmmMMMM""   YMMMb     """"YUMMM MMMM   "W" MMMUP*"^^
+ *                                                                                               
+ *                        By Mike Loss (@mikeloss)                                                
+ */
+using System;
 using System.Linq;
 using System.IO;
 using Newtonsoft.Json.Linq;
@@ -8,7 +18,6 @@ namespace Grouper2
 {
     class Assess
     {
-
         // Assesses the contents of a GPTmpl
         public static JObject AssessGPTmpl(JObject InfToAssess)
         {
@@ -269,10 +278,6 @@ namespace Grouper2
                     JObject AssessedIniFiles = AssessGPPIniFiles((JObject)GPPToAssess["IniFiles"]);
                     AssessedGPPDict.Add("IniFiles", AssessedIniFiles);
                 }
-                if (GPPCategory == "EnvironmentVariables")
-                {
-                    Console.WriteLine("Nobody cares about environment variables.");
-                }
             }
             JObject AssessedGPPJson = (JObject)JToken.FromObject(AssessedGPPDict);
             return AssessedGPPJson;
@@ -288,14 +293,9 @@ namespace Grouper2
         }
         public static JObject AssessGPPGroups(JObject GPPGroups)
         {
-            JObject AssessedGPPGroups = (JObject)GPPGroups["User"];
-            JObject AssessedGPPUsers = (JObject)GPPGroups["Group"];
-            Dictionary<string, JObject> AssessedGPPGroupsAll = new Dictionary<string, JObject>
-            {
-                { "Group", AssessedGPPGroups },
-                { "User", AssessedGPPUsers }
-            };
-            JObject AssessedGPPGroupsAllJson = (JObject)JToken.FromObject(AssessedGPPGroupsAll);
+            JProperty AssessedGPPGroups = new JProperty("User", GPPGroups["User"]);
+            JProperty AssessedGPPUsers = new JProperty("Group", GPPGroups["Group"]);
+            JObject AssessedGPPGroupsAllJson = new JObject(AssessedGPPGroups, AssessedGPPUsers);
             return AssessedGPPGroupsAllJson;
             //Utility.DebugWrite("GPP is about Groups");
             //Console.WriteLine(GPPGroups["User"]);
@@ -303,63 +303,65 @@ namespace Grouper2
         }
         public static JObject AssessGPPNetworkOptions(JObject GPPNetworkOptions)
         {
-            JObject AssessedGPPNetworkOptions = (JObject)GPPNetworkOptions["DUN"];
+            JProperty GPPNetworkOptionsProp = new JProperty("DUN", GPPNetworkOptions["DUN"]);
+            JObject AssessedGPPNetworkOptions = new JObject(GPPNetworkOptionsProp);
             return AssessedGPPNetworkOptions;
             //Utility.DebugWrite("GPP is about Network Options");
             //Console.WriteLine(GPPNetworkOptions["DUN"]);
         }
         public static JObject AssessGPPFiles(JObject GPPFiles)
         {
-            JObject AssessedGPPFiles = (JObject)GPPFiles["File"];
+            JProperty GPPFileProp = new JProperty("File", GPPFiles["File"]);
+            JObject AssessedGPPFiles = new JObject(GPPFileProp);
             return AssessedGPPFiles;
             //Utility.DebugWrite("GPP is about Files");
             //Console.WriteLine(GPPFiles["File"]);
         }
         public static JObject AssessGPPShortcuts(JObject GPPShortcuts)
         {
-            JObject AssessedGPPShortcuts = (JObject)GPPShortcuts["Shortcut"];
+            JProperty GPPShortcutProp = new JProperty("Shortcut", GPPShortcuts["Shortcut"]);
+            JObject AssessedGPPShortcuts = new JObject(GPPShortcutProp);
             return AssessedGPPShortcuts;
             //Utility.DebugWrite("GPP is about GPPShortcuts");
             //Console.WriteLine(GPPShortcuts["Shortcut"]);
         }
         public static JObject AssessGPPRegSettings(JObject GPPRegSettings)
         {
-            JObject AssessedGPPRegSettings = (JObject)GPPRegSettings["Registry"];
+            JProperty GPPRegSettingsProp = new JProperty("RegSettings", GPPRegSettings["Registry"]);
+            JObject AssessedGPPRegSettings = new JObject(GPPRegSettingsProp);
             return AssessedGPPRegSettings;
             //Utility.DebugWrite("GPP is about RegistrySettings");
             //Console.WriteLine(GPPRegSettings["Registry"]);
         }
         public static JObject AssessGPPNTServices(JObject GPPNTServices)
         {
-            JObject AssessedGPPNTServices = (JObject)GPPNTServices["NTService"];
+            JProperty NTServiceProp = new JProperty("NTService", GPPNTServices["NTService"]);
+            JObject AssessedGPPNTServices = new JObject(NTServiceProp);
             return AssessedGPPNTServices;
             //Utility.DebugWrite("GPP is about NTServices");
             //Console.WriteLine(GPPNTServices["NTService"]);
         }
         public static JObject AssessGPPFolders(JObject GPPFolders)
         {
-            JObject AssessedGPPFolders = (JObject)GPPFolders["Folder"];
+            JProperty GPPFoldersProp = new JProperty("Folder", GPPFolders["Folder"]);
+            JObject AssessedGPPFolders = new JObject(GPPFoldersProp);
             return AssessedGPPFolders;
             //Utility.DebugWrite("GPP is about Folders");
             //Console.WriteLine(GPPFolders["Folder"]);
         }
         public static JObject AssessGPPNetShares(JObject GPPNetShares)
         {
-            JObject AssessedGPPNetShares = (JObject)GPPNetShares["NetShare"];
+            JProperty GPPNetSharesProp = new JProperty("NetShare", GPPNetShares["NetShare"]);
+            JObject AssessedGPPNetShares = new JObject(GPPNetSharesProp);
             return AssessedGPPNetShares;
             //Utility.DebugWrite("GPP is about Network Shares");
             //Console.WriteLine(GPPNetShares["NetShare"]);
         }
         public static JObject AssessGPPSchedTasks(JObject GPPSchedTasks)
         {
-            JObject AssessedGPPSchedTasksTask = (JObject)GPPSchedTasks["Task"];
-            JObject AssessedGPPSchedTasksImmediateTask = (JObject)GPPSchedTasks["ImmediateTaskV2"];
-            Dictionary<string, JObject> AssessedGPPSchedTasksAll = new Dictionary<string, JObject>
-            {
-                { "Task", AssessedGPPSchedTasksTask },
-                { "ImmediateTaskV2", AssessedGPPSchedTasksImmediateTask }
-            };
-            JObject AssessedGPPSchedTasksAllJson = (JObject)JToken.FromObject(AssessedGPPSchedTasksAll);
+            JProperty AssessedGPPSchedTasksTaskProp = new JProperty("Task", GPPSchedTasks["Task"]);
+            JProperty AssessedGPPSchedTasksImmediateTaskProp = new JProperty("ImmediateTaskV2", GPPSchedTasks["ImmediateTaskV2"]);
+            JObject AssessedGPPSchedTasksAllJson = new JObject(AssessedGPPSchedTasksTaskProp, AssessedGPPSchedTasksImmediateTaskProp);
             return AssessedGPPSchedTasksAllJson;
             //Utility.DebugWrite("GPP is about SchedTasks");
             //Console.WriteLine(GPPSchedTasks["Task"]);

@@ -1272,51 +1272,6 @@
     ]
   },
 
-  "Output Skeleton": {
-    "GPO Name": "blank",
-    "GPO UID": "blank",
-    "GPO File Path": "blank",
-    "GPO Enabled Status": false,
-    "GPO linked in": [
-      "blank"
-    ],
-    "GPO ACLs": {
-      "GPO Owner Name": "blank",
-      "GPO Owner SID": "blank",
-      "GPO Permissions": [
-        {
-          "Trustee Name": "blank",
-          "Trustee SID": "blank",
-          "Trustee Access": "blank"
-        }
-      ]
-    },
-    "Findings": [
-      {
-        "Finding Type": "blank",
-        "Finding Rating": "blank",
-        "Finding Details": {
-          "Finding Title": "blank",
-          "Finding Description": "blank",
-          "Finding Details": []
-        }
-      }
-    ],
-    "infdata": {
-      "sectionHeading": "funtimes",
-      "sectionContent": [
-        {
-          "LineKey": "thing",
-          "LineValues": [
-            "thing",
-            "thing2",
-            "thing3"
-          ]
-        }
-      ]
-    }
-  },
-
   "InterestingWords": [
     "vnc",
     "vpn",

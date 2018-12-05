@@ -30,6 +30,7 @@ namespace Grouper2
     {
         static void Main(string[] args)
         {
+            Utility.PrintBanner();
             JObject JSonData = JankyDB.Instance;
             JObject JSonData2 = JankyDB.Instance;
 
