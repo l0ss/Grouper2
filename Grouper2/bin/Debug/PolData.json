@@ -227,7 +227,7 @@
         "SID": "S-1-5-20",
         "RID": null,
         "friendlyName": null,
-        "displayName": "NT Authorit Network Service",
+        "displayName": "NT Authority Network Service",
         "domainTrustee": null,
         "localTrustee": null,
         "description": "Network Service",

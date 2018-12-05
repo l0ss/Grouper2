@@ -8,62 +8,84 @@ namespace Grouper2
 {
     class Assess
     {
-        static readonly string JsonDataFile = File.ReadAllText("PolData.Json");
-        static readonly JObject JsonData = JObject.Parse(JsonDataFile);
-        
+
         // Assesses the contents of a GPTmpl
-        public static void AssessGPTmpl(JObject InfToAssess)
+        public static JObject AssessGPTmpl(JObject InfToAssess)
         {
-            //Utility.DebugWrite("Entered AssessGPTmpl");
-            JToken InfResult = JsonData["Output Skeleton"]["Findings"];
-            Utility.DebugWrite("Here's what InfResult looks like");
-            Console.WriteLine(InfResult);
+            // create a dict to put all our results into
+            Dictionary<string, JObject> AssessedGPTmpl = new Dictionary<string, JObject>();
+
             // an array for GPTmpl headings to ignore.
             List<string> KnownKeys = new List<string>
             {
-                "[Unicode]",
-                "[Version]"
+                "Unicode",
+                "Version"
             };
 
             // go through each category we care about and look for goodies.
+            ///////////////////////////////////////////////////////////////
+            // Privilege Rights
+            ///////////////////////////////////////////////////////////////
             JToken PrivRights = InfToAssess["Privilege Rights"];
             try
             {
                 bool PRHasValues = PrivRights.HasValues;
-                Utility.DebugWrite("Found Some Priv Rights");
-                //Console.WriteLine(PrivRights);
-                AssessPrivRights(PrivRights);
+                if (PRHasValues)
+                {
+                    //
+                    JObject PrivRightsResults = AssessPrivRights(PrivRights);
+                    if (PrivRightsResults.Count > 0)
+                    {
+                        AssessedGPTmpl.Add("PrivRights", PrivRightsResults);
+                    }
+                    KnownKeys.Add("Privilege Rights");
+                }
             }
             catch
             {
-                Utility.DebugWrite("No Priv Rights Here");
+                Utility.DebugWrite("No Priv Rights Here - something's broke.");
             }
-
+            ///////////////////////////////////////////////////////////////
+            // Registry Values
+            ///////////////////////////////////////////////////////////////
             JToken RegValues = InfToAssess["Registry Values"];
             try
             {
                 bool PRHasValues = RegValues.HasValues;
-                Utility.DebugWrite("Found Some Registry Values");
-                //Console.WriteLine(RegValues);
-                AssessRegValues(RegValues);
+                if (PRHasValues)
+                {
+                    //Utility.DebugWrite("Found Some Registry Values");
+                    //Console.WriteLine(RegValues);
+                    JObject MatchedRegValues = AssessRegValues(RegValues);
+                    if (MatchedRegValues.Count > 0)
+                    {
+                        //Utility.DebugWrite("Here's what we got back from assessing reg values");
+                        //Console.WriteLine(MatchedRegValues.ToString());
+                        AssessedGPTmpl.Add("RegValues", MatchedRegValues);
+                    }
+                    KnownKeys.Add("Registry Values");
+                }
             }
             catch
             {
-                Utility.DebugWrite("No Reg Values Here");
+                Utility.DebugWrite("No Reg Values Here - something's broke.");
             }
 
-            //Then do:
-            //Registry Values
+            //TODO:
             //System Access
             //Registry Keys
             //Group Membership
             //Service General Setting
-            //catch any stuff that falls through the cracks
 
-            /*
-            string[] KeysInInf = (InfToAssess.Keys.ToArray());
-            var SlippedThrough = KeysInInf.Except(KnownKeys);
+            //catch any stuff that falls through the cracks, i.e. look for headings on sections that we aren't parsing.
 
+            List<string> HeadingsInInf =  new List<string>();
+            foreach (JProperty Section in InfToAssess.Children<JProperty>())
+            {
+                string SectionName = Section.Name;
+                HeadingsInInf.Add(SectionName);
+            }
+            var SlippedThrough = HeadingsInInf.Except(KnownKeys);
             if (SlippedThrough.Count() > 0)
             {
                 Utility.DebugWrite("We didn't parse any of these sections:");
@@ -80,14 +102,20 @@ namespace Grouper2
                     //  Service General Setting +
                 }
             }
-            //return InfResult;
-            */
+            
+            //mangle our json thing into a jobject and return it
+            JObject AssessedGPTmplJson = (JObject)JToken.FromObject(AssessedGPTmpl);
+            return AssessedGPTmplJson;
         }
 
-        public static void AssessPrivRights(JToken PrivRights)
+        public static JObject AssessPrivRights(JToken PrivRights)
         {
+            JObject JsonData = JankyDB.Instance;
             JArray IntPrivRights = (JArray)JsonData["privRights"]["item"];
             JArray WellKnownSIDS = (JArray)JsonData["trustees"]["item"];
+
+            // create an object to put the results in
+            Dictionary<string, Dictionary<string, string>> MatchedPrivRights = new Dictionary<string, Dictionary<string, string>>();
 
             foreach (JProperty PrivRight in PrivRights.Children<JProperty>())
             {
@@ -96,38 +124,34 @@ namespace Grouper2
                     // if the priv is interesting
                     if ((string)IntPrivRight["privRight"] == PrivRight.Name)
                     {
-                        // tell us it's interesting
-                        Console.WriteLine("Interesting privilege " + PrivRight.Name + " is granted to:");
+                        //create a dict to put the trustees into
+                        Dictionary<string, string> TrusteesDict = new Dictionary<string, string>();
                         //then for each trustee it's granted to
                         foreach (string trustee in PrivRight.Value)
                         {
                             // clean up the trustee SID
                             string TrusteeClean = trustee.Trim('*');
-
                             bool SIDmatches = false;
                             string WKSIDDisplay = "";
                             // iterate over the list of well known sids to see if any match.
                             foreach (JToken WellKnownSID in WellKnownSIDS)
                             {
                                 string SIDToMatch = (string)WellKnownSID["SID"];
-                                // a bunch of well known sids all include the domain-unique sid, so we gotta compensate for those.
+                                // a bunch of well known sids all include the domain-unique sid, so we gotta check for matches amongst those.
                                 if ((SIDToMatch.Contains("DOMAIN")) && (TrusteeClean.Length >= 14))
                                 {
                                     string[] TrusteeSplit = trustee.Split("-".ToCharArray());
                                     string[] WKSIDSplit = SIDToMatch.Split("-".ToCharArray());
-
                                     if (TrusteeSplit[TrusteeSplit.Length - 1] == WKSIDSplit[WKSIDSplit.Length - 1])
                                     {
                                         SIDmatches = true;
                                     }
-
                                 }
                                 // check if we have a direct match
                                 if ((string)WellKnownSID["SID"] == TrusteeClean)
                                 {
                                     SIDmatches = true;
                                 }
-
                                 if (SIDmatches == true)
                                 {
                                     WKSIDDisplay = (string)WellKnownSID["displayName"];
@@ -137,29 +161,37 @@ namespace Grouper2
                             // display some info if they match.
                             if (SIDmatches == true)
                             {
-                                Console.WriteLine("Display Name : " + WKSIDDisplay);
-                                Console.WriteLine("SID Matched : " + TrusteeClean);
-                                Console.WriteLine("");
-
+                                //Utility.Debug("SID Matches");
                             }
-                            // if they don't match, show the sid anyway. TODO: check these against the domain.
+                            // if they don't match, handle that.
                             else
                             {
-                                Console.Write("Unrecognised SID : ");
-                                Console.WriteLine(TrusteeClean);
-                                Console.WriteLine("");
-
+                                WKSIDDisplay = "unknown";
+                                //TODO: look up unknown SIDS in the domain if we can.
+                                //Utility.DebugWrite("Unrecognised SID : " + TrusteeClean);
+                                //Console.WriteLine("");
                             }
+                            TrusteesDict.Add(TrusteeClean, WKSIDDisplay);
                         }
+                        // add the results to our dictionary of trustees
+                        string MatchedPrivRightName = PrivRight.Name;
+                        MatchedPrivRights.Add(MatchedPrivRightName, TrusteesDict);
                     }
                 }
             }
+            // cast our dict to a jobject and return it.
+            JObject MatchedPrivRightsJson = (JObject)JToken.FromObject(MatchedPrivRights);
+            return MatchedPrivRightsJson;
         }
 
-        public static void AssessRegValues(JToken RegValues)
+        public static JObject AssessRegValues(JToken RegValues)
         {
+            JObject JsonData = JankyDB.Instance;
+            // get our data about what regkeys are interesting
             JArray IntRegKeys = (JArray)JsonData["regKeys"]["item"];
-            JArray MatchedRegKeys = new JArray();
+            // set up a dictionary for our results to go into
+            Dictionary<string, string[]> MatchedRegValues = new Dictionary<string, string[]>();
+
             foreach (JProperty RegValue in RegValues.Children<JProperty>())
             {
                 // iterate over the list of interesting keys in our json "db".
@@ -168,145 +200,170 @@ namespace Grouper2
                     // if it matches
                     if ((string)IntRegKey["regKey"] == RegValue.Name)
                     {
-                        // add our match to the JArray we created
-                        MatchedRegKeys.Add(IntRegKey);
-                        // print the shit out
-                        Console.WriteLine("Check out this reg key:");
-                        Console.WriteLine(RegValue.Name);
-                        Console.WriteLine("");
-                        Console.WriteLine("With these values:");
+                        string MatchedRegKey = RegValue.Name;
+                        //create a list to put the values in
+                        List<string> RegKeyValueList = new List<string>();
                         foreach (string thing in RegValue.Value)
                         {
-                            Console.WriteLine(thing);
+                            // put the values in the list
+                            RegKeyValueList.Add(thing);
                         }
-                        Console.WriteLine("");
+                        //Console.WriteLine("");
+                        string[] RegKeyValueArray = RegKeyValueList.ToArray();
+                        MatchedRegValues.Add(MatchedRegKey, RegKeyValueArray);
                     }
-                }
-
-                if (IntRegKeys.Contains(RegValue.Name))
-                {
-                    string PrintName = RegValue.Name;
-
-                    Utility.DebugWrite("Name: ");
-                    Console.WriteLine(PrintName);
-                    Utility.DebugWrite("Values: ");
-                    // the first value in these looks like a 'type' code.
-                    // looks like they work like this:
-                    // 4 = Int, but where it's 1 or 0 they use it as a bool
-                    // 1 = String in double quotes, some of which are numbers
-                    // 7 = Array
-                    foreach (string value in RegValues[RegValue.Name])
-                    {
-                        Console.Write(value);
-                        Console.WriteLine("");
-                    }
-
                 }
             }
+            // cast our output into a jobject and return it
+            JObject MatchedRegValuesJson = (JObject)JToken.FromObject(MatchedRegValues);
+            return MatchedRegValuesJson;
         }
 
-        public static void AssessGPPXml(JObject GPPToAssess)
+        public static JObject AssessGPPJson(JObject GPPToAssess)
         {
+            // get an array of categories in our GPP to assess to look at
             string[] GPPCategories = GPPToAssess.Properties().Select(p => p.Name).ToArray();
+            // create a dict to put our results into before returning them
+            Dictionary<string, JObject> AssessedGPPDict = new Dictionary<string, JObject>();
+            // iterate over the array sending appropriate gpp data to the appropriate assess() function.
             foreach (string GPPCategory in GPPCategories)
             {
                 if (GPPCategory == "Groups")
                 {
-                    AssessGPPGroups(GPPToAssess["Groups"]);
+                    AssessGPPGroups((JObject)GPPToAssess["Groups"]);
                 }
                 if (GPPCategory == "NetworkOptions")
                 {
-                   AssessGPPNetworkOptions(GPPToAssess["NetworkOptions"]);
+                   AssessGPPNetworkOptions((JObject)GPPToAssess["NetworkOptions"]);
                 }
                 if (GPPCategory == "Files")
                 {
-                    AssessGPPFiles(GPPToAssess["Files"]);
+                    AssessGPPFiles((JObject)GPPToAssess["Files"]);
                 }
                 if (GPPCategory == "RegistrySettings")
                 {
-                    AssessGPPRegSettings(GPPToAssess["RegistrySettings"]);
+                    AssessGPPRegSettings((JObject)GPPToAssess["RegistrySettings"]);
                 }
                 if (GPPCategory == "Shortcuts")
                 {
-                    AssessGPPShortcuts(GPPToAssess["Shortcuts"]);
+                    AssessGPPShortcuts((JObject)GPPToAssess["Shortcuts"]);
                 }
                 if (GPPCategory == "ScheduledTasks")
                 {
-                    AssessGPPSchedTasks(GPPToAssess["ScheduledTasks"]);
+                    AssessGPPSchedTasks((JObject)GPPToAssess["ScheduledTasks"]);
                 }
                 if (GPPCategory == "NetworkShareSettings")
                 {
-                    AssessGPPNetShares(GPPToAssess["NetworkShareSettings"]);
+                    AssessGPPNetShares((JObject)GPPToAssess["NetworkShareSettings"]);
                 }
                 if (GPPCategory == "Folders")
                 {
-                    AssessGPPFolders(GPPToAssess["Folders"]);
+                    AssessGPPFolders((JObject)GPPToAssess["Folders"]);
                 }
                 if (GPPCategory == "NTServices")
                 {
-                    AssessGPPNTServices(GPPToAssess["NTServices"]);
+                    AssessGPPNTServices((JObject)GPPToAssess["NTServices"]);
                 }
                 if (GPPCategory == "IniFiles")
                 {
-                    AssessGPPIniFiles(GPPToAssess["IniFiles"]);
+                    JObject AssessedIniFiles = AssessGPPIniFiles((JObject)GPPToAssess["IniFiles"]);
+                    AssessedGPPDict.Add("IniFiles", AssessedIniFiles);
                 }
                 if (GPPCategory == "EnvironmentVariables")
                 {
                     Console.WriteLine("Nobody cares about environment variables.");
                 }
             }
+            JObject AssessedGPPJson = (JObject)JToken.FromObject(AssessedGPPDict);
+            return AssessedGPPJson;
         }
-        public static void AssessGPPIniFiles(JToken GPPIniFiles)
+        
+        // none of these assess functions do anything but return the values from the GPP yet.
+        public static JObject AssessGPPIniFiles(JObject GPPIniFiles)
         {
-            Utility.DebugWrite("GPP is about GPPIniFiles");
-            Console.WriteLine(GPPIniFiles["Ini"]);
+            //Utility.DebugWrite("GPP is about GPPIniFiles");
+            JObject AssessedGPPIniFiles = (JObject)GPPIniFiles["Ini"];
+            //Console.WriteLine(AssessedGPPIniFiles.ToString());
+            return AssessedGPPIniFiles;
         }
-        public static void AssessGPPGroups(JToken GPPGroups)
+        public static JObject AssessGPPGroups(JObject GPPGroups)
         {
-            Utility.DebugWrite("GPP is about Groups");
-            Console.WriteLine(GPPGroups["User"]);
-            Console.WriteLine(GPPGroups["Group"]);
+            JObject AssessedGPPGroups = (JObject)GPPGroups["User"];
+            JObject AssessedGPPUsers = (JObject)GPPGroups["Group"];
+            Dictionary<string, JObject> AssessedGPPGroupsAll = new Dictionary<string, JObject>
+            {
+                { "Group", AssessedGPPGroups },
+                { "User", AssessedGPPUsers }
+            };
+            JObject AssessedGPPGroupsAllJson = (JObject)JToken.FromObject(AssessedGPPGroupsAll);
+            return AssessedGPPGroupsAllJson;
+            //Utility.DebugWrite("GPP is about Groups");
+            //Console.WriteLine(GPPGroups["User"]);
+            //Console.WriteLine(GPPGroups["Group"]);
         }
-        public static void AssessGPPNetworkOptions(JToken GPPNetworkOptions)
+        public static JObject AssessGPPNetworkOptions(JObject GPPNetworkOptions)
         {
-            Utility.DebugWrite("GPP is about Network Options");
-            Console.WriteLine(GPPNetworkOptions["DUN"]);
+            JObject AssessedGPPNetworkOptions = (JObject)GPPNetworkOptions["DUN"];
+            return AssessedGPPNetworkOptions;
+            //Utility.DebugWrite("GPP is about Network Options");
+            //Console.WriteLine(GPPNetworkOptions["DUN"]);
         }
-        public static void AssessGPPFiles(JToken GPPFiles)
+        public static JObject AssessGPPFiles(JObject GPPFiles)
         {
-            Utility.DebugWrite("GPP is about Files");
-            Console.WriteLine(GPPFiles["File"]);
+            JObject AssessedGPPFiles = (JObject)GPPFiles["File"];
+            return AssessedGPPFiles;
+            //Utility.DebugWrite("GPP is about Files");
+            //Console.WriteLine(GPPFiles["File"]);
         }
-        public static void AssessGPPShortcuts(JToken GPPShortcuts)
+        public static JObject AssessGPPShortcuts(JObject GPPShortcuts)
         {
-            Utility.DebugWrite("GPP is about GPPShortcuts");
-            Console.WriteLine(GPPShortcuts["Shortcut"]);
+            JObject AssessedGPPShortcuts = (JObject)GPPShortcuts["Shortcut"];
+            return AssessedGPPShortcuts;
+            //Utility.DebugWrite("GPP is about GPPShortcuts");
+            //Console.WriteLine(GPPShortcuts["Shortcut"]);
         }
-        public static void AssessGPPRegSettings(JToken GPPRegSettings)
+        public static JObject AssessGPPRegSettings(JObject GPPRegSettings)
         {
-            Utility.DebugWrite("GPP is about RegistrySettings");
-            Console.WriteLine(GPPRegSettings["Registry"]);
+            JObject AssessedGPPRegSettings = (JObject)GPPRegSettings["Registry"];
+            return AssessedGPPRegSettings;
+            //Utility.DebugWrite("GPP is about RegistrySettings");
+            //Console.WriteLine(GPPRegSettings["Registry"]);
         }
-        public static void AssessGPPNTServices(JToken GPPNTServices)
+        public static JObject AssessGPPNTServices(JObject GPPNTServices)
         {
-            Utility.DebugWrite("GPP is about NTServices");
-            Console.WriteLine(GPPNTServices["NTService"]);
+            JObject AssessedGPPNTServices = (JObject)GPPNTServices["NTService"];
+            return AssessedGPPNTServices;
+            //Utility.DebugWrite("GPP is about NTServices");
+            //Console.WriteLine(GPPNTServices["NTService"]);
         }
-        public static void AssessGPPFolders(JToken GPPFolders)
+        public static JObject AssessGPPFolders(JObject GPPFolders)
         {
-            Utility.DebugWrite("GPP is about Folders");
-            Console.WriteLine(GPPFolders["Folder"]);
+            JObject AssessedGPPFolders = (JObject)GPPFolders["Folder"];
+            return AssessedGPPFolders;
+            //Utility.DebugWrite("GPP is about Folders");
+            //Console.WriteLine(GPPFolders["Folder"]);
         }
-        public static void AssessGPPNetShares(JToken GPPNetShares)
+        public static JObject AssessGPPNetShares(JObject GPPNetShares)
         {
-            Utility.DebugWrite("GPP is about Network Shares");
-            Console.WriteLine(GPPNetShares["NetShare"]);
+            JObject AssessedGPPNetShares = (JObject)GPPNetShares["NetShare"];
+            return AssessedGPPNetShares;
+            //Utility.DebugWrite("GPP is about Network Shares");
+            //Console.WriteLine(GPPNetShares["NetShare"]);
         }
-        public static void AssessGPPSchedTasks(JToken GPPSchedTasks)
+        public static JObject AssessGPPSchedTasks(JObject GPPSchedTasks)
         {
-            Utility.DebugWrite("GPP is about SchedTasks");
-            Console.WriteLine(GPPSchedTasks["Task"]);
-            Console.WriteLine(GPPSchedTasks["ImmediateTaskV2"]);
+            JObject AssessedGPPSchedTasksTask = (JObject)GPPSchedTasks["Task"];
+            JObject AssessedGPPSchedTasksImmediateTask = (JObject)GPPSchedTasks["ImmediateTaskV2"];
+            Dictionary<string, JObject> AssessedGPPSchedTasksAll = new Dictionary<string, JObject>
+            {
+                { "Task", AssessedGPPSchedTasksTask },
+                { "ImmediateTaskV2", AssessedGPPSchedTasksImmediateTask }
+            };
+            JObject AssessedGPPSchedTasksAllJson = (JObject)JToken.FromObject(AssessedGPPSchedTasksAll);
+            return AssessedGPPSchedTasksAllJson;
+            //Utility.DebugWrite("GPP is about SchedTasks");
+            //Console.WriteLine(GPPSchedTasks["Task"]);
+            //Console.WriteLine(GPPSchedTasks["ImmediateTaskV2"]);
         }
     }
 }

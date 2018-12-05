@@ -9,12 +9,6 @@ using Newtonsoft.Json;
 
 namespace Grouper2
 {
-    public class ParsedInf : Dictionary<string, Dictionary<string, string[]>>
-    {
-        //WHAT AM I DOIN HERE?
-    }
-
-
     class Parsers
     {
         static public JObject ParseInf(string infFile)
@@ -59,9 +53,9 @@ namespace Grouper2
                     break;
                 }
             }
-            
+
             // define dict that we're going to put all this in and return at the end
-            ParsedInf infResults = new ParsedInf();
+            Dictionary<string, Dictionary<string, string[]>> infResults = new Dictionary<string, Dictionary<string, string[]>>();
 
             // iterate over the identified sections and get the heading and contents of each.
             foreach (KeyValuePair<int, int> sectionSlice in sectionSlices)
@@ -100,19 +94,17 @@ namespace Grouper2
                 //put the results into the dictionary we're gonna return
                 infResults.Add(SectionHeading, SectionDict);
             }
-
             JObject infResultsJson = (JObject)JToken.FromObject(infResults);
             return infResultsJson;
         }
 
-        static public JObject ParseXmlToJson(string XmlFile)
+        static public JObject ParseGPPXmlToJson(string XmlFile)
         {
-            Utility.DebugWrite("Loading xmlFile : " + XmlFile);
-
-            XElement ParsedXml = XElement.Load(XmlFile);
-            //Utility.DebugWrite("Here's what I loaded : ");
-            //Console.WriteLine(ParsedXml);
-            // just useful for debuggin
+            
+            // load the file into xml
+            //XElement ParsedXml = XElement.Load(XmlFile);
+            // i don't think the above does anything any more
+            // get the relative path
             string XmlRelPath = XmlFile.Split('}')[1];
             //grab the contents of the file path in the argument
             string RawXmlFileContent = File.ReadAllText(XmlFile);
@@ -130,6 +122,4 @@ namespace Grouper2
             return ParsedXmlFileToJson;
         }
     }
-
-    
 }

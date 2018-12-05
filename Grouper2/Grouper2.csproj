@@ -52,7 +52,7 @@
     <Compile Include="Assess.cs" />
     <Compile Include="LDAPthing.cs" />
     <Compile Include="Parsers.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Grouper2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility.cs" />
   </ItemGroup>

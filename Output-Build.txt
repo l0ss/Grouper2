@@ -1,0 +1,3 @@
+﻿------ Build started: Project: Grouper2, Configuration: Debug Any CPU ------
+  Grouper2 -> Z:\Grouper2\Grouper2\bin\Debug\Grouper2.exe
+========== Build: 1 succeeded, 0 failed, 0 up-to-date, 0 skipped ==========
