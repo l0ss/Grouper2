@@ -176,6 +176,7 @@ namespace Grouper2
 
         public static JObject AssessGPPJson(JObject GPPToAssess)
         {
+            AssessGPP assessGPP = new AssessGPP();
             // get an array of categories in our GPP to assess to look at
             string[] GPPCategories = GPPToAssess.Properties().Select(p => p.Name).ToArray();
             // create a dict to put our results into before returning them
@@ -183,58 +184,14 @@ namespace Grouper2
             // iterate over the array sending appropriate gpp data to the appropriate assess() function.
             foreach (string GPPCategory in GPPCategories)
             {
-                if (GPPCategory == "Groups")
+                JObject GPPCategoryJson = (JObject)GPPToAssess[GPPCategory];
+                JObject AssessedGPP = assessGPP.GetAssessed(GPPCategory, GPPCategoryJson);
+
+                if (AssessedGPP != null)
                 {
-                    JObject AssessedGPPGroups = Assess.AssessGPPGroups.GetAssessedGroups((JObject)GPPToAssess["Groups"]);
-                    if (AssessedGPPGroups.HasValues)
-                    {
-                        AssessedGPPDict.Add("Groups", AssessedGPPGroups);
-                    }
+                    AssessedGPPDict.Add(GPPCategory, AssessedGPP);
                 }
-                /*
-                 // NOTE: Don't forget to actually add the output from the below to the results dictionary, ya big dummy.
-                if (GPPCategory == "NetworkOptions")
-                {
-                   Assess.AssessGPPNetworkOptions.GetAssessedNetworkOptions((JObject)GPPToAssess["NetworkOptions"]);
-                }
-                if (GPPCategory == "Files")
-                {
-                    Assess.AssessGPPFiles.GetAssessedFiles((JObject)GPPToAssess["Files"]);
-                }
-                if (GPPCategory == "RegistrySettings")
-                {
-                    Assess.AssessGPPRegSettings.GetAssessedRegSettings((JObject)GPPToAssess["RegistrySettings"]);
-                }
-                if (GPPCategory == "Shortcuts")
-                {
-                    Assess.AssessGPPShortcuts.GetAssessedShortcuts((JObject)GPPToAssess["Shortcuts"]);
-                }
-                if (GPPCategory == "ScheduledTasks")
-                {
-                    Assess.AssessGPPSchedTasks.GetAssessedSchedTasks((JObject)GPPToAssess["ScheduledTasks"]);
-                }
-                if (GPPCategory == "NetworkShareSettings")
-                {
-                    Assess.AssessGPPNetShares.GetAssessedNetShares((JObject)GPPToAssess["NetworkShareSettings"]);
-                }
-                if (GPPCategory == "Folders")
-                {
-                    Assess.AssessGPPFolders.GetAssessedFolders((JObject)GPPToAssess["Folders"]);
-                }
-                if (GPPCategory == "NTServices")
-                {
-                    Assess.AssessGPPNTServices.GetAssessedNTServices((JObject)GPPToAssess["NTServices"]);
-                }
-                if (GPPCategory == "IniFiles")
-                {
-                    JObject AssessedIniFiles = Assess.AssessGPPIniFiles.GetAssessedIniFiles((JObject)GPPToAssess["IniFiles"]);
-                    AssessedGPPDict.Add("IniFiles", AssessedIniFiles);
-                }
-                */
-                else
-                {
-                    break;
-                }
+
             }
             JObject AssessedGPPJson = (JObject)JToken.FromObject(AssessedGPPDict);
             return AssessedGPPJson;

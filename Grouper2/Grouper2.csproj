@@ -87,6 +87,7 @@
     <Compile Include="Assess\AssessGPPFolders.cs" />
     <Compile Include="Assess\AssessGPPNetShares.cs" />
     <Compile Include="Assess\AssessGPPSchedTasks.cs" />
+    <Compile Include="Assess\AssessGPP.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
