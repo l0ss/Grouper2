@@ -2,7 +2,6 @@
 using System.Text.RegularExpressions;
 using System.IO;
 using System.Collections.Generic;
-using System.Xml.Linq;
 using Newtonsoft.Json.Linq;
 using System.Xml;
 using Newtonsoft.Json;
@@ -19,7 +18,7 @@ namespace Grouper2
             string[] infContent = File.ReadAllLines(infFile);
             var headingLines = new List<int>();
 
-            //find all the lines that look like a heading
+            //find all the lines that look like a heading and put the line numbers in an array.
             int i = 0;
             foreach (string infLine in infContent)
             {
@@ -27,13 +26,11 @@ namespace Grouper2
                 if (headingMatch.Success)
                 {
                     headingLines.Add(i);
-                    //Console.Write("Match at: ");
-                    //Console.WriteLine(i.ToString());
-                    //Console.WriteLine(infLine);
                 }
                 i++;
             }
             // make a dictionary with K/V = start/end of each section
+            // this is extraordinarily janky but it works mostly.
             Dictionary<int, int> sectionSlices = new Dictionary<int, int>();
             int fuck = 0;
             while (true)

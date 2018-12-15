@@ -1,4 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Groups clsid="{3125E937-EB16-4b4c-9934-544FC6D24D26}"><User clsid="{DF5F1855-51E5-4d24-8B1A-D9BDE98BA1D1}" name="fuck" image="2" changed="2018-11-06 05:38:58" uid="{E58F3499-7F8E-41E7-B77D-85858BB0D89F}"><Properties action="U" newName="fuck2" fullName="fuck3" description="fuck4" cpassword="" changeLogon="1" noChange="0" neverExpires="0" acctDisabled="0" userName="fuck"/></User>
-	<Group clsid="{6D4A79E4-529C-4481-ABD0-F5BD7EA93BA7}" name="administrators" image="2" changed="2018-11-06 05:39:11" uid="{CA89D323-9C74-4ED5-87A0-E6E90B37EA24}"><Properties action="U" newName="fuckers" description="" deleteAllUsers="0" deleteAllGroups="0" removeAccounts="0" groupName="administrators"/></Group>
+<Groups clsid="{3125E937-EB16-4b4c-9934-544FC6D24D26}">
+<User clsid="{DF5F1855-51E5-4d24-8B1A-D9BDE98BA1D1}" name="fuck" image="2" changed="2018-11-06 05:38:58" uid="{E58F3499-7F8E-41E7-B77D-85858BB0D89F}"><Properties action="U" newName="fuck2" fullName="fuck3" description="fuck4" cpassword="" changeLogon="1" noChange="0" neverExpires="0" acctDisabled="0" userName="fuck"/></User>
+
+<User clsid="{DF5F1855-51E5-4d24-8B1A-D9BDE98BA1D1}" name="BadAdmin" image="2" changed="2014-11-23 23:23:12" uid="{C68559B7-31DC-4419-9A7F-A476B0D00FAC}" userContext="0" removePolicy="0" disabled="1">
+	<Properties action="U" newName="" fullName="" description="" cpassword="VPe/o9YRyz2cksnYRbNeQnM93VF7OMA1+gXjFZ3cFmQ" changeLogon="0" noChange="1" neverExpires="1" acctDisabled="0" subAuthority="" userName="DeskAdmin"/>
+</User>
+<Group clsid="{6D4A79E4-529C-4481-ABD0-F5BD7EA93BA7}" name="Administrators (built-in)" image="2" changed="2014-11-23 23:23:10" uid="{59BBFF5C-0C50-4EDB-8953-BD68D1E2AB71}" userContext="0" removePolicy="0">
+	<Properties action="U" newName="" description="" deleteAllUsers="0" deleteAllGroups="0" removeAccounts="0" groupSid="S-1-5-32-544" groupName="Administrators (built-in)">
+		<Members>
+			<Member name="ThingAdmin" action="ADD" sid=""/>
+			<Member name="localdomain\svc_dumb_stuff" action="ADD" sid="S-1-5-21-45123856-1827659135-1662346257-38133"/>
+		</Members>
+	</Properties>
+</Group>
+<Group clsid="{6D4A79E4-529C-4481-ABD0-F5BD7EA93BA7}" name="administrators" image="2" changed="2018-11-06 05:39:11" uid="{CA89D323-9C74-4ED5-87A0-E6E90B37EA24}"><Properties action="U" newName="fuckers" description="" deleteAllUsers="0" deleteAllGroups="0" removeAccounts="0" groupName="administrators"/></Group>
 </Groups>

@@ -1,9 +1,18 @@
-﻿using System;
+﻿/***
+ *      .,-:::::/  :::::::..       ...      ...    :::::::::::::. .,::::::  :::::::..     .:::.  
+ *    ,;;-'````'   ;;;;``;;;;   .;;;;;;;.   ;;     ;;; `;;;```.;;;;;;;''''  ;;;;``;;;;   ,;'``;. 
+ *    [[[   [[[[[[/ [[[,/[[['  ,[[     \[[,[['     [[[  `]]nnn]]'  [[cccc    [[[,/[[['   ''  ,[['
+ *    "$$c.    "$$  $$$$$$c    $$$,     $$$$$      $$$   $$$""     $$""""    $$$$$$c     .c$$P'  
+ *     `Y8bo,,,o88o 888b "88bo,"888,_ _,88P88    .d888   888o      888oo,__  888b "88bo,d88 _,oo,
+ *       `'YMUP"YMM MMMM   "W"   "YMMMMMP"  "YmmMMMM""   YMMMb     """"YUMMM MMMM   "W" MMMUP*"^^
+ *                                                                                               
+ *                        By Mike Loss (@mikeloss)                                                
+ */
+ using System;
 using System.IO;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
-using System.Xml;
-using Newtonsoft.Json;
+using System.DirectoryServices.ActiveDirectory;
 
 namespace Grouper2
 {
@@ -26,6 +35,12 @@ namespace Grouper2
         }
     }
 
+    public static class GlobalVar
+    {
+        public static bool OnlineChecks;
+        public static int Verbosity;
+    }
+
     class Grouper2
     {
         static void Main(string[] args)
@@ -33,20 +48,34 @@ namespace Grouper2
             Utility.PrintBanner();
             JObject JSonData = JankyDB.Instance;
             JObject JSonData2 = JankyDB.Instance;
+            string SysvolPolDir = "";
 
-            // All this is a placeholder until I put something in to talk LDAP and SMB
+            JObject DomainGPOs = new JObject();
 
-            IDictionary<string, string> policies = new Dictionary<string, string>
+            // Ask the DC for GPO details
+            if (args.Length == 0)
             {
-                { "First", "{31B2F340-016D-11D2-945F-00C04FB984F9}" },
-                { "Second", "{36FA6290-EFEE-4909-845A-4A33A04D3088}" },
-                { "Third", "{6AC1786C-016F-11D2-945F-00C04fB984F9}" },
-                { "Fourth", "{F1EB7588-E641-4676-B2A5-C706B671368A}" }
-            };
+                    Console.WriteLine("Trying to figure out what AD domain we're workin with.");
+                    Domain CurrentDomain = Domain.GetCurrentDomain();
+                    string CurrentDomainString = CurrentDomain.ToString();
+                    Console.WriteLine("Current AD Domain is: " + CurrentDomainString);
+                    SysvolPolDir = @"\\" + CurrentDomainString + @"\sysvol\" + CurrentDomainString + @"\Policies\";
+                    Utility.DebugWrite("SysvolPolDir is " + SysvolPolDir);
+                    GlobalVar.OnlineChecks = true;
+            }
+            if (args.Length == 1)
+            {
+                Console.WriteLine("OK, I trust you know where you're aiming me.");
+                SysvolPolDir = args[0];
+            }
 
-            // end placeholding.
+            Console.WriteLine("We gonna look at the policies in: " + SysvolPolDir);
+            if (GlobalVar.OnlineChecks)
+            {
+                DomainGPOs = LDAPstuff.GetDomainGPOs();
+            }
 
-            string[]GPOPaths = Directory.GetDirectories(@"Z:\Grouper2\Grouper2\bin\Debug\TestPolicies");
+            string[]GPOPaths = Directory.GetDirectories(SysvolPolDir);
             
             // create a dict to put all our output goodies in.
             Dictionary<string, JObject> Grouper2OutputDict = new Dictionary<string, JObject>();
@@ -55,17 +84,25 @@ namespace Grouper2
             {
                 // create a dict to put the stuff we find for this GPO into.
                 Dictionary<string, JObject> GPOResultDict = new Dictionary<string, JObject>();
-
                 Dictionary<string, string> GPOPropsDict = new Dictionary<string, string>();
 
                 // Get the UID of the GPO from the file path.
-                char[] SplitChars = new char[] { '\\' };
+                char DirSeparator = Path.DirectorySeparatorChar;
+                char[] SplitChars = new char[] { DirSeparator };
                 string[] SplitPath = GPOPath.Split(SplitChars);
                 string GPOUID = SplitPath[(SplitPath.Length - 1)];
 
                 // Set some properties of the GPO we're looking at in our output file.
                 GPOPropsDict.Add("GPO UID", GPOUID);
                 GPOPropsDict.Add("GPO Path", GPOPath);
+                if (GlobalVar.OnlineChecks)
+                {
+                    JToken DomainGPO = DomainGPOs[GPOUID];
+                    GPOPropsDict.Add("Display Name", DomainGPO["DisplayName"].ToString());
+                    GPOPropsDict.Add("Distinguished Name", DomainGPO["DistinguishedName"].ToString());
+                    GPOPropsDict.Add("GPO SDDL", DomainGPO["SDDL"].ToString());
+                }
+
                 // TODO (and put in GPOProps)
                 // look up the friendly name of the policy
                 // get the policy ACLs
@@ -74,11 +111,11 @@ namespace Grouper2
                 // get whether it's enabled
 
                 // start processing files
-                string MachinePolPath = GPOPath + "\\Machine";
-                string UserPolPath = GPOPath + "\\User";
+                string[] MachinePolPathArray = { GPOPath, "Machine" };
+                string[] UserPolPathArray = { GPOPath, "User" };
+                string MachinePolPath = Path.Combine(MachinePolPathArray);
+                string UserPolPath = Path.Combine(UserPolPathArray);
 
-                // need to get the shit returned from these
-                //Utility.DebugWrite("About to process Machine Policy Inf");
                 JObject MachinePolInfResults = ProcessInf(MachinePolPath);
                 JObject UserPolInfResults = ProcessInf(UserPolPath);
                 JObject MachinePolGPPResults = ProcessGPXml(MachinePolPath);
@@ -89,8 +126,8 @@ namespace Grouper2
                 GPOResultDict.Add("GPOProps", GPOPropsJson);
                 GPOResultDict.Add("Machine Policy from GPP XML files", MachinePolGPPResults);
                 GPOResultDict.Add("User Policy from GPP XML files", UserPolGPPResults);
-                GPOResultDict.Add("Machine Policy from Inf files", MachinePolInfResults);
-                GPOResultDict.Add("User Policy from Inf files", MachinePolInfResults);
+                //GPOResultDict.Add("Machine Policy from Inf files", MachinePolInfResults);
+                //GPOResultDict.Add("User Policy from Inf files", MachinePolInfResults);
 
                 JObject GPOResultJson = (JObject)JToken.FromObject(GPOResultDict);
 
@@ -108,12 +145,16 @@ namespace Grouper2
                 //  Parse XML files
                 //  Parse ini files
                 //  Grep scripts for creds.
+                // File permissions for referenced files.
             }
-            // Final output is happening here:
+
+            // Final output is finally happening here:
             Utility.DebugWrite("Final Output:");
             JObject Grouper2OutputJson = (JObject)JToken.FromObject(Grouper2OutputDict);
             Console.WriteLine(Grouper2OutputJson.ToString());
+            Console.ReadKey();
         }
+        
 
         static JObject ProcessInf(string Path)
         {
@@ -127,8 +168,8 @@ namespace Grouper2
                 //parse the inf file into a manageable format
                 JObject ParsedInfFile = Parsers.ParseInf(infFile);
                 //send the inf file to be assessed
-                JObject AssessedGPTmpl = Assess.AssessGPTmpl(ParsedInfFile);
-
+                JObject AssessedGPTmpl = AssessHandlers.AssessGPTmpl(ParsedInfFile);
+               
                 //add the result to our results
                 ProcessedInfsDict.Add(infFile, AssessedGPTmpl);
             }
@@ -151,8 +192,11 @@ namespace Grouper2
                     // send each one to get mangled into json
                     JObject ParsedGPPXmlToJson = Parsers.ParseGPPXmlToJson(XmlFile);
                     // then send each one to get assessed for fun things
-                    JObject AssessedGPP = Assess.AssessGPPJson(ParsedGPPXmlToJson);
-                    ProcessedGPXml.Add(XmlFile, AssessedGPP);
+                    JObject AssessedGPP = AssessHandlers.AssessGPPJson(ParsedGPPXmlToJson);
+                    if (AssessedGPP.HasValues)
+                    {
+                        ProcessedGPXml.Add(XmlFile, AssessedGPP);
+                    }
                 }
             }
             JObject ProcessedGPXmlJson = (JObject)JToken.FromObject(ProcessedGPXml);

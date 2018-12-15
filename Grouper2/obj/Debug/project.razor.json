@@ -1,6 +1,6 @@
 {
   "ProjectFilePath": "/Users/mike/projects/Grouper2/Grouper2/Grouper2.csproj",
-  "TargetFramework": "v3.5",
+  "TargetFramework": "v4.0",
   "TagHelpers": [],
   "Configuration": {
     "ConfigurationName": "UnsupportedRazor",
