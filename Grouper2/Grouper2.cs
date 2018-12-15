@@ -126,8 +126,8 @@ namespace Grouper2
                 GPOResultDict.Add("GPOProps", GPOPropsJson);
                 GPOResultDict.Add("Machine Policy from GPP XML files", MachinePolGPPResults);
                 GPOResultDict.Add("User Policy from GPP XML files", UserPolGPPResults);
-                //GPOResultDict.Add("Machine Policy from Inf files", MachinePolInfResults);
-                //GPOResultDict.Add("User Policy from Inf files", MachinePolInfResults);
+                GPOResultDict.Add("Machine Policy from Inf files", MachinePolInfResults);
+                GPOResultDict.Add("User Policy from Inf files", MachinePolInfResults);
 
                 JObject GPOResultJson = (JObject)JToken.FromObject(GPOResultDict);
 
