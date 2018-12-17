@@ -7,12 +7,14 @@ namespace Grouper2
 {
     public class AssessGPP
     {
-        public AssessGPP()
-        {
+        private readonly JObject _GPP;
 
+        public AssessGPP(JObject GPP)
+        {
+            _GPP = GPP;
         }
 
-        public JObject GetAssessed(string assessName, JObject GPP)
+        public JObject GetAssessed(string assessName)
         {
             //construct the method name based on the assessName and get it using reflection
             MethodInfo mi = this.GetType().GetMethod("GetAssessed" + assessName);
@@ -21,7 +23,7 @@ namespace Grouper2
 
             try
             {
-                JObject AssessedThing = (JObject)mi.Invoke(this, parameters: new object[] { GPP });
+                JObject AssessedThing = (JObject)mi.Invoke(this, parameters: new object[] { assessName });
                 if (AssessedThing.HasValues)
                 {
                     return AssessedThing;
@@ -38,15 +40,17 @@ namespace Grouper2
         }
 
         // none of these assess functions do anything but return the values from the GPP yet.
-        public static JObject GetAssessedShortcuts(JObject GPPShortcuts)
+        private JObject GetAssessedShortcuts(string assessName)
         {
-            JProperty GPPShortcutProp = new JProperty("Shortcut", GPPShortcuts["Shortcut"]);
+            JObject GPPCategory = (JObject)_GPP[assessName];
+            JProperty GPPShortcutProp = new JProperty(assessName, GPPCategory[assessName]);
             JObject AssessedGPPShortcuts = new JObject(GPPShortcutProp);
             return AssessedGPPShortcuts;
             //Utility.DebugWrite("GPP is about GPPShortcuts");
             //Console.WriteLine(GPPShortcuts["Shortcut"]);
         }
 
+        //TODO ALL THE METHODS BELOW SHOULD BE CHANGED TO MATCH THE SIGNATURE OF GetAssessedShortcuts ABOVE
         public static JObject GetAssessedSchedTasks(JObject GPPSchedTasks)
         {
             JProperty AssessedGPPSchedTasksTaskProp = new JProperty("Task", GPPSchedTasks["Task"]);

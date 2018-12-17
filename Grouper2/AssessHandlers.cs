@@ -176,7 +176,6 @@ namespace Grouper2
 
         public static JObject AssessGPPJson(JObject GPPToAssess)
         {
-            AssessGPP assessGPP = new AssessGPP();
             // get an array of categories in our GPP to assess to look at
             string[] GPPCategories = GPPToAssess.Properties().Select(p => p.Name).ToArray();
             // create a dict to put our results into before returning them
@@ -184,8 +183,8 @@ namespace Grouper2
             // iterate over the array sending appropriate gpp data to the appropriate assess() function.
             foreach (string GPPCategory in GPPCategories)
             {
-                JObject GPPCategoryJson = (JObject)GPPToAssess[GPPCategory];
-                JObject AssessedGPP = assessGPP.GetAssessed(GPPCategory, GPPCategoryJson);
+                AssessGPP assessGPP = new AssessGPP((JObject)GPPToAssess[GPPCategory]);
+                JObject AssessedGPP = assessGPP.GetAssessed(GPPCategory);
 
                 if (AssessedGPP != null)
                 {
