@@ -179,6 +179,10 @@ namespace Grouper2
 
         private static JObject ProcessGpXml(string Path)
         {
+            if(!Directory.Exists(Path))
+            {
+                return null;
+            }
             // Group Policy Preferences are all XML so those are handled here.
             var xmlFiles = Directory.GetFiles(Path, "*.xml", SearchOption.AllDirectories);
             // create a dict for the stuff we find

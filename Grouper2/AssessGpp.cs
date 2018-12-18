@@ -7,47 +7,75 @@ namespace Grouper2
 {
     public class AssessGpp
     {
+        private readonly JObject _GPP;
 
-        public JObject GetAssessed(string assessName, JObject gpp)
+        public AssessGpp(JObject GPP)
+        {
+            _GPP = GPP;
+        }
+
+        public JObject GetAssessed(string assessName)
         {
             //construct the method name based on the assessName and get it using reflection
-            MethodInfo mi = this.GetType().GetMethod("GetAssessed" + assessName);
+            MethodInfo mi = this.GetType().GetMethod("GetAssessed" + assessName, BindingFlags.NonPublic | BindingFlags.Instance);
             //TODO check if mi exists, error out if not implemented
             //invoke the found method
             try
             {
-                JObject assessedThing = (JObject)mi.Invoke(this, parameters: new object[] { gpp });
-                if (assessedThing != null)
+                JObject gppToAssess = (JObject)_GPP[assessName];
+                if (mi != null)
                 {
-                    return assessedThing;
+                    JObject assessedThing = (JObject)mi.Invoke(this, parameters: new object[] { gppToAssess });
+                    if (assessedThing != null)
+                    {
+                        return assessedThing;
+                    }
                 }
                 else
                 {
-                    return null;
+                    Utility.DebugWrite("Failed to find method: GetAssessed" + assessName);
                 }
+                return null;
             }
             catch (Exception e)
             {
                 Utility.DebugWrite(e.ToString());
                 return null;
             }
+        }
 
+        private JObject GetAssessedDrives(JObject gppCategory)
+        {
+            JProperty gppDriveProp = new JProperty("Drive", gppCategory["Drive"]);
+            JObject assessedGppDrives = new JObject(gppDriveProp);
+            return assessedGppDrives;
+            //Utility.DebugWrite("gpp is about gppShortcuts");
+            //Console.WriteLine(gppShortcuts["Shortcut"]);
+        }
+
+        private JObject GetAssessedEnvironmentVariables(JObject gppCategory)
+        {
+            JProperty gppEVProp = new JProperty("EnvironmentVariable", gppCategory["EnvironmentVariable"]);
+            JObject assessedGppEVs = new JObject(gppEVProp);
+            return assessedGppEVs;
+            //Utility.DebugWrite("gpp is about gppShortcuts");
+            //Console.WriteLine(gppShortcuts["Shortcut"]);
         }
 
         // none of these assess functions do anything but return the values from the gpp yet.
-        public static JObject GetAssessedShortcuts(JObject gppShortcuts)
+        private JObject GetAssessedShortcuts(JObject gppCategory)
         {
-            JProperty gppShortcutProp = new JProperty("Shortcut", gppShortcuts["Shortcut"]);
+            JProperty gppShortcutProp = new JProperty("Shortcut", gppCategory["Shortcut"]);
             JObject assessedGppShortcuts = new JObject(gppShortcutProp);
             return assessedGppShortcuts;
             //Utility.DebugWrite("gpp is about gppShortcuts");
             //Console.WriteLine(gppShortcuts["Shortcut"]);
         }
 
-        public static JObject GetAssessedSchedTasks(JObject gppSchedTasks)
+        private JObject GetAssessedScheduledTasks(JObject gppCategory)
         {
-            JProperty assessedGppSchedTasksTaskProp = new JProperty("Task", gppSchedTasks["Task"]);
-            JProperty assessedGppSchedTasksImmediateTaskProp = new JProperty("ImmediateTaskV2", gppSchedTasks["ImmediateTaskV2"]);
+            JProperty assessedGppSchedTasksTaskProp = new JProperty("Task", gppCategory["Task"]);
+            JProperty assessedGppSchedTasksImmediateTaskProp = new JProperty("ImmediateTaskV2", gppCategory["ImmediateTaskV2"]);
             JObject assessedGppSchedTasksAllJson = new JObject(assessedGppSchedTasksTaskProp, assessedGppSchedTasksImmediateTaskProp);
             return assessedGppSchedTasksAllJson;
             //Utility.DebugWrite("gpp is about SchedTasks");
@@ -55,45 +83,45 @@ namespace Grouper2
             //Console.WriteLine(gppSchedTasks["ImmediateTaskV2"]);
         }
 
-        public static JObject GetAssessedRegSettings(JObject gppRegSettings)
+        private JObject GetAssessedRegistrySettings(JObject gppCategory)
         {
-            JProperty gppRegSettingsProp = new JProperty("RegSettings", gppRegSettings["Registry"]);
+            JProperty gppRegSettingsProp = new JProperty("RegSettings", gppCategory["Registry"]);
             JObject assessedGppRegSettings = new JObject(gppRegSettingsProp);
             return assessedGppRegSettings;
             //Utility.DebugWrite("gpp is about RegistrySettings");
             //Console.WriteLine(gppRegSettings["Registry"]);
         }
 
-        public static JObject GetAssessedNtServices(JObject gppNtServices)
+        private JObject GetAssessedNTServices(JObject gppCategory)
         {
-            JProperty ntServiceProp = new JProperty("NTService", gppNtServices["NTService"]);
+            JProperty ntServiceProp = new JProperty("NTService", gppCategory["NTService"]);
             JObject assessedNtServices = new JObject(ntServiceProp);
             return assessedNtServices;
             //Utility.DebugWrite("gpp is about NTServices");
             //Console.WriteLine(gppNtServices["NTService"]);
         }
 
-        public static JObject GetAssessedNetworkOptions(JObject gppNetworkOptions)
+        private JObject GetAssessedNetworkOptions(JObject gppCategory)
         {
-            JProperty gppNetworkOptionsProp = new JProperty("DUN", gppNetworkOptions["DUN"]);
+            JProperty gppNetworkOptionsProp = new JProperty("DUN", gppCategory["DUN"]);
             JObject assessedGppNetworkOptions = new JObject(gppNetworkOptionsProp);
             return assessedGppNetworkOptions;
             //Utility.DebugWrite("gpp is about Network Options");
             //Console.WriteLine(gppNetworkOptions["DUN"]);
         }
 
-        public static JObject GetAssessedFolders(JObject gppFolders)
+        private JObject GetAssessedFolders(JObject gppCategory)
         {
-            JProperty gppFoldersProp = new JProperty("Folder", gppFolders["Folder"]);
+            JProperty gppFoldersProp = new JProperty("Folder", gppCategory["Folder"]);
             JObject assessedGppFolders = new JObject(gppFoldersProp);
             return assessedGppFolders;
             //Utility.DebugWrite("gpp is about Folders");
             //Console.WriteLine(gppFolders["Folder"]);
         }
 
-        public static JObject GetAssessedNetShares(JObject gppNetShares)
+        private JObject GetAssessedNetworkShareSettings(JObject gppCategory)
         {
-            JProperty gppNetSharesProp = new JProperty("NetShare", gppNetShares["NetShare"]);
+            JProperty gppNetSharesProp = new JProperty("NetShare", gppCategory["NetShare"]);
             JObject assessedGppNetShares = new JObject(gppNetSharesProp);
             return assessedGppNetShares;
             //Utility.DebugWrite("gpp is about Network Shares");
@@ -101,29 +129,29 @@ namespace Grouper2
         }
 
 
-        public static JObject GetAssessedIniFiles(JObject gppIniFiles)
+        private JObject GetAssessedIniFiles(JObject gppCategory)
         {
             //Utility.DebugWrite("gpp is about gppIniFiles");
-            JObject assessedGppIniFiles = (JObject)gppIniFiles["Ini"];
+            JObject assessedGppIniFiles = (JObject)gppCategory["Ini"];
             //Console.WriteLine(AssessedGPPIniFiles.ToString());
             return assessedGppIniFiles;
         }
 
-        public static JObject GetAssessedFiles(JObject gppFiles)
+        private JObject GetAssessedFiles(JObject gppCategory)
         {
-            JProperty gppFileProp = new JProperty("File", gppFiles["File"]);
+            JProperty gppFileProp = new JProperty("File", gppCategory["File"]);
             JObject assessedGppFiles = new JObject(gppFileProp);
             return assessedGppFiles;
             //Utility.DebugWrite("gpp is about Files");
             //Console.WriteLine(gppFiles["File"]);
         }
 
-        public static JObject GetAssessedGroups(JObject gppGroups)
+        private JObject GetAssessedGroups(JObject gppCategory)
         {
             Dictionary<string, Dictionary<string, string>> assessedGroupsDict = new Dictionary<string, Dictionary<string, string>>();
             Dictionary<string, Dictionary<string, string>> assessedUsersDict = new Dictionary<string, Dictionary<string, string>>();
 
-            foreach (JToken gppUser in gppGroups["User"])
+            foreach (JToken gppUser in gppCategory["User"])
             {
                 // dictionary for results from this specific user.
                 Dictionary<string, string> assessedUserDict = new Dictionary<string, string>
@@ -160,7 +188,7 @@ namespace Grouper2
             }
 
             // repeat the process for Groups
-            foreach (JToken gppGroup in gppGroups["Group"])
+            foreach (JToken gppGroup in gppCategory["Group"])
             {
                 //dictionary for results from this specific group
                 Dictionary<string, string> assessedGroupDict = new Dictionary<string, string>
@@ -209,7 +237,7 @@ namespace Grouper2
             return assessedGppGroupsJson;
         }
 
-        public static string GetActionString(string actionChar)
+        private static string GetActionString(string actionChar)
             // shut up, i know it's not really a char.
         {
             string actionString = "";
