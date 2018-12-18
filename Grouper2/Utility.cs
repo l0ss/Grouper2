@@ -47,7 +47,7 @@ namespace Grouper2
             // iterate over the list of well known sids to see if any match.
             foreach (JToken wellKnownSid in wellKnownSids)
             {
-                string sidToMatch = (string)wellKnownSid["sid"];
+                string sidToMatch = (string)wellKnownSid["SID"];
                 // a bunch of well known sids all include the domain-unique sid, so we gotta check for matches amongst those.
                 if ((sidToMatch.Contains("DOMAIN")) && (sid.Length >= 14))
                 {
@@ -59,7 +59,7 @@ namespace Grouper2
                     }
                 }
                 // check if we have a direct match
-                if ((string)wellKnownSid["sid"] == sid)
+                if ((string)wellKnownSid["SID"] == sid)
                 {
                     sidMatches = true;
                 }

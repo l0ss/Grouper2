@@ -115,18 +115,18 @@ namespace Grouper2
                 var machinePolPath = Path.Combine(machinePolPathArray);
                 var userPolPath = Path.Combine(userPolPathArray);
 
-                //JObject MachinePolInfResults = ProcessInf(MachinePolPath);
-                //JObject UserPolInfResults = ProcessInf(UserPolPath);
-                var machinePolGppResults = ProcessGpXml(machinePolPath);
-                var userPolGppResults = ProcessGpXml(userPolPath);
+                //JObject machinePolInfResults = ProcessInf(machinePolPath);
+                //JObject userPolInfResults = ProcessInf(userPolPath);
+                JObject machinePolGppResults = ProcessGpXml(machinePolPath);
+                JObject userPolGppResults = ProcessGpXml(userPolPath);
 
                 var gpoPropsJson = (JObject) JToken.FromObject(gpoPropsDict);
 
                 gpoResultDict.Add("GPOProps", gpoPropsJson);
                 gpoResultDict.Add("Machine Policy from GPP XML files", machinePolGppResults);
                 gpoResultDict.Add("User Policy from GPP XML files", userPolGppResults);
-                //GPOResultDict.Add("Machine Policy from Inf files", MachinePolInfResults);
-                //GPOResultDict.Add("User Policy from Inf files", MachinePolInfResults);
+                //gpoResultDict.Add("Machine Policy from Inf files", machinePolInfResults);
+                //gpoResultDict.Add("User Policy from Inf files", machinePolInfResults);
 
                 var gpoResultJson = (JObject) JToken.FromObject(gpoResultDict);
 
@@ -191,7 +191,7 @@ namespace Grouper2
                     var parsedGppXmlToJson = Parsers.ParseGppXmlToJson(xmlFile);
                     // then send each one to get assessed for fun things
                     var assessedGpp = AssessHandlers.AssessGppJson(parsedGppXmlToJson);
-                    if (assessedGpp.HasValues) processedGpXml.Add(xmlFile, assessedGpp);
+                    if (assessedGpp != null) processedGpXml.Add(xmlFile, assessedGpp);
                 }
 
             var processedGpXmlJson = (JObject) JToken.FromObject(processedGpXml);
