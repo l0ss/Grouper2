@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.IO;
 using Newtonsoft.Json.Linq;
@@ -9,13 +9,13 @@ namespace Grouper2
     class AssessHandlers
     {
         // Assesses the contents of a GPTmpl
-        public static JObject AssessGPTmpl(JObject InfToAssess)
+        public static JObject AssessGptmpl(JObject infToAssess)
         {
             // create a dict to put all our results into
-            Dictionary<string, JObject> AssessedGPTmpl = new Dictionary<string, JObject>();
+            Dictionary<string, JObject> assessedGpTmpl = new Dictionary<string, JObject>();
 
             // an array for GPTmpl headings to ignore.
-            List<string> KnownKeys = new List<string>
+            List<string> knownKeys = new List<string>
             {
                 "Unicode",
                 "Version"
@@ -25,30 +25,30 @@ namespace Grouper2
             ///////////////////////////////////////////////////////////////
             // Privilege Rights
             ///////////////////////////////////////////////////////////////
-            JToken PrivRights = InfToAssess["Privilege Rights"];
+            JToken privRights = infToAssess["Privilege Rights"];
 
-            if (PrivRights != null)
+            if (privRights != null)
                 {
-                    JObject PrivRightsResults = AssessPrivRights(PrivRights);
-                    if (PrivRightsResults.Count > 0)
+                    JObject privRightsResults = AssessPrivRights(privRights);
+                    if (privRightsResults.Count > 0)
                     {
-                        AssessedGPTmpl.Add("PrivRights", PrivRightsResults);
+                        assessedGpTmpl.Add("privRights", privRightsResults);
                     }
-                    KnownKeys.Add("Privilege Rights");
+                    knownKeys.Add("Privilege Rights");
                 }
             ///////////////////////////////////////////////////////////////
             // Registry Values
             ///////////////////////////////////////////////////////////////
-            JToken RegValues = InfToAssess["Registry Values"];
+            JToken regValues = infToAssess["Registry Values"];
 
-            if (RegValues != null)
+            if (regValues != null)
             {
-                JObject MatchedRegValues = AssessRegValues(RegValues);
-                if (MatchedRegValues.Count > 0)
+                JObject matchedRegValues = AssessRegValues(regValues);
+                if (matchedRegValues.Count > 0)
                 {
-                    AssessedGPTmpl.Add("RegValues", MatchedRegValues);
+                    assessedGpTmpl.Add("regValues", matchedRegValues);
                 }
-                KnownKeys.Add("Registry Values");
+                knownKeys.Add("Registry Values");
             }
             
 
@@ -60,19 +60,19 @@ namespace Grouper2
 
             //catch any stuff that falls through the cracks, i.e. look for headings on sections that we aren't parsing.
 
-            List<string> HeadingsInInf =  new List<string>();
-            foreach (JProperty Section in InfToAssess.Children<JProperty>())
+            List<string> headingsInInf =  new List<string>();
+            foreach (JProperty section in infToAssess.Children<JProperty>())
             {
-                string SectionName = Section.Name;
-                HeadingsInInf.Add(SectionName);
+                string sectionName = section.Name;
+                headingsInInf.Add(sectionName);
             }
-            var SlippedThrough = HeadingsInInf.Except(KnownKeys);
-            if (SlippedThrough.Any())
+            var slippedThrough = headingsInInf.Except(knownKeys);
+            if (slippedThrough.Any())
             {
                 Utility.DebugWrite("We didn't parse any of these sections:");
-                foreach (var UnparsedHeader in SlippedThrough)
+                foreach (var unparsedHeader in slippedThrough)
                 {
-                    Console.WriteLine(UnparsedHeader);
+                    Console.WriteLine(unparsedHeader);
                     //  System Access +
                     //  Kerberos Policy -
                     //  Event Audit -
@@ -84,39 +84,39 @@ namespace Grouper2
             }
             
             //mangle our json thing into a jobject and return it
-            JObject AssessedGPTmplJson = (JObject)JToken.FromObject(AssessedGPTmpl);
-            return AssessedGPTmplJson;
+            JObject assessedGpTmplJson = (JObject)JToken.FromObject(assessedGpTmpl);
+            return assessedGpTmplJson;
         }
 
-        public static JObject AssessPrivRights(JToken PrivRights)
+        public static JObject AssessPrivRights(JToken privRights)
         {
-            JObject JsonData = JankyDB.Instance;
-            JArray IntPrivRights = (JArray)JsonData["privRights"]["item"];
+            JObject jsonData = JankyDb.Instance;
+            JArray intPrivRights = (JArray)jsonData["privRights"]["item"];
 
             // create an object to put the results in
-            Dictionary<string, Dictionary<string, string>> MatchedPrivRights = new Dictionary<string, Dictionary<string, string>>();
+            Dictionary<string, Dictionary<string, string>> matchedPrivRights = new Dictionary<string, Dictionary<string, string>>();
 
-            foreach (JProperty PrivRight in PrivRights.Children<JProperty>())
+            foreach (JProperty privRight in privRights.Children<JProperty>())
             {
-                foreach (JToken IntPrivRight in IntPrivRights)
+                foreach (JToken intPrivRight in intPrivRights)
                 {
                     // if the priv is interesting
-                    if ((string)IntPrivRight["privRight"] == PrivRight.Name)
+                    if ((string)intPrivRight["privRight"] == privRight.Name)
                     {
                         //create a dict to put the trustees into
-                        Dictionary<string, string> TrusteesDict = new Dictionary<string, string>();
+                        Dictionary<string, string> trusteesDict = new Dictionary<string, string>();
                         //then for each trustee it's granted to
-                        foreach (string trustee in PrivRight.Value)
+                        foreach (string trustee in privRight.Value)
                         {
-                            string DisplayName = "unknown";
+                            string displayName = "unknown";
                             // clean up the trustee SID
-                            string TrusteeClean = trustee.Trim('*');
-                            JToken CheckedSID = Utility.CheckSID(TrusteeClean);
+                            string trusteeClean = trustee.Trim('*');
+                            JToken checkedSid = Utility.CheckSid(trusteeClean);
 
                             // display some info if they match.
-                            if (CheckedSID != null)
+                            if (checkedSid != null)
                             {
-                                DisplayName = (string)CheckedSID["displayName"];
+                                displayName = (string)checkedSid["displayName"];
                             }
                             // if they don't match, handle that.
                             else
@@ -127,73 +127,74 @@ namespace Grouper2
                                     //TODO: look up unknown SIDS in the domain if we can.
                                 }
                             }
-                            TrusteesDict.Add(TrusteeClean, DisplayName);
+                            trusteesDict.Add(trusteeClean, displayName);
                         }
                         // add the results to our dictionary of trustees
-                        string MatchedPrivRightName = PrivRight.Name;
-                        MatchedPrivRights.Add(MatchedPrivRightName, TrusteesDict);
+                        string matchedPrivRightName = privRight.Name;
+                        matchedPrivRights.Add(matchedPrivRightName, trusteesDict);
                     }
                 }
             }
             // cast our dict to a jobject and return it.
-            JObject MatchedPrivRightsJson = (JObject)JToken.FromObject(MatchedPrivRights);
-            return MatchedPrivRightsJson;
+            JObject matchedPrivRightsJson = (JObject)JToken.FromObject(matchedPrivRights);
+            return matchedPrivRightsJson;
         }
 
-        public static JObject AssessRegValues(JToken RegValues)
+        public static JObject AssessRegValues(JToken regValues)
         {
-            JObject JsonData = JankyDB.Instance;
+            JObject jsonData = JankyDb.Instance;
             // get our data about what regkeys are interesting
-            JArray IntRegKeys = (JArray)JsonData["regKeys"]["item"];
+            JArray intRegKeys = (JArray)jsonData["regKeys"]["item"];
             // set up a dictionary for our results to go into
-            Dictionary<string, string[]> MatchedRegValues = new Dictionary<string, string[]>();
+            Dictionary<string, string[]> matchedRegValues = new Dictionary<string, string[]>();
 
-            foreach (JProperty RegValue in RegValues.Children<JProperty>())
+            foreach (JProperty regValue in regValues.Children<JProperty>())
             {
                 // iterate over the list of interesting keys in our json "db".
-                foreach (JToken IntRegKey in IntRegKeys)
+                foreach (JToken intRegKey in intRegKeys)
                 {
                     // if it matches
-                    if ((string)IntRegKey["regKey"] == RegValue.Name)
+                    if ((string)intRegKey["regKey"] == regValue.Name)
                     {
-                        string MatchedRegKey = RegValue.Name;
+                        string matchedRegKey = regValue.Name;
                         //create a list to put the values in
-                        List<string> RegKeyValueList = new List<string>();
-                        foreach (string thing in RegValue.Value)
+                        List<string> regKeyValueList = new List<string>();
+                        foreach (string thing in regValue.Value)
                         {
                             // put the values in the list
-                            RegKeyValueList.Add(thing);
+                            regKeyValueList.Add(thing);
                         }
-                        string[] RegKeyValueArray = RegKeyValueList.ToArray();
-                        MatchedRegValues.Add(MatchedRegKey, RegKeyValueArray);
+                        string[] regKeyValueArray = regKeyValueList.ToArray();
+                        matchedRegValues.Add(matchedRegKey, regKeyValueArray);
                     }
                 }
             }
             // cast our output into a jobject and return it
-            JObject MatchedRegValuesJson = (JObject)JToken.FromObject(MatchedRegValues);
-            return MatchedRegValuesJson;
+            JObject matchedRegValuesJson = (JObject)JToken.FromObject(matchedRegValues);
+            return matchedRegValuesJson;
         }
 
-        public static JObject AssessGPPJson(JObject GPPToAssess)
+        public static JObject AssessGppJson(JObject gppToAssess)
         {
+            AssessGpp assessGpp = new AssessGpp();
             // get an array of categories in our GPP to assess to look at
-            string[] GPPCategories = GPPToAssess.Properties().Select(p => p.Name).ToArray();
+            string[] gppCategories = gppToAssess.Properties().Select(p => p.Name).ToArray();
             // create a dict to put our results into before returning them
-            Dictionary<string, JObject> AssessedGPPDict = new Dictionary<string, JObject>();
+            Dictionary<string, JObject> assessedGppDict = new Dictionary<string, JObject>();
             // iterate over the array sending appropriate gpp data to the appropriate assess() function.
-            foreach (string GPPCategory in GPPCategories)
+            foreach (string gppCategory in gppCategories)
             {
-                AssessGPP assessGPP = new AssessGPP(GPPToAssess);
-                JObject AssessedGPP = assessGPP.GetAssessed(GPPCategory);
+                JObject gppCategoryJson = (JObject)gppToAssess[gppCategory];
+                JObject assessedGpp = assessGpp.GetAssessed(gppCategory, gppCategoryJson);
 
-                if (AssessedGPP != null)
+                if (assessedGpp != null)
                 {
-                    AssessedGPPDict.Add(GPPCategory, AssessedGPP);
+                    assessedGppDict.Add(gppCategory, assessedGpp);
                 }
 
             }
-            JObject AssessedGPPJson = (JObject)JToken.FromObject(AssessedGPPDict);
-            return AssessedGPPJson;
+            JObject assessedGppJson = (JObject)JToken.FromObject(assessedGppDict);
+            return assessedGppJson;
         }
     }
 }

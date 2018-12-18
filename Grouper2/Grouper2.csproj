@@ -71,23 +71,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssessGpp.cs" />
     <Compile Include="AssessHandlers.cs" />
     <Compile Include="LDAPstuff.cs" />
     <Compile Include="Parsers.cs" />
     <Compile Include="Grouper2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility.cs" />
-    <Compile Include="Assess\AssessGPPGroups.cs" />
-    <Compile Include="Assess\AssessGPPIniFiles.cs" />
-    <Compile Include="Assess\AssessGPPNetworkOptions.cs" />
-    <Compile Include="Assess\AssessGPPFiles.cs" />
-    <Compile Include="Assess\AssessGPPShortcuts.cs" />
-    <Compile Include="Assess\AssessGPPRegSettings.cs" />
-    <Compile Include="Assess\AssessGPPNTServices.cs" />
-    <Compile Include="Assess\AssessGPPFolders.cs" />
-    <Compile Include="Assess\AssessGPPNetShares.cs" />
-    <Compile Include="Assess\AssessGPPSchedTasks.cs" />
-    <Compile Include="Assess\AssessGPP.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -95,9 +85,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Assess\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -10,11 +10,10 @@ namespace Grouper2
 {
     class Parsers
     {
-        static public JObject ParseInf(string infFile)
+        public static JObject ParseInf(string infFile)
         {
             //define what a heading looks like
             Regex headingRegex = new Regex(@"^\[(\w+\s?)+\]$");
-            string infRaw = File.ReadAllText(infFile);
             string[] infContent = File.ReadAllLines(infFile);
             var headingLines = new List<int>();
 
@@ -58,65 +57,59 @@ namespace Grouper2
             foreach (KeyValuePair<int, int> sectionSlice in sectionSlices)
             {
                 //get the section heading
-                char[] SquareBrackets = { '[', ']' };
-                string SectionSliceKey = infContent[sectionSlice.Key];
-                string SectionHeading = SectionSliceKey.Trim(SquareBrackets);
+                char[] squareBrackets = { '[', ']' };
+                string sectionSliceKey = infContent[sectionSlice.Key];
+                string sectionHeading = sectionSliceKey.Trim(squareBrackets);
                 //get the line where the section content starts by adding one to the heading's line
                 int startSection = (sectionSlice.Key + 1);
                 //get the end line of the section
                 int nextSection = sectionSlice.Value;
                 //subtract one from the other to get the section length, without the heading.
                 int sectionLength = (nextSection - startSection);
-                //get an arraysegment with the lines
+                //get an array segment with the lines
                 ArraySegment<string> sectionContent = new ArraySegment<string>(infContent, startSection, sectionLength);
                 //Console.WriteLine("This section contains: ");               
                 //Utility.PrintIndexAndValues(sectionContent);
                 //create the dictionary that we're going to put the lines into.
-                Dictionary<string, string[]> SectionDict = new Dictionary<string, string[]>();
+                Dictionary<string, string[]> sectionDict = new Dictionary<string, string[]>();
                 //iterate over the lines in the section
                 
                 for (int b = sectionContent.Offset; b < (sectionContent.Offset + sectionContent.Count); b++)
                     {
                     string line = sectionContent.Array[b];
                     // split the line into the key (before the =) and the values (after it)
-                    string[] SplitLine = line.Split('=');
-                    string LineKey = (SplitLine[0]).Trim();
+                    string[] splitLine = line.Split('=');
+                    string lineKey = (splitLine[0]).Trim();
                     // then get the values
-                    string LineValues = (SplitLine[1]).Trim();
+                    string lineValues = (splitLine[1]).Trim();
                     // and split them into an array on ","
-                    string[] SplitValues = LineValues.Split(',');
+                    string[] splitValues = lineValues.Split(',');
                     //Add the restructured line into the dictionary.
-                   SectionDict.Add(LineKey, SplitValues);
+                   sectionDict.Add(lineKey, splitValues);
                 }
                 //put the results into the dictionary we're gonna return
-                infResults.Add(SectionHeading, SectionDict);
+                infResults.Add(sectionHeading, sectionDict);
             }
             JObject infResultsJson = (JObject)JToken.FromObject(infResults);
             return infResultsJson;
         }
 
-        static public JObject ParseGPPXmlToJson(string XmlFile)
+        public static JObject ParseGppXmlToJson(string xmlFile)
         {
-            
-            // load the file into xml
-            //XElement ParsedXml = XElement.Load(XmlFile);
-            // i don't think the above does anything any more
-            // get the relative path
-            string XmlRelPath = XmlFile.Split('}')[1];
             //grab the contents of the file path in the argument
-            string RawXmlFileContent = File.ReadAllText(XmlFile);
+            string rawXmlFileContent = File.ReadAllText(xmlFile);
             //create an xml object
-            XmlDocument XmlFileContent = new XmlDocument();
+            XmlDocument xmlFileContent = new XmlDocument();
             //put the file contents in the object
-            XmlFileContent.LoadXml(RawXmlFileContent);
+            xmlFileContent.LoadXml(rawXmlFileContent);
             // turn the Xml into Json
-            string JsonFromXml = JsonConvert.SerializeXmlNode(XmlFileContent.DocumentElement, Newtonsoft.Json.Formatting.Indented);
+            string jsonFromXml = JsonConvert.SerializeXmlNode(xmlFileContent.DocumentElement, Newtonsoft.Json.Formatting.Indented);
             // debug write the json
             //Console.WriteLine(JsonFromXml);
             // put the json into a JObject
-            JObject ParsedXmlFileToJson = JObject.Parse(JsonFromXml);
+            JObject parsedXmlFileToJson = JObject.Parse(jsonFromXml);
             // return the JObject
-            return ParsedXmlFileToJson;
+            return parsedXmlFileToJson;
         }
     }
 }

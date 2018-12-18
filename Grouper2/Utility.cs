@@ -8,65 +8,65 @@ namespace Grouper2
 {
     class Utility
     {
-        public static string DecryptCpassword(string Cpassword)
+        public static string DecryptCpassword(string cpassword)
         {
             // reimplemented based on @obscuresec's Get-GPPPassword PowerShell
-            int CpassMod = Cpassword.Length % 4;
-            string Padding = "";
-            switch (CpassMod)
+            int cpassMod = cpassword.Length % 4;
+            string padding = "";
+            switch (cpassMod)
             {
                 case 1:
-                    Padding = "=";
+                    padding = "=";
                     break;
                 case 2:
-                    Padding = "==";
+                    padding = "==";
                     break;
                 case 3:
-                    Padding = "=";
+                    padding = "=";
                     break;
             }
-            string CpasswordPadded = Cpassword + Padding;
-            byte[] DecodedCpassword = System.Convert.FromBase64String(CpasswordPadded);
-            AesCryptoServiceProvider AesProvider = new AesCryptoServiceProvider();
+            string cpasswordPadded = cpassword + padding;
+            byte[] decodedCpassword = System.Convert.FromBase64String(cpasswordPadded);
+            AesCryptoServiceProvider aesProvider = new AesCryptoServiceProvider();
             byte[] AesKey = new byte[] {0x4e, 0x99, 0x06, 0xe8, 0xfc, 0xb6, 0x6c, 0xc9, 0xfa, 0xf4, 0x93, 0x10, 0x62, 0x0f, 0xfe, 0xe8,
                                  0xf4, 0x96, 0xe8, 0x06, 0xcc, 0x05, 0x79, 0x90, 0x20, 0x9b, 0x09, 0xa4, 0x33, 0xb6, 0x6c, 0x1b };
-            AesProvider.IV = new byte[AesProvider.IV.Length];
-            AesProvider.Key = AesKey;
-            ICryptoTransform Decryptor = AesProvider.CreateDecryptor();
-            byte[] DecryptedBytes = Decryptor.TransformFinalBlock(DecodedCpassword, 0, DecodedCpassword.Length);
-            string DecryptedCpassword = Encoding.Unicode.GetString(DecryptedBytes);
-            return DecryptedCpassword;
+            aesProvider.IV = new byte[aesProvider.IV.Length];
+            aesProvider.Key = AesKey;
+            ICryptoTransform decryptor = aesProvider.CreateDecryptor();
+            byte[] decryptedBytes = decryptor.TransformFinalBlock(decodedCpassword, 0, decodedCpassword.Length);
+            string decryptedCpassword = Encoding.Unicode.GetString(decryptedBytes);
+            return decryptedCpassword;
         }
 
-        public static JToken CheckSID(string SID)
+        public static JToken CheckSid(string sid)
         {
-            JObject JsonData = JankyDB.Instance;
-            JArray WellKnownSIDS = (JArray)JsonData["trustees"]["item"];
+            JObject jsonData = JankyDb.Instance;
+            JArray wellKnownSids = (JArray)jsonData["trustees"]["item"];
 
-            bool SIDmatches = false;
+            bool sidMatches = false;
             // iterate over the list of well known sids to see if any match.
-            foreach (JToken WellKnownSID in WellKnownSIDS)
+            foreach (JToken wellKnownSid in wellKnownSids)
             {
-                string SIDToMatch = (string)WellKnownSID["SID"];
+                string sidToMatch = (string)wellKnownSid["SID"];
                 // a bunch of well known sids all include the domain-unique sid, so we gotta check for matches amongst those.
-                if ((SIDToMatch.Contains("DOMAIN")) && (SID.Length >= 14))
+                if ((sidToMatch.Contains("DOMAIN")) && (sid.Length >= 14))
                 {
-                    string[] TrusteeSplit = SID.Split("-".ToCharArray());
-                    string[] WKSIDSplit = SIDToMatch.Split("-".ToCharArray());
-                    if (TrusteeSplit[TrusteeSplit.Length - 1] == WKSIDSplit[WKSIDSplit.Length - 1])
+                    string[] trusteeSplit = sid.Split("-".ToCharArray());
+                    string[] wkSidSplit = sidToMatch.Split("-".ToCharArray());
+                    if (trusteeSplit[trusteeSplit.Length - 1] == wkSidSplit[wkSidSplit.Length - 1])
                     {
-                        SIDmatches = true;
+                        sidMatches = true;
                     }
                 }
                 // check if we have a direct match
-                if ((string)WellKnownSID["SID"] == SID)
+                if ((string)wellKnownSid["SID"] == sid)
                 {
-                    SIDmatches = true;
+                    sidMatches = true;
                 }
-                if (SIDmatches == true)
+                if (sidMatches == true)
                 {
-                    JToken CheckedSID = WellKnownSID;
-                    return CheckedSID;
+                    JToken checkedSid = wellKnownSid;
+                    return checkedSid;
                 }
             }
             return null;
@@ -79,11 +79,11 @@ namespace Grouper2
             Console.ResetColor();
         }
 
-        public static void DebugWrite(string TextToWrite)
+        public static void DebugWrite(string textToWrite)
         {
             Console.BackgroundColor = ConsoleColor.Yellow;
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(TextToWrite);
+            Console.WriteLine(textToWrite);
             Console.ResetColor();
         }
 
@@ -106,7 +106,7 @@ namespace Grouper2
         }
 
 
-        static public void PrintBanner()
+        public static void PrintBanner()
         {
             string barf = @"  .,-:::::/  :::::::..       ...      ...    :::::::::::::. .,::::::  :::::::..     .:::.  
 ,;;-'````'   ;;;;``;;;;   .;;;;;;;.   ;;     ;;; `;;;```.;;;;;;;''''  ;;;;``;;;;   ,;'``;. 
@@ -118,13 +118,13 @@ namespace Grouper2
                                                             github.com/mikeloss/Grouper2
                                                             @mikeloss
 ";
-            string[] barflines = barf.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+            string[] barfLines = barf.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
 
-            System.ConsoleColor[] Pattern = { System.ConsoleColor.White, System.ConsoleColor.Yellow, System.ConsoleColor.Red, System.ConsoleColor.Red, System.ConsoleColor.DarkRed, System.ConsoleColor.DarkRed, System.ConsoleColor.White, System.ConsoleColor.White, System.ConsoleColor.White, System.ConsoleColor.White };
+            System.ConsoleColor[] pattern = { System.ConsoleColor.White, System.ConsoleColor.Yellow, System.ConsoleColor.Red, System.ConsoleColor.Red, System.ConsoleColor.DarkRed, System.ConsoleColor.DarkRed, System.ConsoleColor.White, System.ConsoleColor.White, System.ConsoleColor.White, System.ConsoleColor.White };
             int i = 0;
-            foreach (string barfline in barflines)
+            foreach (string barfLine in barfLines)
             {
-                WriteColor(barfline, Pattern[i]);
+                WriteColor(barfLine, pattern[i]);
                 i += 1;
             }
         }
