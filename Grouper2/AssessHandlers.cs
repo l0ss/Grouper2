@@ -183,7 +183,7 @@ namespace Grouper2
             // iterate over the array sending appropriate gpp data to the appropriate assess() function.
             foreach (string GPPCategory in GPPCategories)
             {
-                AssessGPP assessGPP = new AssessGPP((JObject)GPPToAssess[GPPCategory]);
+                AssessGPP assessGPP = new AssessGPP(GPPToAssess);
                 JObject AssessedGPP = assessGPP.GetAssessed(GPPCategory);
 
                 if (AssessedGPP != null)

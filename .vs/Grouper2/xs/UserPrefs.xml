@@ -1,10 +1,10 @@
 ﻿<Properties StartupConfiguration="{5DECAEA3-2610-4065-99DC-65B9B4BA6CCD}|Default">
   <MonoDevelop.Ide.ItemProperties.Grouper2 PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Grouper2/Assess/AssessGPP.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Grouper2/Grouper2.cs">
     <Files>
-      <File FileName="Grouper2/Grouper2.cs" Line="130" Column="17" />
-      <File FileName="Grouper2/Assess/AssessGPP.cs" Line="6" Column="19" />
-      <File FileName="Grouper2/AssessHandlers.cs" Line="188" Column="18" />
+      <File FileName="Grouper2/Assess/AssessGPP.cs" Line="20" Column="20" />
+      <File FileName="Grouper2/AssessHandlers.cs" Line="189" Column="23" />
+      <File FileName="Grouper2/Grouper2.cs" Line="80" Column="54" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
