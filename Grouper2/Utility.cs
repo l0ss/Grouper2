@@ -26,9 +26,9 @@ namespace Grouper2
                     break;
             }
             string cpasswordPadded = cpassword + padding;
-            byte[] decodedCpassword = System.Convert.FromBase64String(cpasswordPadded);
+            byte[] decodedCpassword = Convert.FromBase64String(cpasswordPadded);
             AesCryptoServiceProvider aesProvider = new AesCryptoServiceProvider();
-            byte[] AesKey = new byte[] {0x4e, 0x99, 0x06, 0xe8, 0xfc, 0xb6, 0x6c, 0xc9, 0xfa, 0xf4, 0x93, 0x10, 0x62, 0x0f, 0xfe, 0xe8,
+            byte[] AesKey = {0x4e, 0x99, 0x06, 0xe8, 0xfc, 0xb6, 0x6c, 0xc9, 0xfa, 0xf4, 0x93, 0x10, 0x62, 0x0f, 0xfe, 0xe8,
                                  0xf4, 0x96, 0xe8, 0x06, 0xcc, 0x05, 0x79, 0x90, 0x20, 0x9b, 0x09, 0xa4, 0x33, 0xb6, 0x6c, 0x1b };
             aesProvider.IV = new byte[aesProvider.IV.Length];
             aesProvider.Key = AesKey;
@@ -120,7 +120,7 @@ namespace Grouper2
 ";
             string[] barfLines = barf.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
 
-            System.ConsoleColor[] pattern = { System.ConsoleColor.White, System.ConsoleColor.Yellow, System.ConsoleColor.Red, System.ConsoleColor.Red, System.ConsoleColor.DarkRed, System.ConsoleColor.DarkRed, System.ConsoleColor.White, System.ConsoleColor.White, System.ConsoleColor.White, System.ConsoleColor.White };
+            ConsoleColor[] pattern = { ConsoleColor.White, ConsoleColor.Yellow, ConsoleColor.Red, ConsoleColor.Red, ConsoleColor.DarkRed, ConsoleColor.DarkRed, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White };
             int i = 0;
             foreach (string barfLine in barfLines)
             {
