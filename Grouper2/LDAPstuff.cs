@@ -8,7 +8,7 @@ class LDAPstuff
         public static JObject GetDomainGpos()
         {
         DirectoryEntry rootDse = new DirectoryEntry("LDAP://rootDSE");
-        DirectoryEntry root = new DirectoryEntry("GC://" + rootDse.Properties["defaultNamingContext"].Value.ToString());
+        DirectoryEntry root = new DirectoryEntry("GC://" + rootDse.Properties["defaultNamingContext"].Value);
         DirectorySearcher searcher = new DirectorySearcher(root)
         {
             Filter = "(objectClass=groupPolicyContainer)"
