@@ -5,6 +5,6 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'Default' ">
     <StartAction>Project</StartAction>
-    <StartArguments>/Users/liam/tools/Grouper2/Grouper2/bin/Debug/TestPolicies/</StartArguments>
+    <StartArguments>./TestPolicies/</StartArguments>
   </PropertyGroup>
 </Project>
