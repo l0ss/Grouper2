@@ -93,7 +93,7 @@ namespace Grouper2
                     var domainGpo = domainGpos[gpoUid];
                     gpoPropsDict.Add("Display Name", domainGpo["DisplayName"].ToString());
                     gpoPropsDict.Add("Distinguished Name", domainGpo["DistinguishedName"].ToString());
-                    gpoPropsDict.Add("GPO SDDL", domainGpo["SDDL"].ToString());
+                    //gpoPropsDict.Add("GPO SDDL", domainGpo["SDDL"].ToString());
                 }
 
                 // TODO (and put in GPOProps)
