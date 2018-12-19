@@ -2,6 +2,7 @@ Grouper2/bin/Release/*
 Grouper2/bin/Debug/*.exe
 Grouper2/bin/Debug/*.dll
 Grouper2/bin/Debug/*.pdb
+Grouper2/bin/DebugLiveFromDC/*
 Grouper2/obj/*
 .vs/*
 .DS_Store
