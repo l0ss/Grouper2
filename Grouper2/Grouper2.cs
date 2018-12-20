@@ -36,9 +36,10 @@ namespace Grouper2
         }
     }
 
-    public static class GlobalVar
+    public class GlobalVar
     {
         public static bool OnlineChecks;
+        
     }
 
     internal class Grouper2
@@ -120,8 +121,8 @@ namespace Grouper2
                 
                 // Add all this crap into a dict
                 gpoResultDict.Add("GPOProps", gpoPropsJson);
-                gpoResultDict.Add("Machine Policy from GPP XML files", machinePolGppResults);
-                gpoResultDict.Add("User Policy from GPP XML files", userPolGppResults);
+                //gpoResultDict.Add("Machine Policy from GPP XML files", machinePolGppResults);
+                //gpoResultDict.Add("User Policy from GPP XML files", userPolGppResults);
                 gpoResultDict.Add("Machine Policy from Inf files", machinePolInfResults);
                 gpoResultDict.Add("User Policy from Inf files", userPolInfResults);
 

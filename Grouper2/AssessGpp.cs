@@ -152,9 +152,9 @@ namespace Grouper2
             Dictionary<string, Dictionary<string, string>> assessedGroupsDict = new Dictionary<string, Dictionary<string, string>>();
             Dictionary<string, Dictionary<string, string>> assessedUsersDict = new Dictionary<string, Dictionary<string, string>>();
 
-            foreach (JToken gppUsers in gppCategory.SelectTokens("User"))
+            foreach (JToken gppUser in gppCategory.SelectTokens("User"))
             {
-                foreach (JToken gppUser in gppUsers) {
+                //foreach (JToken gppUser in gppUsers) {
                     // dictionary for results from this specific user.
                     Dictionary<string, string> assessedUserDict = new Dictionary<string, string>
                     {
@@ -179,7 +179,7 @@ namespace Grouper2
                     assessedUserDict.Add("Action", userAction);
 
                     // check for cpasswords
-                    string cpassword = gppUser["Properties"]["@cpassword"].ToString();
+                    string cpassword = gppUserProps["@cpassword"].ToString();
                     if (cpassword.Length > 0)
                     {
                         string decryptedCpassword = "";
@@ -191,14 +191,14 @@ namespace Grouper2
 
                     // add to the output dict with a uid to keep it unique.
                     assessedUsersDict.Add(gppUser["@uid"].ToString(), assessedUserDict);
-                }
+                //}
             }
 
             // repeat the process for Groups
-            foreach (JToken gppGroups in gppCategory.SelectTokens("Group"))
+            foreach (JToken gppGroup in gppCategory.SelectTokens("Group"))
             {
-                foreach (JToken gppGroup in gppGroups)
-                {
+                //foreach (JToken gppGroup in gppGroups)
+                //{
                     //dictionary for results from this specific group
                     Dictionary<string, string> assessedGroupDict = new Dictionary<string, string>
                     {
@@ -227,7 +227,7 @@ namespace Grouper2
 
                     // add to the output dict with a uid to keep it unique.
                     assessedGroupsDict.Add(gppGroup["@uid"].ToString(), assessedGroupDict);
-                }
+                //}
             }
 
             // cast our Dictionaries back into JObjects

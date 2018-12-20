@@ -3,6 +3,7 @@ using System.Linq;
 using System.IO;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Security.Principal;
 
 namespace Grouper2
 {
@@ -96,6 +97,13 @@ namespace Grouper2
             // create an object to put the results in
             Dictionary<string, Dictionary<string, string>> matchedPrivRights = new Dictionary<string, Dictionary<string, string>>();
 
+            //set an intentionally non-matchy domainSid value unless we doing online checks.
+            string domainSid = "X";
+            if (GlobalVar.OnlineChecks)
+            {
+                domainSid = LDAPstuff.GetDomainSid();
+            }
+
             foreach (JProperty privRight in privRights.Children<JProperty>())
             {
                 foreach (JToken intPrivRight in intPrivRights)
@@ -123,6 +131,18 @@ namespace Grouper2
                             {
                                 if (GlobalVar.OnlineChecks)
                                 {
+                                    try
+                                    {
+                                        if (trusteeClean.StartsWith(domainSid))
+                                        {
+                                            string resolvedSid = LDAPstuff.GetUserFromSID(trusteeClean);
+                                            displayName = resolvedSid;
+                                        }
+                                    }
+                                    catch (IdentityNotMappedException e)
+                                    {
+                                        displayName = "Failed to resolve SID";
+                                    }
                                     //LDAPStuff.ResolveSID?
                                     //TODO: look up unknown SIDS in the domain if we can.
                                 }
