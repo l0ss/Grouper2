@@ -90,8 +90,8 @@ namespace Grouper2
                 gpoPropsDict.Add("GPO Path", gpoPath);
                 if (GlobalVar.OnlineChecks)
                 {
-                    var domainGpo = domainGpos[gpoUid];
-                    gpoPropsDict.Add("Display Name", domainGpo["DisplayName"].ToString());
+                    JToken domainGpo = domainGpos[gpoUid];
+                    gpoPropsDict.Add("Display Name", domainGpo["Display Name"].ToString());
                     gpoPropsDict.Add("Distinguished Name", domainGpo["DistinguishedName"].ToString());
                     //gpoPropsDict.Add("GPO SDDL", domainGpo["SDDL"].ToString());
                 }

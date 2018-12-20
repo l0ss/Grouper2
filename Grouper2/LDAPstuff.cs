@@ -1,7 +1,10 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
-using System.DirectoryServices;
 using System.Collections.Generic;
+using System.DirectoryServices;
+using System.Linq;
+using System.Security.Principal;
+using Grouper2;
 
 class LDAPstuff
     {
@@ -11,34 +14,81 @@ class LDAPstuff
         DirectoryEntry root = new DirectoryEntry("GC://" + rootDse.Properties["defaultNamingContext"].Value);
         DirectorySearcher searcher = new DirectorySearcher(root)
         {
-            Filter = "(objectClass=groupPolicyContainer)"
+            Filter = "(objectClass=groupPolicyContainer)",
+            SecurityMasks = SecurityMasks.Dacl | SecurityMasks.Owner
         };
 
         SearchResultCollection gpos = searcher.FindAll();
+ 
 
         // new dictionary for data from each GPO to go into
-        Dictionary<string, Dictionary<string, string>> GPOsData = new Dictionary<string, Dictionary<string, string>>();
+        JObject gposData = new JObject();
 
         foreach (SearchResult gpo in gpos)
         {
-            // new dictionary for data from this GPO
-            Dictionary<string, string> GPOData = new Dictionary<string, string>();
-
+            // object for all data for this one gpo
+            JObject gpoData = new JObject();
+            
             DirectoryEntry gpoDe = gpo.GetDirectoryEntry();
-            string gpoDn = gpo.GetDirectoryEntry().Properties["distinguishedName"].Value.ToString();
-            string[] gpoUidSplit0 = gpoDn.Split(',');
-            string[] gpoUidSplit1 = gpoUidSplit0[0].Split('=');
-            string gpoUid = gpoUidSplit1[1];
-            GPOData.Add("UID", gpoUid);
-            GPOData.Add("DistinguishedName", gpoDn);
-      
-            DirectoryEntry gpoObject = new DirectoryEntry($"LDAP://{gpoDn}");
-            GPOData.Add("DisplayName", gpoObject.Properties["displayName"].Value.ToString());
-            GPOsData.Add(gpoUid, GPOData);
+            // get some useful attributes of the gpo
+            string gpoDn = gpoDe.Properties["distinguishedName"].Value.ToString();
+            gpoData.Add("DistinguishedName", gpoDn);
+            string gpoUid = gpoDe.Properties["name"].Value.ToString();
+            gpoData.Add("UID", gpoUid);
+            string gpoDispName = gpoDe.Properties["displayName"].Value.ToString();
+            gpoData.Add("Display Name", gpoDispName);
+            // get the acl
+            //JObject gpoAclJson = new JObject();
+            ActiveDirectorySecurity gpoAcl = gpoDe.ObjectSecurity;
+            // make a jarray to put the acl in
+            JObject gpoAclJObject = new JObject();
+            //iterate over the aces in the acl
+            
+            foreach (ActiveDirectoryAccessRule gpoAce in gpoAcl.GetAccessRules(true, true, typeof(NTAccount)))
+            {
+                ActiveDirectoryRights adRightsObj = gpoAce.ActiveDirectoryRights;
+                if ((adRightsObj & ActiveDirectoryRights.ExtendedRight) != 0)
+                {
+                    Utility.DebugWrite("Fuck, I still have to deal with Extended Rights.");
+                }
+
+                // gett the rights quick and dirty
+                string adRights = gpoAce.ActiveDirectoryRights.ToString();
+                // clean the commas out
+                string cleanAdRights = adRights.Replace(", ", " ");
+                // chuck them into an array
+                string[] adRightsArray = cleanAdRights.Split(' ');
+
+                string trustee = gpoAce.IdentityReference.ToString();
+                //string inheritanceType = gpoAce.InheritanceType.ToString();
+                string acType = gpoAce.AccessControlType.ToString();
+                //string inheritanceFlags = gpoAce.InheritanceFlags.ToString();
+                //string propagationFlags = gpoAce.PropagationFlags.ToString();
+
+                string trusteeNAcType = trustee + " " + acType;
+                
+                // create a jobject of the new stuff we know 
+                JObject aceToMerge = new JObject()
+                {
+                    new JProperty(trusteeNAcType, new JArray(JArray.FromObject(adRightsArray)))
+                };
+                //Utility.DebugWrite("aceToMerge " + aceToMerge.ToString());
+                // merge it into the AclJobject
+                gpoAclJObject.Merge(aceToMerge, new JsonMergeSettings
+                {
+                    MergeArrayHandling = MergeArrayHandling.Union
+                });
+                //Utility.DebugWrite("gpoAclObject: " + gpoAclJObject);
+            }
+            
+            //add the JObject to our blob of data about the gpo
+            gpoData.Add("ACLs", gpoAclJObject);
+            // then add all of the above to the big blob of data about all gpos
+            gposData.Add(gpoUid, gpoData);
         }
 
-        JObject domainGposJson = (JObject)JToken.FromObject(GPOsData);
+        //Console.WriteLine(gposData.ToString());
 
-        return domainGposJson; 
+        return gposData; 
         }
     }
