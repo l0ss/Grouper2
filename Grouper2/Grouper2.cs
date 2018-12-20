@@ -153,6 +153,8 @@ namespace Grouper2
             Console.WriteLine("");
             Console.WriteLine(grouper2OutputJson);
             Console.WriteLine("");
+            Console.WriteLine("This");
+            Console.WriteLine(Utility.CanIWrite("C:\\temp\\thing.txt").ToString());
             // wait for 'anykey'
             Console.ReadKey();
         }

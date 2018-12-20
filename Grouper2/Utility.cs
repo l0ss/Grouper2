@@ -72,6 +72,22 @@ namespace Grouper2
             return null;
         }
 
+        public static bool CanIWrite(string inPath)
+        {
+            bool canWrite = false;
+            try
+            {
+                FileStream stream = File.OpenWrite(inPath);
+                canWrite = stream.CanWrite;
+                stream.Close();
+            }
+            catch (Exception e)
+            {
+                Utility.DebugWrite(e.ToString());
+            }
+            return canWrite;
+        }
+
         public static void WriteColor(string textToWrite, ConsoleColor fgColor)
         {
             Console.ForegroundColor = fgColor;
