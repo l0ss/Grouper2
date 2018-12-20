@@ -151,26 +151,29 @@ namespace Grouper2
             Dictionary<string, Dictionary<string, string>> assessedGroupsDict = new Dictionary<string, Dictionary<string, string>>();
             Dictionary<string, Dictionary<string, string>> assessedUsersDict = new Dictionary<string, Dictionary<string, string>>();
 
-            foreach (JToken gppUser in gppCategory["User"])
+            foreach (JToken gppUser in gppCategory.SelectTokens("User"))
             {
                 // dictionary for results from this specific user.
                 Dictionary<string, string> assessedUserDict = new Dictionary<string, string>
                 {
                     { "InterestLevel", "3" }
                 };
+
+                JToken gppUserProps = gppUser["Properties"];
+
                 // check what the entry is doing to the user and turn it into real word
-                string userAction = gppUser["Properties"]["@action"].ToString();
+                string userAction = gppUserProps["@action"].ToString();
                 userAction = GetActionString(userAction);
 
                 // get the username and a bunch of other details:
                 assessedUserDict.Add("Name", gppUser["@name"].ToString());
-                assessedUserDict.Add("User Name", gppUser["Properties"]["@userName"].ToString());
+                assessedUserDict.Add("User Name", gppUserProps["@userName"].ToString());
                 assessedUserDict.Add("DateTime Changed", gppUser["@changed"].ToString());
-                assessedUserDict.Add("Account Disabled", gppUser["Properties"]["@acctDisabled"].ToString());
-                assessedUserDict.Add("Password Never Expires", gppUser["Properties"]["@neverExpires"].ToString());
-                assessedUserDict.Add("Description", gppUser["Properties"]["@description"].ToString());
-                assessedUserDict.Add("Full Name", gppUser["Properties"]["@fullName"].ToString());
-                assessedUserDict.Add("New Name", gppUser["Properties"]["@newName"].ToString());
+                assessedUserDict.Add("Account Disabled", gppUserProps["@acctDisabled"].ToString());
+                assessedUserDict.Add("Password Never Expires", gppUserProps["@neverExpires"].ToString());
+                assessedUserDict.Add("Description", gppUserProps["@description"].ToString());
+                assessedUserDict.Add("Full Name", gppUserProps["@fullName"].ToString());
+                assessedUserDict.Add("New Name", gppUserProps["@newName"].ToString());
                 assessedUserDict.Add("Action", userAction);
 
                 // check for cpasswords
@@ -188,7 +191,7 @@ namespace Grouper2
             }
 
             // repeat the process for Groups
-            foreach (JToken gppGroup in gppCategory["Group"])
+            foreach (JToken gppGroup in gppCategory.SelectTokens("Group"))
             {
                 //dictionary for results from this specific group
                 Dictionary<string, string> assessedGroupDict = new Dictionary<string, string>
