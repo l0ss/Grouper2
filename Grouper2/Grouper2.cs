@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.DirectoryServices.ActiveDirectory;
 using System.IO;
+using System.Linq;
 
 namespace Grouper2
 {
@@ -79,49 +80,55 @@ namespace Grouper2
             {
                 // create a dict to put the stuff we find for this GPO into.
                 Dictionary<string, JObject> gpoResultDict = new Dictionary<string, JObject>();
-                Dictionary<string, string> gpoPropsDict = new Dictionary<string, string>();
+                //
 
                 // Get the UID of the GPO from the file path.
                 string[] splitPath = gpoPath.Split(Path.DirectorySeparatorChar);
                 string gpoUid = splitPath[splitPath.Length - 1];
 
-                // Set some properties of the GPO we're looking at in our output file.
-                gpoPropsDict.Add("GPO UID", gpoUid);
-                gpoPropsDict.Add("GPO Path", gpoPath);
+                // Make a JObject for GPO metadata
+                JObject gpoPropsJson = new JObject();
+                // If we're online and talking to the domain, just use that data
                 if (GlobalVar.OnlineChecks)
                 {
                     JToken domainGpo = domainGpos[gpoUid];
-                    gpoPropsDict.Add("Display Name", domainGpo["Display Name"].ToString());
-                    gpoPropsDict.Add("Distinguished Name", domainGpo["DistinguishedName"].ToString());
-                    //gpoPropsDict.Add("GPO SDDL", domainGpo["SDDL"].ToString());
+                    gpoPropsJson = (JObject) JToken.FromObject(domainGpo);
+                }
+                // otherwise do what we can with what we have
+                else
+                {
+                    Dictionary<string, string> gpoPropsDict = new Dictionary<string, string>();
+                    gpoPropsDict.Add("GPO UID", gpoUid);
+                    gpoPropsDict.Add("GPO Path", gpoPath);
+                    gpoPropsJson = (JObject)JToken.FromObject(gpoPropsDict);
                 }
 
                 // TODO (and put in GPOProps)
-                // look up the friendly name of the policy
-                // get the policy ACLs
                 // get the policy owner
                 // get whether it's linked and where
                 // get whether it's enabled
 
-                // start processing files
+                // Get the paths for the machine policy and user policy dirs
                 string machinePolPath = Path.Combine(gpoPath, "Machine");
                 string userPolPath = Path.Combine(gpoPath, "User");
 
-                //JObject machinePolInfResults = ProcessInf(machinePolPath);
-                //JObject userPolInfResults = ProcessInf(userPolPath);
+                // Process Inf and Xml Policy data for machine and user
+                JObject machinePolInfResults = ProcessInf(machinePolPath);
+                JObject userPolInfResults = ProcessInf(userPolPath);
                 JObject machinePolGppResults = ProcessGpXml(machinePolPath);
                 JObject userPolGppResults = ProcessGpXml(userPolPath);
-
-                JObject gpoPropsJson = (JObject) JToken.FromObject(gpoPropsDict);
-
+                
+                // Add all this crap into a dict
                 gpoResultDict.Add("GPOProps", gpoPropsJson);
                 gpoResultDict.Add("Machine Policy from GPP XML files", machinePolGppResults);
                 gpoResultDict.Add("User Policy from GPP XML files", userPolGppResults);
-                //gpoResultDict.Add("Machine Policy from Inf files", machinePolInfResults);
-                //gpoResultDict.Add("User Policy from Inf files", machinePolInfResults);
+                gpoResultDict.Add("Machine Policy from Inf files", machinePolInfResults);
+                gpoResultDict.Add("User Policy from Inf files", userPolInfResults);
 
+                // turn dict of data for this gpo into jobj
                 JObject gpoResultJson = (JObject) JToken.FromObject(gpoResultDict);
 
+                // put into final jobj
                 grouper2OutputDict.Add(gpoPath, gpoResultJson);
 
                 //  TODO
@@ -136,13 +143,16 @@ namespace Grouper2
                 //  Parse XML files
                 //  Parse ini files
                 //  Grep scripts for creds.
-                // File permissions for referenced files.
+                //  File permissions for referenced files.
             }
 
-            // Final output is finally happening here:
+            // Final output is finally happening finally here:
             Utility.DebugWrite("Final Output:");
             JObject grouper2OutputJson = (JObject) JToken.FromObject(grouper2OutputDict);
+            Console.WriteLine("");
             Console.WriteLine(grouper2OutputJson);
+            Console.WriteLine("");
+            // wait for 'anykey'
             Console.ReadKey();
         }
 
@@ -150,7 +160,16 @@ namespace Grouper2
         private static JObject ProcessInf(string Path)
         {
             // find all the GptTmpl.inf files
-            string[] gpttmplInfFiles = Directory.GetFiles(Path, "GptTmpl.inf", SearchOption.AllDirectories);
+            List<string> gpttmplInfFiles = new List<string>();
+            try
+            {
+                gpttmplInfFiles = Directory.GetFiles(Path, "GptTmpl.inf", SearchOption.AllDirectories).ToList();
+            }
+            catch (System.IO.DirectoryNotFoundException)
+            {
+                return null;
+            }
+
             // make a dict for our results
             Dictionary<string, JObject> processedInfsDict = new Dictionary<string, JObject>();
             // iterate over the list of inf files we found

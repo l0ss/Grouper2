@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json.Linq;
 
@@ -151,76 +152,82 @@ namespace Grouper2
             Dictionary<string, Dictionary<string, string>> assessedGroupsDict = new Dictionary<string, Dictionary<string, string>>();
             Dictionary<string, Dictionary<string, string>> assessedUsersDict = new Dictionary<string, Dictionary<string, string>>();
 
-            foreach (JToken gppUser in gppCategory.SelectTokens("User"))
+            foreach (JToken gppUsers in gppCategory.SelectTokens("User"))
             {
-                // dictionary for results from this specific user.
-                Dictionary<string, string> assessedUserDict = new Dictionary<string, string>
-                {
-                    { "InterestLevel", "3" }
-                };
+                foreach (JToken gppUser in gppUsers) {
+                    // dictionary for results from this specific user.
+                    Dictionary<string, string> assessedUserDict = new Dictionary<string, string>
+                    {
+                        {"InterestLevel", "3"}
+                    };
 
-                JToken gppUserProps = gppUser["Properties"];
+                    JToken gppUserProps = gppUser["Properties"];
 
-                // check what the entry is doing to the user and turn it into real word
-                string userAction = gppUserProps["@action"].ToString();
-                userAction = GetActionString(userAction);
+                    // check what the entry is doing to the user and turn it into real word
+                    string userAction = gppUserProps["@action"].ToString();
+                    userAction = GetActionString(userAction);
 
-                // get the username and a bunch of other details:
-                assessedUserDict.Add("Name", gppUser["@name"].ToString());
-                assessedUserDict.Add("User Name", gppUserProps["@userName"].ToString());
-                assessedUserDict.Add("DateTime Changed", gppUser["@changed"].ToString());
-                assessedUserDict.Add("Account Disabled", gppUserProps["@acctDisabled"].ToString());
-                assessedUserDict.Add("Password Never Expires", gppUserProps["@neverExpires"].ToString());
-                assessedUserDict.Add("Description", gppUserProps["@description"].ToString());
-                assessedUserDict.Add("Full Name", gppUserProps["@fullName"].ToString());
-                assessedUserDict.Add("New Name", gppUserProps["@newName"].ToString());
-                assessedUserDict.Add("Action", userAction);
+                    // get the username and a bunch of other details:
+                    assessedUserDict.Add("Name", gppUser["@name"].ToString());
+                    assessedUserDict.Add("User Name", gppUserProps["@userName"].ToString());
+                    assessedUserDict.Add("DateTime Changed", gppUser["@changed"].ToString());
+                    assessedUserDict.Add("Account Disabled", gppUserProps["@acctDisabled"].ToString());
+                    assessedUserDict.Add("Password Never Expires", gppUserProps["@neverExpires"].ToString());
+                    assessedUserDict.Add("Description", gppUserProps["@description"].ToString());
+                    assessedUserDict.Add("Full Name", gppUserProps["@fullName"].ToString());
+                    assessedUserDict.Add("New Name", gppUserProps["@newName"].ToString());
+                    assessedUserDict.Add("Action", userAction);
 
-                // check for cpasswords
-                string cpassword = gppUser["Properties"]["@cpassword"].ToString();
-                if (cpassword.Length > 0)
-                {
-                    string decryptedCpassword = "";
-                    decryptedCpassword = Utility.DecryptCpassword(cpassword);
-                    // if we find one, that's super interesting.
-                    assessedUserDict.Add("Cpassword", decryptedCpassword);
-                    assessedUserDict["InterestLevel"] = "10";
+                    // check for cpasswords
+                    string cpassword = gppUser["Properties"]["@cpassword"].ToString();
+                    if (cpassword.Length > 0)
+                    {
+                        string decryptedCpassword = "";
+                        decryptedCpassword = Utility.DecryptCpassword(cpassword);
+                        // if we find one, that's super interesting.
+                        assessedUserDict.Add("Cpassword", decryptedCpassword);
+                        assessedUserDict["InterestLevel"] = "10";
+                    }
+
+                    // add to the output dict with a uid to keep it unique.
+                    assessedUsersDict.Add(gppUser["@uid"].ToString(), assessedUserDict);
                 }
-                // add to the output dict with a uid to keep it unique.
-                assessedUsersDict.Add(gppUser["@uid"].ToString(), assessedUserDict);
             }
 
             // repeat the process for Groups
-            foreach (JToken gppGroup in gppCategory.SelectTokens("Group"))
+            foreach (JToken gppGroups in gppCategory.SelectTokens("Group"))
             {
-                //dictionary for results from this specific group
-                Dictionary<string, string> assessedGroupDict = new Dictionary<string, string>
+                foreach (JToken gppGroup in gppGroups)
                 {
-                    { "InterestLevel", "3" }
-                };
-                // check what the entry is doing to the group and turn it into real word
-                string groupAction = gppGroup["Properties"]["@action"].ToString();
-                groupAction = GetActionString(groupAction);
+                    //dictionary for results from this specific group
+                    Dictionary<string, string> assessedGroupDict = new Dictionary<string, string>
+                    {
+                        {"InterestLevel", "3"}
+                    };
 
-                // get the group name and a bunch of other details:
-                assessedGroupDict.Add("Name", gppGroup["@name"].ToString());
-                //assessedGroupDict.Add("User Name", gppGroup["Properties"]["@userName"].ToString());
-                assessedGroupDict.Add("DateTime Changed", gppGroup["@changed"].ToString());
-                //assessedGroupDict.Add("Account Disabled", gppGroup["Properties"]["@acctDisabled"].ToString());
-                //assessedGroupDict.Add("Password Never Expires", gppGroup["Properties"]["@neverExpires"].ToString());
-                //assessedGroupDict.Add("Description", gppGroup["Properties"]["@description"].ToString());
-                //assessedGroupDict.Add("Full Name", gppGroup["Properties"]["@fullName"].ToString());
-                //assessedGroupDict.Add("New Name", gppGroup["Properties"]["@newName"].ToString());
-                //assessedGroupDict.Add("Delete All Users", gppGroup["Properties"]["@deleteAllUsers"].ToString());
-                //assessedGroupDict.Add("Delete All Groups", gppGroup["Properties"]["@deleteAllGroups"].ToString());
-                //assessedGroupDict.Add("Remove Accounts", gppGroup["Properties"]["@removeAccounts"].ToString());
-                assessedGroupDict.Add("Action", groupAction);
-                //Utility.DebugWrite(gppGroup["Properties"]["Members"].ToString());
+                    JToken gppGroupProps = gppGroup["Properties"];
+
+                    // check what the entry is doing to the group and turn it into real word
+                    string groupAction = gppGroupProps["@action"].ToString();
+                    groupAction = GetActionString(groupAction);
+
+                    // get the group name and a bunch of other details:
+                    assessedGroupDict.Add("Name", gppGroup["@name"].ToString());
+                    //assessedGroupDict.Add("User Name", gppGroupProps["@userName"].ToString());
+                    assessedGroupDict.Add("DateTime Changed", gppGroup["@changed"].ToString());
+                    assessedGroupDict.Add("Description", gppGroupProps["@description"].ToString());
+                    assessedGroupDict.Add("New Name", gppGroupProps["@newName"].ToString());
+                    assessedGroupDict.Add("Delete All Users", gppGroupProps["@deleteAllUsers"].ToString());
+                    assessedGroupDict.Add("Delete All Groups", gppGroupProps["@deleteAllGroups"].ToString());
+                    assessedGroupDict.Add("Remove Accounts", gppGroupProps["@removeAccounts"].ToString());
+                    assessedGroupDict.Add("Action", groupAction);
+                    Utility.DebugWrite("You still need to figure out group members.");
+                    //Utility.DebugWrite(gppGroupProps["Members"].ToString());
 
 
-                // add to the output dict with a uid to keep it unique.
-                assessedGroupsDict.Add(gppGroup["@uid"].ToString(), assessedGroupDict);
-
+                    // add to the output dict with a uid to keep it unique.
+                    assessedGroupsDict.Add(gppGroup["@uid"].ToString(), assessedGroupDict);
+                }
             }
 
             // cast our Dictionaries back into JObjects

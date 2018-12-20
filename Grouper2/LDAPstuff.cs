@@ -28,11 +28,10 @@ class LDAPstuff
         {
             // object for all data for this one gpo
             JObject gpoData = new JObject();
-            
             DirectoryEntry gpoDe = gpo.GetDirectoryEntry();
             // get some useful attributes of the gpo
             string gpoDn = gpoDe.Properties["distinguishedName"].Value.ToString();
-            gpoData.Add("DistinguishedName", gpoDn);
+            gpoData.Add("Distinguished Name", gpoDn);
             string gpoUid = gpoDe.Properties["name"].Value.ToString();
             gpoData.Add("UID", gpoUid);
             string gpoDispName = gpoDe.Properties["displayName"].Value.ToString();
@@ -40,10 +39,9 @@ class LDAPstuff
             // get the acl
             //JObject gpoAclJson = new JObject();
             ActiveDirectorySecurity gpoAcl = gpoDe.ObjectSecurity;
-            // make a jarray to put the acl in
+            // make a JObject to put the acl in
             JObject gpoAclJObject = new JObject();
             //iterate over the aces in the acl
-            
             foreach (ActiveDirectoryAccessRule gpoAce in gpoAcl.GetAccessRules(true, true, typeof(NTAccount)))
             {
                 ActiveDirectoryRights adRightsObj = gpoAce.ActiveDirectoryRights;
@@ -51,8 +49,7 @@ class LDAPstuff
                 {
                     Utility.DebugWrite("Fuck, I still have to deal with Extended Rights.");
                 }
-
-                // gett the rights quick and dirty
+                // get the rights quick and dirty
                 string adRights = gpoAce.ActiveDirectoryRights.ToString();
                 // clean the commas out
                 string cleanAdRights = adRights.Replace(", ", " ");
@@ -60,25 +57,20 @@ class LDAPstuff
                 string[] adRightsArray = cleanAdRights.Split(' ');
 
                 string trustee = gpoAce.IdentityReference.ToString();
-                //string inheritanceType = gpoAce.InheritanceType.ToString();
                 string acType = gpoAce.AccessControlType.ToString();
-                //string inheritanceFlags = gpoAce.InheritanceFlags.ToString();
-                //string propagationFlags = gpoAce.PropagationFlags.ToString();
 
                 string trusteeNAcType = trustee + " " + acType;
                 
-                // create a jobject of the new stuff we know 
+                // create a JObject of the new stuff we know 
                 JObject aceToMerge = new JObject()
                 {
                     new JProperty(trusteeNAcType, new JArray(JArray.FromObject(adRightsArray)))
                 };
-                //Utility.DebugWrite("aceToMerge " + aceToMerge.ToString());
-                // merge it into the AclJobject
+
                 gpoAclJObject.Merge(aceToMerge, new JsonMergeSettings
                 {
                     MergeArrayHandling = MergeArrayHandling.Union
                 });
-                //Utility.DebugWrite("gpoAclObject: " + gpoAclJObject);
             }
             
             //add the JObject to our blob of data about the gpo
@@ -86,8 +78,6 @@ class LDAPstuff
             // then add all of the above to the big blob of data about all gpos
             gposData.Add(gpoUid, gpoData);
         }
-
-        //Console.WriteLine(gposData.ToString());
 
         return gposData; 
         }
