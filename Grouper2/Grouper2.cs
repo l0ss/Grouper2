@@ -133,7 +133,8 @@ namespace Grouper2
                 grouper2OutputDict.Add(gpoPath, gpoResultJson);
 
                 //  TODO
-                //  Parse other inf sections:
+                //  do something with 'interest levels' 
+                //  Parse other inf sections properly:
                 //  System Access
                 //  Kerberos Policy
                 //  Event Audit
@@ -153,8 +154,6 @@ namespace Grouper2
             Console.WriteLine("");
             Console.WriteLine(grouper2OutputJson);
             Console.WriteLine("");
-            Console.WriteLine("This");
-            Console.WriteLine(Utility.CanIWrite("C:\\temp\\thing.txt").ToString());
             // wait for 'anykey'
             Console.ReadKey();
         }

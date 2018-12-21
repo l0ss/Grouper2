@@ -79,7 +79,7 @@ namespace Grouper2
             assessedFileDict.Add("Name", gppFile["@name"].ToString());
             assessedFileDict.Add("Status", gppFile["@status"].ToString());
             assessedFileDict.Add("Changed", gppFile["@changed"].ToString());
-            string gppFileAction = GetActionString(gppFileProps["@action"].ToString());
+            string gppFileAction = Util.GetActionString(gppFileProps["@action"].ToString());
             assessedFileDict.Add("Action", gppFileAction);
             string fromPath = gppFileProps["@fromPath"].ToString();
             assessedFileDict.Add("From Path", fromPath);
@@ -161,7 +161,7 @@ namespace Grouper2
 
             // check what the entry is doing to the user and turn it into real word
             string userAction = gppUserProps["@action"].ToString();
-            userAction = GetActionString(userAction);
+            userAction = Util.GetActionString(userAction);
 
             // get the username and a bunch of other details:
             assessedUserDict.Add("Name", gppUser["@name"].ToString());
@@ -202,7 +202,7 @@ namespace Grouper2
 
             // check what the entry is doing to the group and turn it into real word
             string groupAction = gppGroupProps["@action"].ToString();
-            groupAction = GetActionString(groupAction);
+            groupAction = Util.GetActionString(groupAction);
 
             // get the group name and a bunch of other details:
             assessedGroupDict.Add("Name", gppGroup["@name"].ToString());
@@ -219,14 +219,12 @@ namespace Grouper2
 
         }
 
-        /*
+       
        private JObject GetAssessedDrives(JObject gppCategory)
        {
            JProperty gppDriveProp = new JProperty("Drive", gppCategory["Drive"]);
            JObject assessedGppDrives = new JObject(gppDriveProp);
            return assessedGppDrives;
-           //Utility.DebugWrite("gpp is about gppShortcuts");
-           //Console.WriteLine(gppShortcuts["Shortcut"]);
        }
 
        private JObject GetAssessedEnvironmentVariables(JObject gppCategory)
@@ -234,18 +232,13 @@ namespace Grouper2
            JProperty gppEVProp = new JProperty("EnvironmentVariable", gppCategory["EnvironmentVariable"]);
            JObject assessedGppEVs = new JObject(gppEVProp);
            return assessedGppEVs;
-           //Utility.DebugWrite("gpp is about gppShortcuts");
-           //Console.WriteLine(gppShortcuts["Shortcut"]);
        }
 
-       // none of these assess functions do anything but return the values from the gpp yet.
        private JObject GetAssessedShortcuts(JObject gppCategory)
        {
            JProperty gppShortcutProp = new JProperty("Shortcut", gppCategory["Shortcut"]);
            JObject assessedGppShortcuts = new JObject(gppShortcutProp);
            return assessedGppShortcuts;
-           //Utility.DebugWrite("gpp is about gppShortcuts");
-           //Console.WriteLine(gppShortcuts["Shortcut"]);
        }
 
        private JObject GetAssessedScheduledTasks(JObject gppCategory)
@@ -254,9 +247,6 @@ namespace Grouper2
            JProperty assessedGppSchedTasksImmediateTaskProp = new JProperty("ImmediateTaskV2", gppCategory["ImmediateTaskV2"]);
            JObject assessedGppSchedTasksAllJson = new JObject(assessedGppSchedTasksTaskProp, assessedGppSchedTasksImmediateTaskProp);
            return assessedGppSchedTasksAllJson;
-           //Utility.DebugWrite("gpp is about SchedTasks");
-           //Console.WriteLine(gppSchedTasks["Task"]);
-           //Console.WriteLine(gppSchedTasks["ImmediateTaskV2"]);
        }
 
        private JObject GetAssessedRegistrySettings(JObject gppCategory)
@@ -264,8 +254,6 @@ namespace Grouper2
            JProperty gppRegSettingsProp = new JProperty("RegSettings", gppCategory["Registry"]);
            JObject assessedGppRegSettings = new JObject(gppRegSettingsProp);
            return assessedGppRegSettings;
-           //Utility.DebugWrite("gpp is about RegistrySettings");
-           //Console.WriteLine(gppRegSettings["Registry"]);
        }
 
        private JObject GetAssessedNTServices(JObject gppCategory)
@@ -273,8 +261,6 @@ namespace Grouper2
            JProperty ntServiceProp = new JProperty("NTService", gppCategory["NTService"]);
            JObject assessedNtServices = new JObject(ntServiceProp);
            return assessedNtServices;
-           //Utility.DebugWrite("gpp is about NTServices");
-           //Console.WriteLine(gppNtServices["NTService"]);
        }
 
        private JObject GetAssessedNetworkOptions(JObject gppCategory)
@@ -282,8 +268,6 @@ namespace Grouper2
            JProperty gppNetworkOptionsProp = new JProperty("DUN", gppCategory["DUN"]);
            JObject assessedGppNetworkOptions = new JObject(gppNetworkOptionsProp);
            return assessedGppNetworkOptions;
-           //Utility.DebugWrite("gpp is about Network Options");
-           //Console.WriteLine(gppNetworkOptions["DUN"]);
        }
 
        private JObject GetAssessedFolders(JObject gppCategory)
@@ -291,8 +275,6 @@ namespace Grouper2
            JProperty gppFoldersProp = new JProperty("Folder", gppCategory["Folder"]);
            JObject assessedGppFolders = new JObject(gppFoldersProp);
            return assessedGppFolders;
-           //Utility.DebugWrite("gpp is about Folders");
-           //Console.WriteLine(gppFolders["Folder"]);
        }
 
        private JObject GetAssessedNetworkShareSettings(JObject gppCategory)
@@ -300,42 +282,14 @@ namespace Grouper2
            JProperty gppNetSharesProp = new JProperty("NetShare", gppCategory["NetShare"]);
            JObject assessedGppNetShares = new JObject(gppNetSharesProp);
            return assessedGppNetShares;
-           //Utility.DebugWrite("gpp is about Network Shares");
-           //Console.WriteLine(gppNetShares["NetShare"]);
        }
 
 
        private JObject GetAssessedIniFiles(JObject gppCategory)
        {
-           //Utility.DebugWrite("gpp is about gppIniFiles");
-           JObject assessedGppIniFiles = (JObject)gppCategory["Ini"];
-           //Console.WriteLine(AssessedGPPIniFiles.ToString());
+           JProperty gppIniFilesProp = new JProperty("Ini", gppCategory["Ini"]);
+           JObject assessedGppIniFiles = new JObject(gppIniFilesProp);
            return assessedGppIniFiles;
-       }*/
-
-        private static string GetActionString(string actionChar)
-            // shut up, i know it's not really a char.
-        {
-            string actionString = "";
-
-            switch (actionChar)
-            {
-                case "U":
-                    actionString = "Update";
-                    break;
-                case "A":
-                    actionString = "Add";
-                    break;
-                case "D":
-                    actionString = "Delete";
-                    break;
-                default:
-                    Utility.DebugWrite("oh no this is new");
-                    actionString = "Broken";
-                    break;
-            }
-
-            return actionString;
-        }
+       }
     }
 }

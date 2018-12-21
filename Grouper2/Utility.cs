@@ -88,14 +88,7 @@ namespace Grouper2
             }
             return canWrite;
         }
-
-        public static void WriteColor(string textToWrite, ConsoleColor fgColor)
-        {
-            Console.ForegroundColor = fgColor;
-            Console.WriteLine(textToWrite);
-            Console.ResetColor();
-        }
-
+        
         public static void DebugWrite(string textToWrite)
         {
             Console.BackgroundColor = ConsoleColor.Yellow;
@@ -122,26 +115,46 @@ namespace Grouper2
             Console.WriteLine();
         }
 
+        public static void WriteColor(string textToWrite, ConsoleColor fgColor)
+        {
+            Console.ForegroundColor = fgColor;
+            Console.Write(textToWrite);
+            Console.ResetColor();
+        }
+
+        public static void WriteColorLine(string textToWrite, ConsoleColor fgColor)
+        {
+            Console.ForegroundColor = fgColor;
+            Console.WriteLine(textToWrite);
+            Console.ResetColor();
+        }
 
         public static void PrintBanner()
         {
-            string barf = @"  .,-:::::/  :::::::..       ...      ...    :::::::::::::. .,::::::  :::::::..     .:::.  
-,;;-'````'   ;;;;``;;;;   .;;;;;;;.   ;;     ;;; `;;;```.;;;;;;;''''  ;;;;``;;;;   ,;'``;. 
-[[[   [[[[[[/ [[[,/[[['  ,[[     \[[,[['     [[[  `]]nnn]]'  [[cccc    [[[,/[[['   ''  ,[['
-*$$c.    *$$  $$$$$$c    $$$,     $$$$$      $$$   $$$**     $$****    $$$$$$c     .c$$P'  
- `Y8bo,,,o88o 888b *88bo,*888,_ _,88P88    .d888   888o      888oo,__  888b *88bo,d88 _,oo,
-   `'YMUP*YMM MMMM   *W*   *YMMMMMP*  *YmmMMMM**   YMMMb     ****YUMMM MMMM   *W* MMMUP**^^
-                                                            Now even Grouperer.
-                                                            github.com/mikeloss/Grouper2
-                                                            @mikeloss
-";
+            string barf = @"  .,-:::::/  :::::::..       ...      ...    :::::::::::::. .,::::::  :::::::..     .:::.   
+,;;-'````'   ;;;;``;;;;   .;;;;;;;.   ;;     ;;; `;;;```.;;;;;;;''''  ;;;;``;;;;   ,;'``;.  
+[[[   [[[[[[/ [[[,/[[['  ,[[     \[[,[['     [[[  `]]nnn]]'  [[cccc    [[[,/[[['   ''  ,[[' 
+*$$c.    *$$  $$$$$$c    $$$,     $$$$$      $$$   $$$**     $$****    $$$$$$c     .c$$P'   
+ `Y8bo,,,o88o 888b *88bo,*888,_ _,88P88    .d888   888o      888oo,__  888b *88bo,d88 _,oo, 
+   `'YMUP*YMM MMMM   *W*   *YMMMMMP*  *YmmMMMM**   YMMMb     ****YUMMM MMMM   *W* MMMUP**^^ 
+                                                            Now even Grouperer.              
+                                                            github.com/mikeloss/Grouper2    
+                                                            @mikeloss                          ";
             string[] barfLines = barf.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
 
-            ConsoleColor[] pattern = { ConsoleColor.White, ConsoleColor.Yellow, ConsoleColor.Red, ConsoleColor.Red, ConsoleColor.DarkRed, ConsoleColor.DarkRed, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White };
+            ConsoleColor[] patternOne = { ConsoleColor.White, ConsoleColor.Yellow, ConsoleColor.Red, ConsoleColor.Red, ConsoleColor.DarkRed, ConsoleColor.DarkRed, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White };
+            ConsoleColor[] patternTwo =
+            {
+                ConsoleColor.White, ConsoleColor.White, ConsoleColor.Cyan, ConsoleColor.Blue, ConsoleColor.DarkBlue,
+                ConsoleColor.DarkBlue, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White,
+            };
             int i = 0;
             foreach (string barfLine in barfLines)
             {
-                WriteColor(barfLine, pattern[i]);
+                string barfOne = barfLine.Substring(0, 82);
+                string barfTwo = barfLine.Substring(82, 9);
+                WriteColor(barfOne, patternOne[i]);
+                WriteColorLine(barfTwo, patternTwo[i]);
                 i += 1;
             }
         }

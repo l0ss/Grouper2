@@ -127,12 +127,11 @@ namespace Grouper2
             var slippedThrough = headingsInInf.Except(knownKeys);
             if (slippedThrough.Any())
             {
-                Utility.DebugWrite("We didn't parse any of these sections:");
+                Console.WriteLine("We didn't parse any of these sections:");
                 foreach (var unparsedHeader in slippedThrough)
                 {
                     Console.WriteLine(unparsedHeader);
                     //  Event Audit ?
-
                 }
             }
             //mangle our json thing into a jobject and return it
