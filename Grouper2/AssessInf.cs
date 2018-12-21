@@ -59,8 +59,6 @@ static internal class AssessInf
                                 {
                                     displayName = "Failed to resolve SID";
                                 }
-                                //LDAPStuff.ResolveSID?
-                                //TODO: look up unknown SIDS in the domain if we can.
                             }
                         }
                         trusteesDict.Add(trusteeClean, displayName);
@@ -108,5 +106,40 @@ static internal class AssessInf
         // cast our output into a jobject and return it
         JObject matchedRegValuesJson = (JObject)JToken.FromObject(matchedRegValues);
         return matchedRegValuesJson;
+    }
+
+    public static JObject AssessSysAccess(JToken sysAccess)
+    {
+        //placeholder only
+        JObject sysAccessJson = (JObject)JToken.FromObject(sysAccess);
+        return sysAccessJson;
+    }
+
+    public static JObject AssessKerbPolicy(JToken kerbPolicy)
+    {
+        //placeholder only
+        JObject sysAccessJson = (JObject)JToken.FromObject(kerbPolicy);
+        return sysAccessJson;
+    }
+
+    public static JObject AssessRegKeys(JToken regKeys)
+    {
+        //placeholder only
+        JObject regKeysJson = (JObject)JToken.FromObject(regKeys);
+        return regKeysJson;
+    }
+
+    public static JObject AssessGroupMembership(JToken grpMembership)
+    {
+        //placeholder only
+        JObject grpMembershipJson = (JObject)JToken.FromObject(grpMembership);
+        return grpMembershipJson;
+    }
+
+    public static JObject AssessServiceGenSetting(JToken svcGenSetting)
+    {
+        //placeholder only
+        JObject svcGenSettingJson = (JObject)JToken.FromObject(svcGenSetting);
+        return svcGenSettingJson;
     }
 }

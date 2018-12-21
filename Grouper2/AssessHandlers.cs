@@ -33,7 +33,7 @@ namespace Grouper2
                     JObject privRightsResults = AssessInf.AssessPrivRights(privRights);
                     if (privRightsResults.Count > 0)
                     {
-                        assessedGpTmpl.Add("privRights", privRightsResults);
+                        assessedGpTmpl.Add("Privilege Rights", privRightsResults);
                     }
                     knownKeys.Add("Privilege Rights");
                 }
@@ -47,20 +47,77 @@ namespace Grouper2
                 JObject matchedRegValues = AssessInf.AssessRegValues(regValues);
                 if (matchedRegValues.Count > 0)
                 {
-                    assessedGpTmpl.Add("regValues", matchedRegValues);
+                    assessedGpTmpl.Add("Registry Values", matchedRegValues);
                 }
                 knownKeys.Add("Registry Values");
             }
-            
-
-            //TODO:
-            //System Access
-            //Registry Keys
-            //Group Membership
-            //Service General Setting
+            ///////////////////////////////////////////////////////////////
+            // System Access
+            ///////////////////////////////////////////////////////////////
+            JToken sysAccess = infToAssess["System Access"];
+            if (sysAccess != null)
+            {
+                JObject assessedSysAccess = AssessInf.AssessSysAccess(sysAccess);
+                if (assessedSysAccess.Count > 0)
+                {
+                    assessedGpTmpl.Add("System Access", assessedSysAccess);
+                }
+                knownKeys.Add("System Access");
+            }
+            ///////////////////////////////////////////////////////////////
+            // Kerberos Policy
+            ///////////////////////////////////////////////////////////////
+            JToken kerbPolicy = infToAssess["Kerberos Policy"];
+            if (kerbPolicy != null)
+            {
+                JObject assessedKerbPol = AssessInf.AssessKerbPolicy(kerbPolicy);
+                if (assessedKerbPol.Count > 0)
+                {
+                    assessedGpTmpl.Add("Kerberos Policy", assessedKerbPol);
+                }
+                knownKeys.Add("Kerberos Policy");
+            }
+            ///////////////////////////////////////////////////////////////
+            // Registry Keys
+            ///////////////////////////////////////////////////////////////
+            JToken regKeys = infToAssess["Registry Keys"];
+            if (regKeys != null)
+            {
+                JObject assessedRegKeys = AssessInf.AssessRegKeys(regKeys);
+                if (assessedRegKeys.Count > 0)
+                {
+                    assessedGpTmpl.Add("Registry Keys", assessedRegKeys);
+                }
+                knownKeys.Add("Registry Keys");
+            }
+            ///////////////////////////////////////////////////////////////
+            // Group Membership
+            ///////////////////////////////////////////////////////////////
+            JToken grpMembership = infToAssess["Group Membership"];
+            if (grpMembership != null)
+            {
+                JObject assessedgrpMembership = AssessInf.AssessRegKeys(grpMembership);
+                if (assessedgrpMembership.Count > 0)
+                {
+                    assessedGpTmpl.Add("Group Membership", assessedgrpMembership);
+                }
+                knownKeys.Add("Group Membership");
+            }
+            ///////////////////////////////////////////////////////////////
+            // Registry Keys
+            ///////////////////////////////////////////////////////////////
+            JToken svcGenSetting = infToAssess["Service General Setting"];
+            if (regKeys != null)
+            {
+                JObject assessedSvcGenSetting = AssessInf.AssessRegKeys(svcGenSetting);
+                if (assessedSvcGenSetting.Count > 0)
+                {
+                    assessedGpTmpl.Add("Service General Setting", assessedSvcGenSetting);
+                }
+                knownKeys.Add("Service General Setting");
+            }
 
             //catch any stuff that falls through the cracks, i.e. look for headings on sections that we aren't parsing.
-
             List<string> headingsInInf =  new List<string>();
             foreach (JProperty section in infToAssess.Children<JProperty>())
             {
@@ -74,16 +131,10 @@ namespace Grouper2
                 foreach (var unparsedHeader in slippedThrough)
                 {
                     Console.WriteLine(unparsedHeader);
-                    //  System Access +
-                    //  Kerberos Policy -
-                    //  Event Audit -
-                    //  Registry Values +
-                    //  Registry Keys +
-                    //  Group Membership +
-                    //  Service General Setting +
+                    //  Event Audit ?
+
                 }
             }
-            
             //mangle our json thing into a jobject and return it
             JObject assessedGpTmplJson = (JObject)JToken.FromObject(assessedGpTmpl);
             return assessedGpTmplJson;
