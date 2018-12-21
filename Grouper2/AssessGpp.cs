@@ -81,9 +81,20 @@ namespace Grouper2
             assessedFileDict.Add("Changed", gppFile["@changed"].ToString());
             string gppFileAction = GetActionString(gppFileProps["@action"].ToString());
             assessedFileDict.Add("Action", gppFileAction);
-            assessedFileDict.Add("From Path", gppFileProps["@fromPath"].ToString());
+            string fromPath = gppFileProps["@fromPath"].ToString();
+            assessedFileDict.Add("From Path", fromPath);
             assessedFileDict.Add("Target Path", gppFileProps["@targetPath"].ToString());
             //TODO some logic to check from path file perms
+            if (GlobalVar.OnlineChecks && (fromPath.Length > 0))
+            {
+                bool writable = false;
+                writable = Utility.CanIWrite(fromPath);
+                if (writable)
+                {
+                    assessedFileDict["InterestLevel"] = "10";
+                    assessedFileDict.Add("From Path Writable", "True");
+                }
+            }
             return assessedFileDict;
         }
 
@@ -105,7 +116,6 @@ namespace Grouper2
                 assessedGroupsDict.Add(gppGroup["@uid"].ToString(), GetAssessedGroup(gppGroup));
             }
             JObject assessedGppGroups = (JObject)JToken.FromObject(assessedGroupsDict);
-            
 
             if (gppCategory["User"] is JArray)
             {
