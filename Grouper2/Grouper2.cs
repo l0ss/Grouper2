@@ -58,7 +58,7 @@ namespace Grouper2
                 string currentDomainString = Domain.GetCurrentDomain().ToString();
                 Console.WriteLine("Current AD Domain is: " + currentDomainString);
                 sysvolPolDir = @"\\" + currentDomainString + @"\sysvol\" + currentDomainString + @"\Policies\";
-                Utility.DebugWrite("SysvolPolDir is " + sysvolPolDir);
+                //Utility.DebugWrite("SysvolPolDir is " + sysvolPolDir);
                 GlobalVar.OnlineChecks = true;
             }
 
@@ -121,8 +121,8 @@ namespace Grouper2
                 
                 // Add all this crap into a dict
                 gpoResultDict.Add("GPOProps", gpoPropsJson);
-                //gpoResultDict.Add("Machine Policy from GPP XML files", machinePolGppResults);
-                //gpoResultDict.Add("User Policy from GPP XML files", userPolGppResults);
+                gpoResultDict.Add("Machine Policy from GPP XML files", machinePolGppResults);
+                gpoResultDict.Add("User Policy from GPP XML files", userPolGppResults);
                 gpoResultDict.Add("Machine Policy from Inf files", machinePolInfResults);
                 gpoResultDict.Add("User Policy from Inf files", userPolInfResults);
 
