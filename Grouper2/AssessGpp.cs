@@ -79,7 +79,7 @@ namespace Grouper2
             assessedFileDict.Add("Name", gppFile["@name"].ToString());
             assessedFileDict.Add("Status", gppFile["@status"].ToString());
             assessedFileDict.Add("Changed", gppFile["@changed"].ToString());
-            string gppFileAction = Util.GetActionString(gppFileProps["@action"].ToString());
+            string gppFileAction = Utility.GetActionString(gppFileProps["@action"].ToString());
             assessedFileDict.Add("Action", gppFileAction);
             string fromPath = gppFileProps["@fromPath"].ToString();
             assessedFileDict.Add("From Path", fromPath);
@@ -132,8 +132,8 @@ namespace Grouper2
             JObject assessedGppUsers = (JObject)JToken.FromObject(assessedUsersDict);
 
             // cast our Dictionaries back into JObjects
-            JProperty assessedUsersJson = new JProperty("GPP User settings", assessedGppUsers);
-            JProperty assessedGroupsJson = new JProperty("GPP Group settings", assessedGppGroups);
+            JProperty assessedUsersJson = new JProperty("GPPUserSettings", assessedGppUsers);
+            JProperty assessedGroupsJson = new JProperty("GPPGroupSettings", assessedGppGroups);
             // chuck the users and groups together in one JObject
             JObject assessedGppGroupsJson = new JObject();
             // only want to actually output these things if there's anything useful in them.
@@ -161,7 +161,7 @@ namespace Grouper2
 
             // check what the entry is doing to the user and turn it into real word
             string userAction = gppUserProps["@action"].ToString();
-            userAction = Util.GetActionString(userAction);
+            userAction = Utility.GetActionString(userAction);
 
             // get the username and a bunch of other details:
             assessedUserDict.Add("Name", gppUser["@name"].ToString());
@@ -202,23 +202,24 @@ namespace Grouper2
 
             // check what the entry is doing to the group and turn it into real word
             string groupAction = gppGroupProps["@action"].ToString();
-            groupAction = Util.GetActionString(groupAction);
+            groupAction = Utility.GetActionString(groupAction);
 
             // get the group name and a bunch of other details:
-            assessedGroupDict.Add("Name", gppGroup["@name"].ToString());
-            assessedGroupDict.Add("DateTime Changed", gppGroup["@changed"].ToString());
-            assessedGroupDict.Add("Description", gppGroupProps["@description"].ToString());
-            assessedGroupDict.Add("New Name", gppGroupProps["@newName"].ToString());
-            assessedGroupDict.Add("Delete All Users", gppGroupProps["@deleteAllUsers"].ToString());
-            assessedGroupDict.Add("Delete All Groups", gppGroupProps["@deleteAllGroups"].ToString());
-            assessedGroupDict.Add("Remove Accounts", gppGroupProps["@removeAccounts"].ToString());
+            assessedGroupDict.Add("Name", Utility.GetSafeString(gppGroup, "@name"));
+            assessedGroupDict.Add("DateTime Changed", Utility.GetSafeString(gppGroup,"@changed"));
+            assessedGroupDict.Add("Description", Utility.GetSafeString(gppGroupProps, "@description"));
+            assessedGroupDict.Add("New Name", Utility.GetSafeString(gppGroupProps, "@newName"));
+            assessedGroupDict.Add("Delete All Users", Utility.GetSafeString(gppGroupProps,"@deleteAllUsers"));
+            assessedGroupDict.Add("Delete All Groups", Utility.GetSafeString(gppGroupProps,"@deleteAllGroups"));
+            assessedGroupDict.Add("Remove Accounts", Utility.GetSafeString(gppGroupProps,"@removeAccounts"));
             assessedGroupDict.Add("Action", groupAction);
+            //assessedGroupDict.Add("Group Members", gppGroup);
+            Console.WriteLine(gppGroup.ToString());
             Utility.DebugWrite("You still need to figure out group members.");
 
             return assessedGroupDict;
 
         }
-
        
        private JObject GetAssessedDrives(JObject gppCategory)
        {

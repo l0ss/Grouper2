@@ -96,7 +96,7 @@ namespace Grouper2
             JToken grpMembership = infToAssess["Group Membership"];
             if (grpMembership != null)
             {
-                JObject assessedgrpMembership = AssessInf.AssessRegKeys(grpMembership);
+                JObject assessedgrpMembership = AssessInf.AssessGroupMembership(grpMembership);
                 if (assessedgrpMembership.Count > 0)
                 {
                     assessedGpTmpl.Add("Group Membership", assessedgrpMembership);
@@ -104,12 +104,12 @@ namespace Grouper2
                 knownKeys.Add("Group Membership");
             }
             ///////////////////////////////////////////////////////////////
-            // Registry Keys
+            // Service General Setting
             ///////////////////////////////////////////////////////////////
             JToken svcGenSetting = infToAssess["Service General Setting"];
             if (regKeys != null)
             {
-                JObject assessedSvcGenSetting = AssessInf.AssessRegKeys(svcGenSetting);
+                JObject assessedSvcGenSetting = AssessInf.AssessServiceGenSetting(svcGenSetting);
                 if (assessedSvcGenSetting.Count > 0)
                 {
                     assessedGpTmpl.Add("Service General Setting", assessedSvcGenSetting);

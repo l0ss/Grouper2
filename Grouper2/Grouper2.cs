@@ -15,6 +15,9 @@ using System.Collections.Generic;
 using System.DirectoryServices.ActiveDirectory;
 using System.IO;
 using System.Linq;
+using System.Net.Mime;
+using CommandLineParser.Arguments;
+using CommandLineParser.Exceptions;
 
 namespace Grouper2
 {
@@ -39,7 +42,8 @@ namespace Grouper2
     public class GlobalVar
     {
         public static bool OnlineChecks;
-        
+        public static int IntLevelToShow;
+
     }
 
     internal class Grouper2
@@ -47,32 +51,96 @@ namespace Grouper2
         private static void Main(string[] args)
         {
             Utility.PrintBanner();
+
+            CommandLineParser.CommandLineParser parser = new CommandLineParser.CommandLineParser();
+            SwitchArgument offlineArg = new SwitchArgument('o', "offline", "Disables checks that require LDAP comms with a DC or SMB comms with file shares found in policy settings. Requires that you define a value for --sysvol.", false);
+            ValueArgument<string> sysvolArg = new ValueArgument<string>('s', "sysvol", "Set the path to a domain SYSVOL directory.");
+            ValueArgument<int> intlevArg = new ValueArgument<int>('i', "interestlevel", "The minimum interest level to display. i.e. findings with an interest level lower than x will not be seen in output. Defaults to 1, i.e. show everything.");
+            ValueArgument<string> domainArg = new ValueArgument<string>('d', "domain", "The domain to connect to. If not specified, connects to current user context domain.");
+            ValueArgument<string> usernameArg = new ValueArgument<string>('u', "username", "Username to authenticate as. SMB permissions checks will be run from this user's perspective.");
+            ValueArgument<string> passwordArg = new ValueArgument<string>('p', "password", "Password to use for authentication.");
+            parser.Arguments.Add(domainArg);
+            parser.Arguments.Add(usernameArg);
+            parser.Arguments.Add(passwordArg);
+            parser.Arguments.Add(intlevArg);
+            parser.Arguments.Add(sysvolArg);
+            parser.Arguments.Add(offlineArg);
+
+            // set a couple of defaults
             string sysvolPolDir = "";
+            GlobalVar.OnlineChecks = true;
+
+            try
+            {
+                parser.ParseCommandLine(args);
+                parser.ShowParsedArguments();
+
+                if (offlineArg.Parsed && offlineArg.Value && sysvolArg.Parsed)
+                {
+                    // args config for valid offline run.
+                    GlobalVar.OnlineChecks = false;
+                    sysvolPolDir = sysvolArg.Value;
+                }
+                if (offlineArg.Parsed && offlineArg.Value && !sysvolArg.Parsed)
+                {
+                    // handle someone trying to run in offline mode without giving a value for sysvol
+                    Console.WriteLine("Offline mode requires you to provide a value for -s, the path where Grouper2 can find the domain SYSVOL share, or a copy of it at least.");
+                    Environment.Exit(1);
+                }
+                if (intlevArg.Parsed)
+                {
+                    // handle interest level parsing
+                    Console.WriteLine("Roger. Everything with an Interest Level lower than " + intlevArg.Value.ToString() +" is getting thrown on the floor.");
+                    GlobalVar.IntLevelToShow = intlevArg.Value;
+                }
+                else
+                {
+                    GlobalVar.IntLevelToShow = 0;
+                }
+
+                if (sysvolArg.Parsed)
+                {
+                    sysvolPolDir = sysvolArg.Value;
+                }
+                if (domainArg.Parsed || usernameArg.Parsed || passwordArg.Parsed)
+                {
+                    Console.WriteLine("I haven't set up anything to handle the domain/password stuff yet, so it won't work");
+                    Environment.Exit(1);
+                }
+            }
+            catch (CommandLineException e)
+            {
+                Console.WriteLine(e.Message);
+            }
 
             JObject domainGpos = new JObject();
 
             // Ask the DC for GPO details
-            if (args.Length == 0)
+            if (GlobalVar.OnlineChecks)
             {
                 Console.WriteLine("Trying to figure out what AD domain we're working with.");
                 string currentDomainString = Domain.GetCurrentDomain().ToString();
                 Console.WriteLine("Current AD Domain is: " + currentDomainString);
-                sysvolPolDir = @"\\" + currentDomainString + @"\sysvol\" + currentDomainString + @"\Policies\";
-                //Utility.DebugWrite("SysvolPolDir is " + sysvolPolDir);
-                GlobalVar.OnlineChecks = true;
-            }
-
-            // or if the user gives a path argument, just look for policies in there
-            if (args.Length == 1)
-            {
-                Console.WriteLine("OK, I trust you know where you're aiming me.");
-                sysvolPolDir = args[0];
+                if (sysvolPolDir == "")
+                {
+                    sysvolPolDir = @"\\" + currentDomainString + @"\sysvol\" + currentDomainString + @"\Policies\";
+                }
             }
 
             Console.WriteLine("We gonna look at the policies in: " + sysvolPolDir);
+
             if (GlobalVar.OnlineChecks) domainGpos = LDAPstuff.GetDomainGpos();
 
-            string[] gpoPaths = Directory.GetDirectories(sysvolPolDir);
+            string[] gpoPaths = new string[0];
+            try
+            {
+                gpoPaths = Directory.GetDirectories(sysvolPolDir);
+            }
+            catch
+            {
+                Console.WriteLine("Sysvol path is broken. You should fix it.");
+                Environment.Exit(1);
+            }
 
             // create a dict to put all our output goodies in.
             Dictionary<string, JObject> grouper2OutputDict = new Dictionary<string, JObject>();
@@ -119,12 +187,25 @@ namespace Grouper2
                 JObject machinePolGppResults = ProcessGpXml(machinePolPath);
                 JObject userPolGppResults = ProcessGpXml(userPolPath);
                 
-                // Add all this crap into a dict
+                // Add all this crap into a dict, if we found anything of interest.
                 gpoResultDict.Add("GPOProps", gpoPropsJson);
-                gpoResultDict.Add("Machine Policy from GPP XML files", machinePolGppResults);
-                gpoResultDict.Add("User Policy from GPP XML files", userPolGppResults);
-                gpoResultDict.Add("Machine Policy from Inf files", machinePolInfResults);
-                gpoResultDict.Add("User Policy from Inf files", userPolInfResults);
+                if (machinePolGppResults.HasValues)
+                {
+                    gpoResultDict.Add("Machine Policy from GPP XML files", machinePolGppResults);
+                }
+                if (userPolGppResults.HasValues)
+                {
+                    gpoResultDict.Add("User Policy from GPP XML files", userPolGppResults);
+                }
+                if (machinePolInfResults.HasValues)
+                {
+                    gpoResultDict.Add("Machine Policy from Inf files", machinePolInfResults);
+                }
+                if (userPolInfResults.HasValues)
+                {
+                    gpoResultDict.Add("User Policy from Inf files", userPolInfResults);
+                }
+                
 
                 // turn dict of data for this gpo into jobj
                 JObject gpoResultJson = (JObject) JToken.FromObject(gpoResultDict);
@@ -146,6 +227,10 @@ namespace Grouper2
                 //  Parse ini files
                 //  Grep scripts for creds.
                 //  File permissions for referenced files.
+                //  Parse Registry.pol
+                //  Parse Scripts.ini
+                //  Parse Machine\Applications\*.AAS (assigned applications?
+
             }
 
             // Final output is finally happening finally here:

@@ -1,8 +1,10 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.DirectoryServices;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Security.Principal;
 using Grouper2;
 
@@ -12,16 +14,60 @@ class LDAPstuff
         {
             DirectoryEntry rootDse = new DirectoryEntry("LDAP://rootDSE");
             DirectoryEntry root = new DirectoryEntry("GC://" + rootDse.Properties["defaultNamingContext"].Value);
-            DirectorySearcher searcher = new DirectorySearcher(root)
+            //DirectoryEntry cfg = new DirectoryEntry("LDAP://" + rootDse.Properties["configurationnamingcontext"].Value);
+            //DirectoryEntry exRights = new DirectoryEntry("LDAP://cn=Extended-rights," + rootDse.Properties["configurationnamingcontext"].Value);
+            // create and populate a hashtable with extended rights from the domain
+            //Hashtable exRighthash = new Hashtable();
+            //foreach (DirectoryEntry chent in exRights.Children)
+            //{
+            //    if (exRighthash.ContainsKey(chent.Properties["rightsGuid"].Value) == false)
+            //    {
+            //        exRighthash.Add(chent.Properties["rightsGuid"].Value, chent.Properties["DisplayName"].Value);
+            //    }
+            //}
+            //
+            //DirectorySearcher cfgsearch = new DirectorySearcher(cfg);
+            //cfgsearch.Filter = "(objectCategory=msExchPrivateMDB)";
+            //cfgsearch.PropertiesToLoad.Add("distinguishedName");
+            //cfgsearch.SearchScope = SearchScope.Subtree;
+            //SearchResultCollection res = cfgsearch.FindAll();
+            //foreach (SearchResult se in res)
+            //{
+            //    DirectoryEntry ssStoreObj = se.GetDirectoryEntry();
+            //    ActiveDirectorySecurity StoreobjSec = ssStoreObj.ObjectSecurity;
+            //    AuthorizationRuleCollection Storeacls =
+            //        StoreobjSec.GetAccessRules(true, true, typeof(System.Security.Principal.SecurityIdentifier));
+            //    foreach (ActiveDirectoryAccessRule ace in Storeacls)
+            //    {
+            //        if (ace.IdentityReference.Value != "S-1-5-7" & ace.IdentityReference.Value != "S-1-1-0" &
+            //            ace.IsInherited != true)
+            //        {
+            //            DirectoryEntry sidUser = new DirectoryEntry("LDAP://");
+            //            Console.WriteLine(sidUser.Properties["DisplayName"].Value.ToString());
+            //            Console.WriteLine(exRighthash[ace.ObjectType.ToString()].ToString());
+            //        }
+            //
+            //
+            //    }
+            //}
+
+
+        // make a searcher to find GPOs
+        DirectorySearcher searcher = new DirectorySearcher(root)
             {
                 Filter = "(objectClass=groupPolicyContainer)",
                 SecurityMasks = SecurityMasks.Dacl | SecurityMasks.Owner
             };
 
             SearchResultCollection gpos = searcher.FindAll();
- 
 
-            // new dictionary for data from each GPO to go into
+
+        
+        
+
+        
+
+        // new dictionary for data from each GPO to go into
             JObject gposData = new JObject();
 
             foreach (SearchResult gpo in gpos)
@@ -37,12 +83,11 @@ class LDAPstuff
                 string gpoDispName = gpoDe.Properties["displayName"].Value.ToString();
                 gpoData.Add("Display Name", gpoDispName);
                 // get the acl
-                //JObject gpoAclJson = new JObject();
                 ActiveDirectorySecurity gpoAcl = gpoDe.ObjectSecurity;
                 // make a JObject to put the acl in
                 JObject gpoAclJObject = new JObject();
                 //iterate over the aces in the acl
-                foreach (ActiveDirectoryAccessRule gpoAce in gpoAcl.GetAccessRules(true, true, typeof(NTAccount)))
+                foreach (ActiveDirectoryAccessRule gpoAce in gpoAcl.GetAccessRules(true, true, typeof(System.Security.Principal.SecurityIdentifier)))
                 {
                     ActiveDirectoryRights adRightsObj = gpoAce.ActiveDirectoryRights;
                     if ((adRightsObj & ActiveDirectoryRights.ExtendedRight) != 0)
@@ -55,18 +100,15 @@ class LDAPstuff
                     string cleanAdRights = adRights.Replace(", ", " ");
                     // chuck them into an array
                     string[] adRightsArray = cleanAdRights.Split(' ');
-
-                    string trustee = gpoAce.IdentityReference.ToString();
+                    string trusteeSid = gpoAce.IdentityReference.ToString();
+                    string trusteeName = GetUserFromSid(trusteeSid);
                     string acType = gpoAce.AccessControlType.ToString();
-
-                    string trusteeNAcType = trustee + " " + acType;
-                    
+                    string trusteeNAcType = trusteeName + " - " + acType + " - " + trusteeSid;
                     // create a JObject of the new stuff we know 
                     JObject aceToMerge = new JObject()
                     {
                         new JProperty(trusteeNAcType, new JArray(JArray.FromObject(adRightsArray)))
                     };
-
                     gpoAclJObject.Merge(aceToMerge, new JsonMergeSettings
                     {
                         MergeArrayHandling = MergeArrayHandling.Union
@@ -81,14 +123,19 @@ class LDAPstuff
             return gposData; 
         }
 
-        public static string GetDomainSid()
+  
+
+
+
+
+public static string GetDomainSid()
         {
             WindowsIdentity id = WindowsIdentity.GetCurrent();
             string domainSid = id.User.AccountDomainSid.ToString();
             return domainSid;
         }
 
-        public static string GetUserFromSID(string sid)
+        public static string GetUserFromSid(string sid)
         {
             string account = new System.Security.Principal.SecurityIdentifier(sid).Translate(typeof(System.Security.Principal.NTAccount)).ToString();
             return account;

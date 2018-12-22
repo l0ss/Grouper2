@@ -3,7 +3,7 @@ using System.Security.Principal;
 using Grouper2;
 using Newtonsoft.Json.Linq;
 
-static internal class AssessInf
+internal static class AssessInf
 {
     public static JObject AssessPrivRights(JToken privRights)
     {
@@ -51,13 +51,14 @@ static internal class AssessInf
                                 {
                                     if (trusteeClean.StartsWith(domainSid))
                                     {
-                                        string resolvedSid = LDAPstuff.GetUserFromSID(trusteeClean);
+                                        string resolvedSid = LDAPstuff.GetUserFromSid(trusteeClean);
                                         displayName = resolvedSid;
                                     }
                                 }
-                                catch (IdentityNotMappedException e)
+                                catch (IdentityNotMappedException)
                                 {
                                     displayName = "Failed to resolve SID";
+
                                 }
                             }
                         }

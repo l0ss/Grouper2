@@ -88,31 +88,27 @@ namespace Grouper2
             }
             return canWrite;
         }
-        
+
+        public static string GetSafeString(JToken json, string inString)
+        {
+            string stringOut;
+            try
+            {
+                stringOut = json[inString].ToString();
+            }
+            catch (System.NullReferenceException)
+            {
+                stringOut = "";
+            }
+            return stringOut;
+        }
+
         public static void DebugWrite(string textToWrite)
         {
             Console.BackgroundColor = ConsoleColor.Yellow;
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(textToWrite);
             Console.ResetColor();
-        }
-
-        public static void PrintIndexAndValues(ArraySegment<String> arrSeg)
-        {
-            for (int i = arrSeg.Offset; i < (arrSeg.Offset + arrSeg.Count); i++)
-            {
-                Console.WriteLine("   [{0}] : {1}", i, arrSeg.Array[i]);
-            }
-            Console.WriteLine();
-        }
-
-        public static void PrintIndexAndValues(String[] myArr)
-        {
-            for (int i = 0; i < myArr.Length; i++)
-            {
-                Console.WriteLine("   [{0}] : {1}", i, myArr[i]);
-            }
-            Console.WriteLine();
         }
 
         public static void WriteColor(string textToWrite, ConsoleColor fgColor)
@@ -157,6 +153,35 @@ namespace Grouper2
                 WriteColorLine(barfTwo, patternTwo[i]);
                 i += 1;
             }
+        }
+
+        public static string GetActionString(string actionChar)
+            // shut up, i know it's not really a char.
+        {
+            string actionString = "";
+
+            switch (actionChar)
+            {
+                case "U":
+                    actionString = "Update";
+                    break;
+                case "A":
+                    actionString = "Add";
+                    break;
+                case "D":
+                    actionString = "Delete";
+                    break;
+                case "C":
+                    actionString = "Create";
+                    break;
+                default:
+                    Utility.DebugWrite("oh no this is new");
+                    Utility.DebugWrite(actionChar);
+                    actionString = "Broken";
+                    break;
+            }
+
+            return actionString;
         }
     }
 }
