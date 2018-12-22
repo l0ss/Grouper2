@@ -9,13 +9,31 @@
  *                        By Mike Loss (@mikeloss)                                                
  */
 
+//  Master TODO list.
+//  do something with 'interest levels' 
+//  Parse other inf sections properly:
+//  System Access
+//  Kerberos Policy
+//  Event Audit
+//  Registry Values
+//  Registry Keys
+//  Group Membership
+//  Service General Setting
+//  Parse XML files
+//  Parse ini files
+//  Grep scripts for creds.
+//  File permissions for referenced files.
+//  Parse Registry.pol
+//  Parse Scripts.ini
+//  Parse Machine\Applications\*.AAS (assigned applications?
+// figure out what happened to MSI files?
+
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.DirectoryServices.ActiveDirectory;
 using System.IO;
 using System.Linq;
-using System.Net.Mime;
 using CommandLineParser.Arguments;
 using CommandLineParser.Exceptions;
 
@@ -145,12 +163,12 @@ namespace Grouper2
             // create a dict to put all our output goodies in.
             Dictionary<string, JObject> grouper2OutputDict = new Dictionary<string, JObject>();
 
+            // so for each uid directory (including ones with that dumb broken domain replication condition)
+            // we're going to gather up all our goodies and put them into that dict we just created.
             foreach (var gpoPath in gpoPaths)
             {
                 // create a dict to put the stuff we find for this GPO into.
                 Dictionary<string, JObject> gpoResultDict = new Dictionary<string, JObject>();
-                //
-
                 // Get the UID of the GPO from the file path.
                 string[] splitPath = gpoPath.Split(Path.DirectorySeparatorChar);
                 string gpoUid = splitPath[splitPath.Length - 1];
@@ -166,9 +184,11 @@ namespace Grouper2
                 // otherwise do what we can with what we have
                 else
                 {
-                    Dictionary<string, string> gpoPropsDict = new Dictionary<string, string>();
-                    gpoPropsDict.Add("GPO UID", gpoUid);
-                    gpoPropsDict.Add("GPO Path", gpoPath);
+                    Dictionary<string, string> gpoPropsDict = new Dictionary<string, string>
+                    {
+                        { "gpoUID", gpoUid },
+                        { "gpoPath", gpoPath }
+                    };
                     gpoPropsJson = (JObject)JToken.FromObject(gpoPropsDict);
                 }
 
@@ -191,46 +211,28 @@ namespace Grouper2
                 gpoResultDict.Add("GPOProps", gpoPropsJson);
                 if (machinePolGppResults.HasValues)
                 {
-                    gpoResultDict.Add("Machine Policy from GPP XML files", machinePolGppResults);
+                    gpoResultDict.Add("machinePolGppResults", machinePolGppResults);
                 }
                 if (userPolGppResults.HasValues)
                 {
-                    gpoResultDict.Add("User Policy from GPP XML files", userPolGppResults);
+                    gpoResultDict.Add("userPolGppResults", userPolGppResults);
                 }
                 if (machinePolInfResults.HasValues)
                 {
-                    gpoResultDict.Add("Machine Policy from Inf files", machinePolInfResults);
+                    gpoResultDict.Add("machinePolInfResults", machinePolInfResults);
                 }
                 if (userPolInfResults.HasValues)
                 {
-                    gpoResultDict.Add("User Policy from Inf files", userPolInfResults);
+                    gpoResultDict.Add("userPolInfResults", userPolInfResults);
                 }
                 
-
                 // turn dict of data for this gpo into jobj
                 JObject gpoResultJson = (JObject) JToken.FromObject(gpoResultDict);
 
                 // put into final jobj
                 grouper2OutputDict.Add(gpoPath, gpoResultJson);
 
-                //  TODO
-                //  do something with 'interest levels' 
-                //  Parse other inf sections properly:
-                //  System Access
-                //  Kerberos Policy
-                //  Event Audit
-                //  Registry Values
-                //  Registry Keys
-                //  Group Membership
-                //  Service General Setting
-                //  Parse XML files
-                //  Parse ini files
-                //  Grep scripts for creds.
-                //  File permissions for referenced files.
-                //  Parse Registry.pol
-                //  Parse Scripts.ini
-                //  Parse Machine\Applications\*.AAS (assigned applications?
-
+                
             }
 
             // Final output is finally happening finally here:

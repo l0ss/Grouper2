@@ -10,4 +10,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugFromTestPolicies|AnyCPU'">
     <StartArguments>./TestPolicies</StartArguments>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugLiveFromDC|AnyCPU'">
+    <StartArguments>-i 2</StartArguments>
+  </PropertyGroup>
 </Project>

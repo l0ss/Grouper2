@@ -20,8 +20,11 @@ internal static class AssessInf
             domainSid = LDAPstuff.GetDomainSid();
         }
 
+        //iterate over the entries
         foreach (JProperty privRight in privRights.Children<JProperty>())
         {
+            // our interest level always starts at 1. Everything is boring until proven otherwise.
+            int interestLevel = 1;
             foreach (JToken intPrivRight in intPrivRights)
             {
                 // if the priv is interesting
@@ -35,14 +38,16 @@ internal static class AssessInf
                         string displayName = "unknown";
                         // clean up the trustee SID
                         string trusteeClean = trustee.Trim('*');
+                        // check if it's a well known trustee in our JankyDB
                         JToken checkedSid = Utility.CheckSid(trusteeClean);
 
-                        // display some info if they match.
+                        // extract some info if they match.
                         if (checkedSid != null)
                         {
                             displayName = (string)checkedSid["displayName"];
                         }
-                        // if they don't match, handle that.
+                        // if they don't match, try to resolve the sid with the domain.
+                        // tbh it would probably be better to do this the other way around and prefer the resolved sid output over the contents of jankydb. @liamosaur?
                         else
                         {
                             if (GlobalVar.OnlineChecks)
@@ -57,16 +62,18 @@ internal static class AssessInf
                                 }
                                 catch (IdentityNotMappedException)
                                 {
-                                    displayName = "Failed to resolve SID";
-
+                                    displayName = "Failed to resolve SID with domain.";
                                 }
                             }
                         }
                         trusteesDict.Add(trusteeClean, displayName);
                     }
-                    // add the results to our dictionary of trustees
+                    // add the results to our dictionary of trustees if they are interesting enough.
                     string matchedPrivRightName = privRight.Name;
-                    matchedPrivRights.Add(matchedPrivRightName, trusteesDict);
+                    if (interestLevel >= GlobalVar.IntLevelToShow)
+                    {
+                        matchedPrivRights.Add(matchedPrivRightName, trusteesDict);
+                    }
                 }
             }
         }
