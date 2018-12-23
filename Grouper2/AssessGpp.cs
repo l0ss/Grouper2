@@ -71,10 +71,8 @@ namespace Grouper2
 
         private Dictionary<string, string> GetAssessedFile(JObject gppFile)
         {
-            Dictionary<string, string> assessedFileDict = new Dictionary<string, string>
-            {
-                {"InterestLevel", "5"}
-            };
+            int interestLevel = 3;
+            Dictionary<string, string> assessedFileDict = new Dictionary<string, string>();
             JToken gppFileProps = gppFile["Properties"];
             assessedFileDict.Add("Name", gppFile["@name"].ToString());
             assessedFileDict.Add("Status", gppFile["@status"].ToString());
@@ -91,9 +89,15 @@ namespace Grouper2
                 writable = Utility.CanIWrite(fromPath);
                 if (writable)
                 {
-                    assessedFileDict["InterestLevel"] = "10";
+                    interestLevel = 10;
                     assessedFileDict.Add("From Path Writable", "True");
                 }
+            }
+
+            // if it's too boring to be worth showing, return an empty dict.
+            if (interestLevel < GlobalVar.IntLevelToShow)
+            {
+                assessedFileDict = new Dictionary<string, string>();
             }
             return assessedFileDict;
         }
@@ -107,13 +111,21 @@ namespace Grouper2
             {
                 foreach (JObject gppGroup in gppCategory["Group"])
                 {
-                    assessedGroupsDict.Add(gppGroup["@uid"].ToString(), GetAssessedGroup(gppGroup));
+                    Dictionary<string, string> assessedGroup = GetAssessedGroup(gppGroup);
+                    if (assessedGroup.Count > 0)
+                    {
+                        assessedGroupsDict.Add(gppGroup["@uid"].ToString(), assessedGroup);
+                    }
                 }
             }
             else
             {
                 JObject gppGroup = (JObject)JToken.FromObject(gppCategory["Group"]);
-                assessedGroupsDict.Add(gppGroup["@uid"].ToString(), GetAssessedGroup(gppGroup));
+                Dictionary<string, string> assessedGroup = GetAssessedGroup(gppGroup);
+                if (assessedGroup.Count > 0)
+                {
+                    assessedGroupsDict.Add(gppGroup["@uid"].ToString(), assessedGroup);
+                }
             }
             JObject assessedGppGroups = (JObject)JToken.FromObject(assessedGroupsDict);
 
@@ -121,13 +133,21 @@ namespace Grouper2
             {
                 foreach (JObject gppUser in gppCategory["User"])
                 {
-                    assessedUsersDict.Add(gppUser["@uid"].ToString(), GetAssessedUser(gppUser));
+                    Dictionary<string, string> assessedUser = GetAssessedUser(gppUser);
+                    if (assessedUser.Count > 0)
+                    {
+                        assessedUsersDict.Add(gppUser["@uid"].ToString(), assessedUser);
+                    }
                 }
             }
             else
             {
                 JObject gppUser = (JObject)JToken.FromObject(gppCategory["User"]);
-                assessedUsersDict.Add(gppUser["@uid"].ToString(), GetAssessedUser(gppUser));
+                Dictionary<string, string> assessedUser = GetAssessedUser(gppUser);
+                if (assessedUser.Count > 0)
+                {
+                    assessedUsersDict.Add(gppUser["@uid"].ToString(), assessedUser);
+                }
             }
             JObject assessedGppUsers = (JObject)JToken.FromObject(assessedUsersDict);
 
@@ -152,10 +172,10 @@ namespace Grouper2
         {
             //foreach (JToken gppUser in gppUsers) {
             // dictionary for results from this specific user.
-            Dictionary<string, string> assessedUserDict = new Dictionary<string, string>
-                    {
-                        {"InterestLevel", "3"}
-                    };
+            Dictionary<string, string> assessedUserDict = new Dictionary<string, string>();
+
+            //set base interest level
+            int interestLevel = 3;
 
             JToken gppUserProps = gppUser["Properties"];
 
@@ -182,9 +202,13 @@ namespace Grouper2
                 decryptedCpassword = Utility.DecryptCpassword(cpassword);
                 // if we find one, that's super interesting.
                 assessedUserDict.Add("Cpassword", decryptedCpassword);
-                assessedUserDict["InterestLevel"] = "10";
+                interestLevel = 10;
             }
-
+            // if it's too boring to be worth showing, return an empty dict.
+            if (interestLevel < GlobalVar.IntLevelToShow)
+            {
+                assessedUserDict = new Dictionary<string, string>();
+            }
             return assessedUserDict;
         }
 
@@ -193,10 +217,8 @@ namespace Grouper2
             //foreach (JToken gppGroup in gppGroups)
             //{
             //dictionary for results from this specific group
-            Dictionary<string, string> assessedGroupDict = new Dictionary<string, string>
-            {
-                {"InterestLevel", "3"}
-            };
+            Dictionary<string, string> assessedGroupDict = new Dictionary<string, string>();
+            int interestLevel = 3;
 
             JToken gppGroupProps = gppGroup["Properties"];
 
@@ -217,80 +239,135 @@ namespace Grouper2
             Console.WriteLine(gppGroup.ToString());
             Utility.DebugWrite("You still need to figure out group members.");
 
+            if (interestLevel < GlobalVar.IntLevelToShow)
+            {
+                assessedGroupDict = new Dictionary<string, string>();
+            }
             return assessedGroupDict;
 
         }
        
        private JObject GetAssessedDrives(JObject gppCategory)
        {
+           int interestLevel = 3;
            JProperty gppDriveProp = new JProperty("Drive", gppCategory["Drive"]);
            JObject assessedGppDrives = new JObject(gppDriveProp);
+           if (interestLevel < GlobalVar.IntLevelToShow)
+           {
+               assessedGppDrives = new JObject();
+           }
            return assessedGppDrives;
-       }
+        }
+  
 
-       private JObject GetAssessedEnvironmentVariables(JObject gppCategory)
+    private JObject GetAssessedEnvironmentVariables(JObject gppCategory)
        {
+           int interestLevel = 1;
            JProperty gppEVProp = new JProperty("EnvironmentVariable", gppCategory["EnvironmentVariable"]);
            JObject assessedGppEVs = new JObject(gppEVProp);
-           return assessedGppEVs;
+           if (interestLevel < GlobalVar.IntLevelToShow)
+           {
+               assessedGppEVs = new JObject();
+           }
+            return assessedGppEVs;
        }
 
        private JObject GetAssessedShortcuts(JObject gppCategory)
        {
+           int interestLevel = 3;
            JProperty gppShortcutProp = new JProperty("Shortcut", gppCategory["Shortcut"]);
            JObject assessedGppShortcuts = new JObject(gppShortcutProp);
-           return assessedGppShortcuts;
+           if (interestLevel < GlobalVar.IntLevelToShow)
+           {
+               assessedGppShortcuts = new JObject();
+           }
+            return assessedGppShortcuts;
        }
 
        private JObject GetAssessedScheduledTasks(JObject gppCategory)
        {
+           int interestLevel = 4;
            JProperty assessedGppSchedTasksTaskProp = new JProperty("Task", gppCategory["Task"]);
            JProperty assessedGppSchedTasksImmediateTaskProp = new JProperty("ImmediateTaskV2", gppCategory["ImmediateTaskV2"]);
            JObject assessedGppSchedTasksAllJson = new JObject(assessedGppSchedTasksTaskProp, assessedGppSchedTasksImmediateTaskProp);
-           return assessedGppSchedTasksAllJson;
+           if (interestLevel < GlobalVar.IntLevelToShow)
+           {
+               assessedGppSchedTasksAllJson = new JObject();
+           }
+            return assessedGppSchedTasksAllJson;
        }
 
        private JObject GetAssessedRegistrySettings(JObject gppCategory)
        {
+           int interestLevel = 2;
            JProperty gppRegSettingsProp = new JProperty("RegSettings", gppCategory["Registry"]);
            JObject assessedGppRegSettings = new JObject(gppRegSettingsProp);
-           return assessedGppRegSettings;
+           if (interestLevel < GlobalVar.IntLevelToShow)
+           {
+               assessedGppRegSettings = new JObject();
+           }
+            return assessedGppRegSettings;
        }
 
        private JObject GetAssessedNTServices(JObject gppCategory)
        {
+           int interestLevel = 3;
            JProperty ntServiceProp = new JProperty("NTService", gppCategory["NTService"]);
            JObject assessedNtServices = new JObject(ntServiceProp);
-           return assessedNtServices;
+           if (interestLevel < GlobalVar.IntLevelToShow)
+           {
+               assessedNtServices = new JObject();
+           }
+            return assessedNtServices;
        }
 
        private JObject GetAssessedNetworkOptions(JObject gppCategory)
        {
+           int interestLevel = 1;
            JProperty gppNetworkOptionsProp = new JProperty("DUN", gppCategory["DUN"]);
            JObject assessedGppNetworkOptions = new JObject(gppNetworkOptionsProp);
-           return assessedGppNetworkOptions;
+           if (interestLevel < GlobalVar.IntLevelToShow)
+           {
+               assessedGppNetworkOptions = new JObject();
+           }
+            return assessedGppNetworkOptions;
        }
 
        private JObject GetAssessedFolders(JObject gppCategory)
        {
+           int interestLevel = 1;
            JProperty gppFoldersProp = new JProperty("Folder", gppCategory["Folder"]);
            JObject assessedGppFolders = new JObject(gppFoldersProp);
-           return assessedGppFolders;
+           if (interestLevel < GlobalVar.IntLevelToShow)
+           {
+               assessedGppFolders = new JObject();
+           }
+            return assessedGppFolders;
        }
 
        private JObject GetAssessedNetworkShareSettings(JObject gppCategory)
        {
+           int interestLevel = 1;
            JProperty gppNetSharesProp = new JProperty("NetShare", gppCategory["NetShare"]);
            JObject assessedGppNetShares = new JObject(gppNetSharesProp);
-           return assessedGppNetShares;
+           if (interestLevel < GlobalVar.IntLevelToShow)
+           {
+               assessedGppNetShares = new JObject();
+           }
+            return assessedGppNetShares;
        }
 
 
        private JObject GetAssessedIniFiles(JObject gppCategory)
        {
+           int interestLevel = 2;
            JProperty gppIniFilesProp = new JProperty("Ini", gppCategory["Ini"]);
            JObject assessedGppIniFiles = new JObject(gppIniFilesProp);
-           return assessedGppIniFiles;
+           if (interestLevel < GlobalVar.IntLevelToShow)
+           {
+               assessedGppIniFiles = new JObject();
+           }
+            return assessedGppIniFiles;
        }
     }
 }

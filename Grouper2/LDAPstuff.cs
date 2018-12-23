@@ -76,19 +76,21 @@ class LDAPstuff
                 JObject gpoData = new JObject();
                 DirectoryEntry gpoDe = gpo.GetDirectoryEntry();
                 // get some useful attributes of the gpo
-                string gpoDn = gpoDe.Properties["distinguishedName"].Value.ToString();
-                gpoData.Add("Distinguished Name", gpoDn);
-                string gpoUid = gpoDe.Properties["name"].Value.ToString();
-                gpoData.Add("UID", gpoUid);
                 string gpoDispName = gpoDe.Properties["displayName"].Value.ToString();
                 gpoData.Add("Display Name", gpoDispName);
-                // get the acl
-                ActiveDirectorySecurity gpoAcl = gpoDe.ObjectSecurity;
+                string gpoUid = gpoDe.Properties["name"].Value.ToString();
+                gpoData.Add("UID", gpoUid);
+                string gpoDn = gpoDe.Properties["distinguishedName"].Value.ToString();
+                gpoData.Add("Distinguished Name", gpoDn);
+
+            // get the acl
+            ActiveDirectorySecurity gpoAcl = gpoDe.ObjectSecurity;
                 // make a JObject to put the acl in
                 JObject gpoAclJObject = new JObject();
                 //iterate over the aces in the acl
                 foreach (ActiveDirectoryAccessRule gpoAce in gpoAcl.GetAccessRules(true, true, typeof(System.Security.Principal.SecurityIdentifier)))
                 {
+                    int aceInterestLevel = 1;
                     ActiveDirectoryRights adRightsObj = gpoAce.ActiveDirectoryRights;
                     if ((adRightsObj & ActiveDirectoryRights.ExtendedRight) != 0)
                     {
@@ -104,21 +106,27 @@ class LDAPstuff
                     string trusteeName = GetUserFromSid(trusteeSid);
                     string acType = gpoAce.AccessControlType.ToString();
                     string trusteeNAcType = trusteeName + " - " + acType + " - " + trusteeSid;
-                    // create a JObject of the new stuff we know 
-                    JObject aceToMerge = new JObject()
+                    if (aceInterestLevel >= GlobalVar.IntLevelToShow)
                     {
-                        new JProperty(trusteeNAcType, new JArray(JArray.FromObject(adRightsArray)))
-                    };
-                    gpoAclJObject.Merge(aceToMerge, new JsonMergeSettings
-                    {
-                        MergeArrayHandling = MergeArrayHandling.Union
-                    });
+                        // create a JObject of the new stuff we know 
+                        JObject aceToMerge = new JObject()
+                        {
+                            new JProperty(trusteeNAcType, new JArray(JArray.FromObject(adRightsArray)))
+                        };
+                        gpoAclJObject.Merge(aceToMerge, new JsonMergeSettings
+                        {
+                            MergeArrayHandling = MergeArrayHandling.Union
+                        });
+                }
                 }
                 
                 //add the JObject to our blob of data about the gpo
-                gpoData.Add("ACLs", gpoAclJObject);
-                // then add all of the above to the big blob of data about all gpos
-                gposData.Add(gpoUid, gpoData);
+                if (gpoAclJObject.HasValues)
+                {
+                    gpoData.Add("ACLs", gpoAclJObject);
+                }
+            // then add all of the above to the big blob of data about all gpos
+            gposData.Add(gpoUid, gpoData);
             }
             return gposData; 
         }

@@ -19,7 +19,6 @@ internal static class AssessInf
         {
             domainSid = LDAPstuff.GetDomainSid();
         }
-
         //iterate over the entries
         foreach (JProperty privRight in privRights.Children<JProperty>())
         {
@@ -84,6 +83,7 @@ internal static class AssessInf
 
     public static JObject AssessRegValues(JToken regValues)
     {
+        int interestLevel = 1;
         JObject jsonData = JankyDb.Instance;
         // get our data about what regkeys are interesting
         JArray intRegKeys = (JArray)jsonData["regKeys"]["item"];
@@ -107,7 +107,10 @@ internal static class AssessInf
                         regKeyValueList.Add(thing);
                     }
                     string[] regKeyValueArray = regKeyValueList.ToArray();
-                    matchedRegValues.Add(matchedRegKey, regKeyValueArray);
+                    if (interestLevel >= GlobalVar.IntLevelToShow)
+                    {
+                        matchedRegValues.Add(matchedRegKey, regKeyValueArray);
+                    }
                 }
             }
         }
@@ -118,36 +121,61 @@ internal static class AssessInf
 
     public static JObject AssessSysAccess(JToken sysAccess)
     {
-        //placeholder only
-        JObject sysAccessJson = (JObject)JToken.FromObject(sysAccess);
+        // this bit kind of works backwards on the placeholders. Fix as you fill these out.
+        int interestLevel = 1;
+        JObject sysAccessJson = new JObject();
+        if (interestLevel >= GlobalVar.IntLevelToShow)
+        {
+            sysAccessJson = (JObject) JToken.FromObject(sysAccess);
+        }
         return sysAccessJson;
     }
 
     public static JObject AssessKerbPolicy(JToken kerbPolicy)
     {
-        //placeholder only
-        JObject sysAccessJson = (JObject)JToken.FromObject(kerbPolicy);
-        return sysAccessJson;
+        // this bit kind of works backwards on the placeholders. Fix as you fill these out.
+        int interestLevel = 1;
+        JObject kerbPolicyJson = new JObject();
+        if (interestLevel >= GlobalVar.IntLevelToShow)
+        {
+            kerbPolicyJson = (JObject)JToken.FromObject(kerbPolicy);
+        }
+        return kerbPolicyJson;
     }
 
     public static JObject AssessRegKeys(JToken regKeys)
     {
-        //placeholder only
-        JObject regKeysJson = (JObject)JToken.FromObject(regKeys);
+        // this bit kind of works backwards on the placeholders. Fix as you fill these out.
+        int interestLevel = 1;
+        JObject regKeysJson = new JObject();
+        if (interestLevel >= GlobalVar.IntLevelToShow)
+        {
+            regKeys = (JObject)JToken.FromObject(regKeys);
+        }
         return regKeysJson;
     }
 
     public static JObject AssessGroupMembership(JToken grpMembership)
     {
-        //placeholder only
-        JObject grpMembershipJson = (JObject)JToken.FromObject(grpMembership);
+        // this bit kind of works backwards on the placeholders. Fix as you fill these out.
+        int interestLevel = 1;
+        JObject grpMembershipJson = new JObject();
+        if (interestLevel >= GlobalVar.IntLevelToShow)
+        {
+            grpMembershipJson = (JObject)JToken.FromObject(grpMembership);
+        }
         return grpMembershipJson;
     }
 
     public static JObject AssessServiceGenSetting(JToken svcGenSetting)
     {
-        //placeholder only
-        JObject svcGenSettingJson = (JObject)JToken.FromObject(svcGenSetting);
+        // this bit kind of works backwards on the placeholders. Fix as you fill these out.
+        int interestLevel = 1;
+        JObject svcGenSettingJson = new JObject();
+        if (interestLevel >= GlobalVar.IntLevelToShow)
+        {
+            svcGenSettingJson = (JObject)JToken.FromObject(svcGenSetting);
+        }
         return svcGenSettingJson;
     }
 }

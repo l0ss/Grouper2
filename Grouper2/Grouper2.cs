@@ -10,7 +10,7 @@
  */
 
 //  Master TODO list.
-//  do something with 'interest levels' 
+//  put 'interest levels' into GPP stuff, make them more meaningful in inf stuff.
 //  Parse other inf sections properly:
 //  System Access
 //  Kerberos Policy
@@ -147,6 +147,7 @@ namespace Grouper2
 
             Console.WriteLine("We gonna look at the policies in: " + sysvolPolDir);
 
+            // if we're online, get a bunch of metadata about the GPOs via LDAP
             if (GlobalVar.OnlineChecks) domainGpos = LDAPstuff.GetDomainGpos();
 
             string[] gpoPaths = new string[0];
@@ -231,8 +232,6 @@ namespace Grouper2
 
                 // put into final jobj
                 grouper2OutputDict.Add(gpoPath, gpoResultJson);
-
-                
             }
 
             // Final output is finally happening finally here:
@@ -270,9 +269,11 @@ namespace Grouper2
                 JObject assessedGpTmpl = AssessHandlers.AssessGptmpl(parsedInfFile);
 
                 //add the result to our results
-                processedInfsDict.Add(infFile, assessedGpTmpl);
+                if (assessedGpTmpl.HasValues)
+                {
+                    processedInfsDict.Add(infFile, assessedGpTmpl);
+                }
             }
-
             return (JObject) JToken.FromObject(processedInfsDict);
         }
 
@@ -294,7 +295,7 @@ namespace Grouper2
                     JObject parsedGppXmlToJson = Parsers.ParseGppXmlToJson(xmlFile);
                     // then send each one to get assessed for fun things
                     JObject assessedGpp = AssessHandlers.AssessGppJson(parsedGppXmlToJson);
-                    if (assessedGpp != null) processedGpXml.Add(xmlFile, assessedGpp);
+                    if (assessedGpp.HasValues) processedGpXml.Add(xmlFile, assessedGpp);
                 }
 
             return (JObject) JToken.FromObject(processedGpXml);
