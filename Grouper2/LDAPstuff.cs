@@ -102,10 +102,39 @@ class LDAPstuff
                     string cleanAdRights = adRights.Replace(", ", " ");
                     // chuck them into an array
                     string[] adRightsArray = cleanAdRights.Split(' ');
+                    // an array of interesting privs
+                    string[] intRightsArray = new string[]{ "WriteOwner", "GenericAll", "WriteProperty", "WriteDacl", "CreateChild", "DeleteChild", "Self", "DeleteTree", "Delete"};
+                    // if we see one of these, the ACE just got more interesting.
+                    foreach (string right in adRightsArray)
+                    {
+                        if (intRightsArray.Contains(right))
+                        {
+                            aceInterestLevel++;
+                        }
+                    }
                     string trusteeSid = gpoAce.IdentityReference.ToString();
+                    // array of sid endings for the default SIDs
+                    string[] boringSidEndings = new string[] { "-3-0" , "-5-9", "5-18", "-512", "-519" };
+                    // if the last 4 chars of trusteeSid don't match an entry in boringSidEndings, increase the interest level.
+                    if (boringSidEndings.Contains(trusteeSid.Substring((trusteeSid.Length - 4), 4)))
+                    {
+                        aceInterestLevel = 1;
+                    }
                     string trusteeName = GetUserFromSid(trusteeSid);
                     string acType = gpoAce.AccessControlType.ToString();
                     string trusteeNAcType = trusteeName + " - " + acType + " - " + trusteeSid;
+// From the original Grouper
+//// an array of permissions that aren't exciting
+//                        $boringPerms = @()
+//                        $boringPerms += "Read"
+//                        $boringPerms += "Apply Group Policy"
+//// an array of users who have RW permissions on GPOs by default, so they're boring too.
+//                        $boringTrustees = @()
+//                        $boringTrustees += "Domain Admins"
+//                        $boringTrustees += "Enterprise Admins"
+//                        $boringTrustees += "ENTERPRISE DOMAIN CONTROLLERS"
+//                        $boringTrustees += "SYSTEM"
+
                     if (aceInterestLevel >= GlobalVar.IntLevelToShow)
                     {
                         // create a JObject of the new stuff we know 

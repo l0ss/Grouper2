@@ -203,6 +203,8 @@ namespace Grouper2
                 // turn dict of data for this gpo into jobj
                 JObject gpoResultJson = (JObject)JToken.FromObject(gpoResultDict);
 
+                // if I were smarter I would have done this shit with the machine and user dirs inside the Process methods instead of calling each one twice out here.
+                // @liamosaur you reckon you can see how to clean it up after the fact?
                 // Get the paths for the machine policy and user policy dirs
                 string machinePolPath = Path.Combine(gpoPath, "Machine");
                 string userPolPath = Path.Combine(gpoPath, "User");
