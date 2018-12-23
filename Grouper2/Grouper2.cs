@@ -198,37 +198,44 @@ namespace Grouper2
                 // get whether it's linked and where
                 // get whether it's enabled
 
+                // Add all this crap into a dict, if we found anything of interest.
+                gpoResultDict.Add("GPOProps", gpoPropsJson);
+                // turn dict of data for this gpo into jobj
+                JObject gpoResultJson = (JObject)JToken.FromObject(gpoResultDict);
+
                 // Get the paths for the machine policy and user policy dirs
                 string machinePolPath = Path.Combine(gpoPath, "Machine");
                 string userPolPath = Path.Combine(gpoPath, "User");
-
-                // Process Inf and Xml Policy data for machine and user
-                JObject machinePolInfResults = ProcessInf(machinePolPath);
-                JObject userPolInfResults = ProcessInf(userPolPath);
-                JObject machinePolGppResults = ProcessGpXml(machinePolPath);
-                JObject userPolGppResults = ProcessGpXml(userPolPath);
                 
-                // Add all this crap into a dict, if we found anything of interest.
-                gpoResultDict.Add("GPOProps", gpoPropsJson);
+                // Process Inf and Xml Policy data for machine and user
+                JArray machinePolInfResults = ProcessInf(machinePolPath);
+                JArray userPolInfResults = ProcessInf(userPolPath);
+                JArray machinePolGppResults = ProcessGpXml(machinePolPath);
+                JArray userPolGppResults = ProcessGpXml(userPolPath);
+
+                JArray gpoFindingsArray = new JArray();
                 if (machinePolGppResults.HasValues)
                 {
-                    gpoResultDict.Add("machinePolGppResults", machinePolGppResults);
+                    gpoFindingsArray.Add(machinePolGppResults);
                 }
                 if (userPolGppResults.HasValues)
                 {
-                    gpoResultDict.Add("userPolGppResults", userPolGppResults);
+                    gpoFindingsArray.Add(userPolGppResults);
                 }
                 if (machinePolInfResults.HasValues)
                 {
-                    gpoResultDict.Add("machinePolInfResults", machinePolInfResults);
+                    gpoFindingsArray.Add(machinePolInfResults);
                 }
                 if (userPolInfResults.HasValues)
                 {
-                    gpoResultDict.Add("userPolInfResults", userPolInfResults);
+                    gpoFindingsArray.Add(userPolInfResults);
                 }
-                
-                // turn dict of data for this gpo into jobj
-                JObject gpoResultJson = (JObject) JToken.FromObject(gpoResultDict);
+
+                if (gpoFindingsArray.Any())
+                {
+                    JProperty gpoFindingsProp = new JProperty("Findings", gpoFindingsArray);
+                    gpoResultJson.Add(gpoFindingsProp);
+                }
 
                 // put into final jobj
                 grouper2OutputDict.Add(gpoPath, gpoResultJson);
@@ -245,7 +252,7 @@ namespace Grouper2
         }
 
 
-        private static JObject ProcessInf(string Path)
+        private static JArray ProcessInf(string Path)
         {
             // find all the GptTmpl.inf files
             List<string> gpttmplInfFiles = new List<string>();
@@ -258,8 +265,8 @@ namespace Grouper2
                 return null;
             }
 
-            // make a dict for our results
-            Dictionary<string, JObject> processedInfsDict = new Dictionary<string, JObject>();
+            // make a JObject for our results
+            JArray processedInfs = new JArray();
             // iterate over the list of inf files we found
             foreach (string infFile in gpttmplInfFiles)
             {
@@ -271,13 +278,13 @@ namespace Grouper2
                 //add the result to our results
                 if (assessedGpTmpl.HasValues)
                 {
-                    processedInfsDict.Add(infFile, assessedGpTmpl);
+                    processedInfs.Add(assessedGpTmpl);
                 }
             }
-            return (JObject) JToken.FromObject(processedInfsDict);
+            return processedInfs;
         }
 
-        private static JObject ProcessGpXml(string Path)
+        private static JArray ProcessGpXml(string Path)
         {
             if(!Directory.Exists(Path))
             {
@@ -286,7 +293,7 @@ namespace Grouper2
             // Group Policy Preferences are all XML so those are handled here.
             string[] xmlFiles = Directory.GetFiles(Path, "*.xml", SearchOption.AllDirectories);
             // create a dict for the stuff we find
-            Dictionary<string, JObject> processedGpXml = new Dictionary<string, JObject>();
+            JArray processedGpXml = new JArray();
             // if we find any xml files
             if (xmlFiles.Length >= 1)
                 foreach (var xmlFile in xmlFiles)
@@ -295,10 +302,10 @@ namespace Grouper2
                     JObject parsedGppXmlToJson = Parsers.ParseGppXmlToJson(xmlFile);
                     // then send each one to get assessed for fun things
                     JObject assessedGpp = AssessHandlers.AssessGppJson(parsedGppXmlToJson);
-                    if (assessedGpp.HasValues) processedGpXml.Add(xmlFile, assessedGpp);
+                    if (assessedGpp.HasValues) processedGpXml.Add(assessedGpp);
                 }
 
-            return (JObject) JToken.FromObject(processedGpXml);
+            return processedGpXml;
         }
     }
 }
