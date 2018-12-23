@@ -216,19 +216,31 @@ namespace Grouper2
                 JArray gpoFindingsArray = new JArray();
                 if (machinePolGppResults.HasValues)
                 {
-                    gpoFindingsArray.Add(machinePolGppResults);
+                    foreach (JObject finding in machinePolGppResults)
+                    {
+                        gpoFindingsArray.Add(finding);
+                    }
                 }
                 if (userPolGppResults.HasValues)
                 {
-                    gpoFindingsArray.Add(userPolGppResults);
+                    foreach (JObject finding in userPolGppResults)
+                    {
+                        gpoFindingsArray.Add(finding);
+                    }
                 }
                 if (machinePolInfResults.HasValues)
                 {
-                    gpoFindingsArray.Add(machinePolInfResults);
+                    foreach (JObject finding in machinePolInfResults)
+                    {
+                        gpoFindingsArray.Add(finding);
+                    }
                 }
                 if (userPolInfResults.HasValues)
                 {
-                    gpoFindingsArray.Add(userPolInfResults);
+                    foreach (JObject finding in userPolInfResults)
+                    {
+                        gpoFindingsArray.Add(finding);
+                    }
                 }
 
                 if (gpoFindingsArray.Any())
