@@ -51,37 +51,37 @@ namespace Grouper2
 
         private JObject GetAssessedFiles(JObject gppCategory)
         {
-            Dictionary<string, Dictionary<string, string>> assessedFilesDict = new Dictionary<string, Dictionary<string, string>>();
+            JObject assessedFiles = new JObject();
 
             if (gppCategory["File"] is JArray)
             {
                 foreach (JObject gppFile in gppCategory["File"])
                 {
-                    assessedFilesDict.Add(gppFile["@uid"].ToString(), GetAssessedFile(gppFile));
+                    assessedFiles.Add(gppFile["@uid"].ToString(), GetAssessedFile(gppFile));
                 }
             }
             else
             {
                 JObject gppFile = (JObject)JToken.FromObject(gppCategory["File"]);
-                assessedFilesDict.Add(gppFile["@uid"].ToString(), GetAssessedFile(gppFile));
+                assessedFiles.Add(gppFile["@uid"].ToString(), GetAssessedFile(gppFile));
             }
-            JObject assessedGppFiles = (JObject)JToken.FromObject(assessedFilesDict);
-            return assessedGppFiles;
+            
+            return assessedFiles;
         }
 
-        private Dictionary<string, string> GetAssessedFile(JObject gppFile)
+        private JObject GetAssessedFile(JObject gppFile)
         {
             int interestLevel = 3;
-            Dictionary<string, string> assessedFileDict = new Dictionary<string, string>();
+            JObject assessedFile = new JObject();
             JToken gppFileProps = gppFile["Properties"];
-            assessedFileDict.Add("Name", gppFile["@name"].ToString());
-            assessedFileDict.Add("Status", gppFile["@status"].ToString());
-            assessedFileDict.Add("Changed", gppFile["@changed"].ToString());
+            assessedFile.Add("Name", gppFile["@name"].ToString());
+            assessedFile.Add("Status", gppFile["@status"].ToString());
+            assessedFile.Add("Changed", gppFile["@changed"].ToString());
             string gppFileAction = Utility.GetActionString(gppFileProps["@action"].ToString());
-            assessedFileDict.Add("Action", gppFileAction);
+            assessedFile.Add("Action", gppFileAction);
             string fromPath = gppFileProps["@fromPath"].ToString();
-            assessedFileDict.Add("From Path", fromPath);
-            assessedFileDict.Add("Target Path", gppFileProps["@targetPath"].ToString());
+            assessedFile.Add("From Path", fromPath);
+            assessedFile.Add("Target Path", gppFileProps["@targetPath"].ToString());
             //TODO some logic to check from path file perms
             if (GlobalVar.OnlineChecks && (fromPath.Length > 0))
             {
@@ -90,16 +90,16 @@ namespace Grouper2
                 if (writable)
                 {
                     interestLevel = 10;
-                    assessedFileDict.Add("From Path Writable", "True");
+                    assessedFile.Add("From Path Writable", "True");
                 }
             }
 
-            // if it's too boring to be worth showing, return an empty dict.
+            // if it's too boring to be worth showing, return an empty jobj.
             if (interestLevel < GlobalVar.IntLevelToShow)
             {
-                assessedFileDict = new Dictionary<string, string>();
+                assessedFile = new JObject();
             }
-            return assessedFileDict;
+            return assessedFile;
         }
 
         private JObject GetAssessedGroups(JObject gppCategory)
@@ -170,7 +170,7 @@ namespace Grouper2
         private JObject GetAssessedUser(JObject gppUser)
         {
             //foreach (JToken gppUser in gppUsers) {
-            // dictionary for results from this specific user.
+            // jobj for results from this specific user.
             JObject assessedUser = new JObject();
 
             //set base interest level
@@ -203,7 +203,7 @@ namespace Grouper2
                 assessedUser.Add("Cpassword", decryptedCpassword);
                 interestLevel = 10;
             }
-            // if it's too boring to be worth showing, return an empty dict.
+            // if it's too boring to be worth showing, return an empty jobj.
             if (interestLevel < GlobalVar.IntLevelToShow)
             {
                 assessedUser = new JObject();
@@ -213,7 +213,7 @@ namespace Grouper2
 
         private JObject GetAssessedGroup(JObject gppGroup)
         {
-            //dictionary for results from this specific group
+            //jobj for results from this specific group
             JObject assessedGroup = new JObject();
             int interestLevel = 3;
 
@@ -281,7 +281,7 @@ namespace Grouper2
 
        private JObject GetAssessedDrives(JObject gppCategory)
        {
-           int interestLevel = 3;
+           int interestLevel = 2;
            JProperty gppDriveProp = new JProperty("Drive", gppCategory["Drive"]);
            JObject assessedGppDrives = new JObject(gppDriveProp);
            if (interestLevel < GlobalVar.IntLevelToShow)
