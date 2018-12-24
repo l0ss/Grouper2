@@ -11,7 +11,7 @@ internal static class AssessInf
         JArray intPrivRights = (JArray)jsonData["privRights"]["item"];
 
         // create an object to put the results in
-        Dictionary<string, Dictionary<string, string>> matchedPrivRights = new Dictionary<string, Dictionary<string, string>>();
+        JObject assessedPrivRights = new JObject();
 
         //set an intentionally non-matchy domainSid value unless we doing online checks.
         string domainSid = "X";
@@ -29,8 +29,8 @@ internal static class AssessInf
                 // if the priv is interesting
                 if ((string)intPrivRight["privRight"] == privRight.Name)
                 {
-                    //create a dict to put the trustees into
-                    Dictionary<string, string> trusteesDict = new Dictionary<string, string>();
+                    //create a jobj to put the trustees into
+                    JObject trustees = new JObject();
                     //then for each trustee it's granted to
                     foreach (string trustee in privRight.Value)
                     {
@@ -65,20 +65,19 @@ internal static class AssessInf
                                 }
                             }
                         }
-                        trusteesDict.Add(trusteeClean, displayName);
+                        trustees.Add(trusteeClean, displayName);
                     }
-                    // add the results to our dictionary of trustees if they are interesting enough.
+                    // add the results to our jobj of trustees if they are interesting enough.
                     string matchedPrivRightName = privRight.Name;
                     if (interestLevel >= GlobalVar.IntLevelToShow)
                     {
-                        matchedPrivRights.Add(matchedPrivRightName, trusteesDict);
+                        assessedPrivRights.Add(matchedPrivRightName, trustees);
                     }
                 }
             }
         }
-        // cast our dict to a jobject and return it.
-        JObject matchedPrivRightsJson = (JObject)JToken.FromObject(matchedPrivRights);
-        return matchedPrivRightsJson;
+        
+        return assessedPrivRights;
     }
 
     public static JObject AssessRegValues(JToken regValues)
@@ -87,8 +86,8 @@ internal static class AssessInf
         JObject jsonData = JankyDb.Instance;
         // get our data about what regkeys are interesting
         JArray intRegKeys = (JArray)jsonData["regKeys"]["item"];
-        // set up a dictionary for our results to go into
-        Dictionary<string, string[]> matchedRegValues = new Dictionary<string, string[]>();
+        // set up a jobj for our results to go into
+        JObject assessedRegValues = new JObject();
 
         foreach (JProperty regValue in regValues.Children<JProperty>())
         {
@@ -109,14 +108,17 @@ internal static class AssessInf
                     string[] regKeyValueArray = regKeyValueList.ToArray();
                     if (interestLevel >= GlobalVar.IntLevelToShow)
                     {
-                        matchedRegValues.Add(matchedRegKey, regKeyValueArray);
+                        JArray regKeyValueJArray = new JArray();
+                        foreach (string value in regKeyValueArray)
+                        {
+                            regKeyValueJArray.Add(value);
+                        }
+                        assessedRegValues.Add(matchedRegKey, regKeyValueJArray);
                     }
                 }
             }
         }
-        // cast our output into a jobject and return it
-        JObject matchedRegValuesJson = (JObject)JToken.FromObject(matchedRegValues);
-        return matchedRegValuesJson;
+        return assessedRegValues;
     }
 
     public static JObject AssessSysAccess(JToken sysAccess)

@@ -33,6 +33,7 @@ namespace Grouper2
                     }
                     else
                     {
+                        Utility.DebugWrite(assessName);
                         return null;
                     }
                 }
@@ -278,45 +279,68 @@ namespace Grouper2
             }
             return assessedMember;
         }
-
-       private JObject GetAssessedDrives(JObject gppCategory)
-       {
-           int interestLevel = 2;
-           JProperty gppDriveProp = new JProperty("Drive", gppCategory["Drive"]);
-           JObject assessedGppDrives = new JObject(gppDriveProp);
-           if (interestLevel < GlobalVar.IntLevelToShow)
-           {
-               assessedGppDrives = new JObject();
-           }
-           return assessedGppDrives;
-        }
-  
-
-    private JObject GetAssessedEnvironmentVariables(JObject gppCategory)
-       {
-           int interestLevel = 1;
-           JProperty gppEVProp = new JProperty("EnvironmentVariable", gppCategory["EnvironmentVariable"]);
-           JObject assessedGppEVs = new JObject(gppEVProp);
-           if (interestLevel < GlobalVar.IntLevelToShow)
-           {
-               assessedGppEVs = new JObject();
-           }
-            return assessedGppEVs;
-       }
-
+        
        private JObject GetAssessedShortcuts(JObject gppCategory)
        {
-           int interestLevel = 3;
-           JProperty gppShortcutProp = new JProperty("Shortcut", gppCategory["Shortcut"]);
-           JObject assessedGppShortcuts = new JObject(gppShortcutProp);
-           if (interestLevel < GlobalVar.IntLevelToShow)
+           JObject assessedShortcuts = new JObject();
+
+           if (gppCategory["Shortcut"] is JArray)
            {
-               assessedGppShortcuts = new JObject();
+               foreach (JObject gppShortcuts in gppCategory["Shortcut"])
+               {
+                   assessedShortcuts.Add(gppShortcuts["@uid"].ToString(), GetAssessedShortcut(gppShortcuts));
+               }
            }
-            return assessedGppShortcuts;
+           else
+           {
+               JObject gppShortcuts = (JObject)JToken.FromObject(gppCategory["Shortcut"]);
+               assessedShortcuts.Add(gppShortcuts["@uid"].ToString(), GetAssessedShortcut(gppShortcuts));
+           }
+
+           return assessedShortcuts;
        }
 
-       private JObject GetAssessedScheduledTasks(JObject gppCategory)
+        private JObject GetAssessedShortcut(JObject gppShortcut)
+       {
+           int interestLevel = 3;
+           JObject assessedShortcut = new JObject();
+           JToken gppShortcutProps = gppShortcut["Properties"];
+           assessedShortcut.Add("Name", gppShortcut["@name"].ToString());
+           assessedShortcut.Add("Status", gppShortcut["@status"].ToString());
+           assessedShortcut.Add("Changed", gppShortcut["@changed"].ToString());
+           string gppShortcutAction = Utility.GetActionString(gppShortcutProps["@action"].ToString());
+           assessedShortcut.Add("Action", gppShortcutAction);
+           assessedShortcut.Add("Target Type", gppShortcutProps["@targetType"]);
+           assessedShortcut.Add("Arguments", gppShortcutProps["@arguments"]);
+           assessedShortcut.Add("Icon Path", gppShortcutProps["@iconPath"]);
+           assessedShortcut.Add("Icon Index", gppShortcutProps["@iconIndex"]);
+           assessedShortcut.Add("Working Directory", gppShortcutProps["@startIn"]);
+           assessedShortcut.Add("Shortcut Path", gppShortcutProps["@shortcutPath"]);
+           assessedShortcut.Add("Comment", gppShortcutProps["@comment"]);
+
+            string targetPath = gppShortcutProps["@targetPath"].ToString();
+           assessedShortcut.Add("Target Path", targetPath);
+           //TODO some logic to check target path file perms and icon Path file perms
+           if (GlobalVar.OnlineChecks && (targetPath.Length > 0))
+           {
+               bool writable = false;
+               writable = Utility.CanIWrite(targetPath);
+               if (writable)
+               {
+                   interestLevel = 10;
+                   assessedShortcut.Add("From Path Writable", "True");
+               }
+           }
+
+           // if it's too boring to be worth showing, return an empty jobj.
+           if (interestLevel < GlobalVar.IntLevelToShow)
+           {
+               assessedShortcut = new JObject();
+           }
+           return assessedShortcut;
+       }
+
+        private JObject GetAssessedScheduledTasks(JObject gppCategory)
        {
            int interestLevel = 4;
            JProperty assessedGppSchedTasksTaskProp = new JProperty("Task", gppCategory["Task"]);
@@ -341,7 +365,33 @@ namespace Grouper2
             return assessedGppRegSettings;
        }
 
-       private JObject GetAssessedNTServices(JObject gppCategory)
+
+       private JObject GetAssessedDrives(JObject gppCategory)
+       {
+           int interestLevel = 2;
+           JProperty gppDriveProp = new JProperty("Drive", gppCategory["Drive"]);
+           JObject assessedGppDrives = new JObject(gppDriveProp);
+           if (interestLevel < GlobalVar.IntLevelToShow)
+           {
+               assessedGppDrives = new JObject();
+           }
+           return assessedGppDrives;
+       }
+
+
+       private JObject GetAssessedEnvironmentVariables(JObject gppCategory)
+       {
+           int interestLevel = 1;
+           JProperty gppEVProp = new JProperty("EnvironmentVariable", gppCategory["EnvironmentVariable"]);
+           JObject assessedGppEVs = new JObject(gppEVProp);
+           if (interestLevel < GlobalVar.IntLevelToShow)
+           {
+               assessedGppEVs = new JObject();
+           }
+           return assessedGppEVs;
+       }
+
+        private JObject GetAssessedNTServices(JObject gppCategory)
        {
            int interestLevel = 3;
            JProperty ntServiceProp = new JProperty("NTService", gppCategory["NTService"]);

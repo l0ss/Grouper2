@@ -10,7 +10,7 @@
  */
 
 //  Master TODO list.
-//  unfuck all the back and forthing between Dictionaries and JObjects and just work in straight JSON more.
+//  unfuck the last of the the back and forthing between Dictionaries and JObjects and just work in straight JSON.
 //  put 'interest levels' into GPP stuff, make them more meaningful in inf stuff.
 //  Parse other inf sections properly:
 //  System Access
@@ -27,7 +27,7 @@
 //  Parse Registry.pol
 //  Parse Scripts.ini
 //  Parse Machine\Applications\*.AAS (assigned applications?
-// figure out what happened to MSI files?
+//  figure out what happened to MSI files?
 
 using Newtonsoft.Json.Linq;
 using System;
@@ -62,7 +62,6 @@ namespace Grouper2
     {
         public static bool OnlineChecks;
         public static int IntLevelToShow;
-
     }
 
     internal class Grouper2
@@ -75,12 +74,12 @@ namespace Grouper2
             SwitchArgument offlineArg = new SwitchArgument('o', "offline", "Disables checks that require LDAP comms with a DC or SMB comms with file shares found in policy settings. Requires that you define a value for --sysvol.", false);
             ValueArgument<string> sysvolArg = new ValueArgument<string>('s', "sysvol", "Set the path to a domain SYSVOL directory.");
             ValueArgument<int> intlevArg = new ValueArgument<int>('i', "interestlevel", "The minimum interest level to display. i.e. findings with an interest level lower than x will not be seen in output. Defaults to 1, i.e. show everything.");
-            ValueArgument<string> domainArg = new ValueArgument<string>('d', "domain", "The domain to connect to. If not specified, connects to current user context domain.");
-            ValueArgument<string> usernameArg = new ValueArgument<string>('u', "username", "Username to authenticate as. SMB permissions checks will be run from this user's perspective.");
-            ValueArgument<string> passwordArg = new ValueArgument<string>('p', "password", "Password to use for authentication.");
-            parser.Arguments.Add(domainArg);
-            parser.Arguments.Add(usernameArg);
-            parser.Arguments.Add(passwordArg);
+            //ValueArgument<string> domainArg = new ValueArgument<string>('d', "domain", "The domain to connect to. If not specified, connects to current user context domain.");
+            //ValueArgument<string> usernameArg = new ValueArgument<string>('u', "username", "Username to authenticate as. SMB permissions checks will be run from this user's perspective.");
+            //ValueArgument<string> passwordArg = new ValueArgument<string>('p', "password", "Password to use for authentication.");
+            //parser.Arguments.Add(domainArg);
+            //parser.Arguments.Add(usernameArg);
+            //parser.Arguments.Add(passwordArg);
             parser.Arguments.Add(intlevArg);
             parser.Arguments.Add(sysvolArg);
             parser.Arguments.Add(offlineArg);
@@ -121,11 +120,11 @@ namespace Grouper2
                 {
                     sysvolPolDir = sysvolArg.Value;
                 }
-                if (domainArg.Parsed || usernameArg.Parsed || passwordArg.Parsed)
-                {
-                    Console.WriteLine("I haven't set up anything to handle the domain/password stuff yet, so it won't work");
-                    Environment.Exit(1);
-                }
+                //if (domainArg.Parsed || usernameArg.Parsed || passwordArg.Parsed)
+                //{
+                //    Console.WriteLine("I haven't set up anything to handle the domain/password stuff yet, so it won't work");
+                //    Environment.Exit(1);
+                //}
             }
             catch (CommandLineException e)
             {
@@ -146,7 +145,7 @@ namespace Grouper2
                 }
             }
 
-            Console.WriteLine("We gonna look at the policies in: " + sysvolPolDir);
+            Console.WriteLine("Targeting SYSVOL at: " + sysvolPolDir);
 
             // if we're online, get a bunch of metadata about the GPOs via LDAP
             if (GlobalVar.OnlineChecks) domainGpos = LDAPstuff.GetDomainGpos();
@@ -164,7 +163,6 @@ namespace Grouper2
 
             // create a dict to put all our output goodies in.
             Dictionary<string, JObject> grouper2OutputDict = new Dictionary<string, JObject>();
-
             // so for each uid directory (including ones with that dumb broken domain replication condition)
             // we're going to gather up all our goodies and put them into that dict we just created.
             foreach (var gpoPath in gpoPaths)
@@ -215,7 +213,7 @@ namespace Grouper2
                 JArray userPolInfResults = ProcessInf(userPolPath);
                 JArray machinePolGppResults = ProcessGpXml(machinePolPath);
                 JArray userPolGppResults = ProcessGpXml(userPolPath);
-
+                // add all our findings to a JArray
                 JArray gpoFindingsArray = new JArray();
                 if (machinePolGppResults.HasValues)
                 {
@@ -245,7 +243,7 @@ namespace Grouper2
                         gpoFindingsArray.Add(finding);
                     }
                 }
-
+                // if there are any Findings, add it to the final output.
                 if (gpoFindingsArray.Any())
                 {
                     JProperty gpoFindingsProp = new JProperty("Findings", gpoFindingsArray);
