@@ -10,6 +10,7 @@
  */
 
 //  Master TODO list.
+//  unfuck all the back and forthing between Dictionaries and JObjects and just work in straight JSON more.
 //  put 'interest levels' into GPP stuff, make them more meaningful in inf stuff.
 //  Parse other inf sections properly:
 //  System Access

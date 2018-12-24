@@ -104,75 +104,74 @@ namespace Grouper2
 
         private JObject GetAssessedGroups(JObject gppCategory)
         {
-            Dictionary<string, Dictionary<string, string>> assessedGroupsDict = new Dictionary<string, Dictionary<string, string>>();
-            Dictionary<string, Dictionary<string, string>> assessedUsersDict = new Dictionary<string, Dictionary<string, string>>();
+            JObject assessedGroups = new JObject();
+            JObject assessedUsers = new JObject();
 
             if (gppCategory["Group"] is JArray)
             {
                 foreach (JObject gppGroup in gppCategory["Group"])
                 {
-                    Dictionary<string, string> assessedGroup = GetAssessedGroup(gppGroup);
+                    JObject assessedGroup = GetAssessedGroup(gppGroup);
                     if (assessedGroup.Count > 0)
                     {
-                        assessedGroupsDict.Add(gppGroup["@uid"].ToString(), assessedGroup);
+                        assessedGroups.Add(gppGroup["@uid"].ToString(), assessedGroup);
                     }
                 }
             }
             else
             {
                 JObject gppGroup = (JObject)JToken.FromObject(gppCategory["Group"]);
-                Dictionary<string, string> assessedGroup = GetAssessedGroup(gppGroup);
+                JObject assessedGroup = GetAssessedGroup(gppGroup);
                 if (assessedGroup.Count > 0)
                 {
-                    assessedGroupsDict.Add(gppGroup["@uid"].ToString(), assessedGroup);
+                    assessedGroups.Add(gppGroup["@uid"].ToString(), assessedGroup);
                 }
             }
-            JObject assessedGppGroups = (JObject)JToken.FromObject(assessedGroupsDict);
+            JObject assessedGppGroups = (JObject)JToken.FromObject(assessedGroups);
 
             if (gppCategory["User"] is JArray)
             {
                 foreach (JObject gppUser in gppCategory["User"])
                 {
-                    Dictionary<string, string> assessedUser = GetAssessedUser(gppUser);
+                    JObject assessedUser = GetAssessedUser(gppUser);
                     if (assessedUser.Count > 0)
                     {
-                        assessedUsersDict.Add(gppUser["@uid"].ToString(), assessedUser);
+                        assessedUsers.Add(gppUser["@uid"].ToString(), assessedUser);
                     }
                 }
             }
             else
             {
                 JObject gppUser = (JObject)JToken.FromObject(gppCategory["User"]);
-                Dictionary<string, string> assessedUser = GetAssessedUser(gppUser);
+                JObject assessedUser = GetAssessedUser(gppUser);
                 if (assessedUser.Count > 0)
                 {
-                    assessedUsersDict.Add(gppUser["@uid"].ToString(), assessedUser);
+                    assessedUsers.Add(gppUser["@uid"].ToString(), assessedUser);
                 }
             }
-            JObject assessedGppUsers = (JObject)JToken.FromObject(assessedUsersDict);
-
-            // cast our Dictionaries back into JObjects
+            JObject assessedGppUsers = (JObject)JToken.FromObject(assessedUsers);
+            
             JProperty assessedUsersJson = new JProperty("GPPUserSettings", assessedGppUsers);
             JProperty assessedGroupsJson = new JProperty("GPPGroupSettings", assessedGppGroups);
             // chuck the users and groups together in one JObject
             JObject assessedGppGroupsJson = new JObject();
             // only want to actually output these things if there's anything useful in them.
-            if (assessedUsersDict.Count > 0)
+            if (assessedUsers.Count > 0)
             {
                 assessedGppGroupsJson.Add(assessedUsersJson);
             }
-            if (assessedGroupsDict.Count > 0)
+            if (assessedGroups.Count > 0)
             {
                 assessedGppGroupsJson.Add(assessedGroupsJson);
             }
             return assessedGppGroupsJson;
         }
 
-        private Dictionary<string, string> GetAssessedUser(JObject gppUser)
+        private JObject GetAssessedUser(JObject gppUser)
         {
             //foreach (JToken gppUser in gppUsers) {
             // dictionary for results from this specific user.
-            Dictionary<string, string> assessedUserDict = new Dictionary<string, string>();
+            JObject assessedUser = new JObject();
 
             //set base interest level
             int interestLevel = 3;
@@ -184,15 +183,15 @@ namespace Grouper2
             userAction = Utility.GetActionString(userAction);
 
             // get the username and a bunch of other details:
-            assessedUserDict.Add("Name", gppUser["@name"].ToString());
-            assessedUserDict.Add("User Name", gppUserProps["@userName"].ToString());
-            assessedUserDict.Add("DateTime Changed", gppUser["@changed"].ToString());
-            assessedUserDict.Add("Account Disabled", gppUserProps["@acctDisabled"].ToString());
-            assessedUserDict.Add("Password Never Expires", gppUserProps["@neverExpires"].ToString());
-            assessedUserDict.Add("Description", gppUserProps["@description"].ToString());
-            assessedUserDict.Add("Full Name", gppUserProps["@fullName"].ToString());
-            assessedUserDict.Add("New Name", gppUserProps["@newName"].ToString());
-            assessedUserDict.Add("Action", userAction);
+            assessedUser.Add("Name", gppUser["@name"].ToString());
+            assessedUser.Add("User Name", gppUserProps["@userName"].ToString());
+            assessedUser.Add("DateTime Changed", gppUser["@changed"].ToString());
+            assessedUser.Add("Account Disabled", gppUserProps["@acctDisabled"].ToString());
+            assessedUser.Add("Password Never Expires", gppUserProps["@neverExpires"].ToString());
+            assessedUser.Add("Description", gppUserProps["@description"].ToString());
+            assessedUser.Add("Full Name", gppUserProps["@fullName"].ToString());
+            assessedUser.Add("New Name", gppUserProps["@newName"].ToString());
+            assessedUser.Add("Action", userAction);
 
             // check for cpasswords
             string cpassword = gppUserProps["@cpassword"].ToString();
@@ -201,23 +200,21 @@ namespace Grouper2
                 string decryptedCpassword = "";
                 decryptedCpassword = Utility.DecryptCpassword(cpassword);
                 // if we find one, that's super interesting.
-                assessedUserDict.Add("Cpassword", decryptedCpassword);
+                assessedUser.Add("Cpassword", decryptedCpassword);
                 interestLevel = 10;
             }
             // if it's too boring to be worth showing, return an empty dict.
             if (interestLevel < GlobalVar.IntLevelToShow)
             {
-                assessedUserDict = new Dictionary<string, string>();
+                assessedUser = new JObject();
             }
-            return assessedUserDict;
+            return assessedUser;
         }
 
-        private Dictionary<string, string> GetAssessedGroup(JObject gppGroup)
+        private JObject GetAssessedGroup(JObject gppGroup)
         {
-            //foreach (JToken gppGroup in gppGroups)
-            //{
             //dictionary for results from this specific group
-            Dictionary<string, string> assessedGroupDict = new Dictionary<string, string>();
+            JObject assessedGroup = new JObject();
             int interestLevel = 3;
 
             JToken gppGroupProps = gppGroup["Properties"];
@@ -227,26 +224,59 @@ namespace Grouper2
             groupAction = Utility.GetActionString(groupAction);
 
             // get the group name and a bunch of other details:
-            assessedGroupDict.Add("Name", Utility.GetSafeString(gppGroup, "@name"));
-            assessedGroupDict.Add("DateTime Changed", Utility.GetSafeString(gppGroup,"@changed"));
-            assessedGroupDict.Add("Description", Utility.GetSafeString(gppGroupProps, "@description"));
-            assessedGroupDict.Add("New Name", Utility.GetSafeString(gppGroupProps, "@newName"));
-            assessedGroupDict.Add("Delete All Users", Utility.GetSafeString(gppGroupProps,"@deleteAllUsers"));
-            assessedGroupDict.Add("Delete All Groups", Utility.GetSafeString(gppGroupProps,"@deleteAllGroups"));
-            assessedGroupDict.Add("Remove Accounts", Utility.GetSafeString(gppGroupProps,"@removeAccounts"));
-            assessedGroupDict.Add("Action", groupAction);
-            //assessedGroupDict.Add("Group Members", gppGroup);
-            Console.WriteLine(gppGroup.ToString());
-            Utility.DebugWrite("You still need to figure out group members.");
+            assessedGroup.Add("Name", Utility.GetSafeString(gppGroup, "@name"));
+            //TODO if the name is an interesting group, make the finding more interesting.
+            assessedGroup.Add("DateTime Changed", Utility.GetSafeString(gppGroup,"@changed"));
+            assessedGroup.Add("Description", Utility.GetSafeString(gppGroupProps, "@description"));
+            assessedGroup.Add("New Name", Utility.GetSafeString(gppGroupProps, "@newName"));
+            assessedGroup.Add("Delete All Users", Utility.GetSafeString(gppGroupProps,"@deleteAllUsers"));
+            assessedGroup.Add("Delete All Groups", Utility.GetSafeString(gppGroupProps,"@deleteAllGroups"));
+            assessedGroup.Add("Remove Accounts", Utility.GetSafeString(gppGroupProps,"@removeAccounts"));
+            assessedGroup.Add("Action", groupAction);
+
+            JArray gppGroupMemberArray = new JArray();
+            JToken members = gppGroupProps["Members"]["Member"];
+            if (members.Type.ToString() == "Array")
+            {
+                foreach (JToken member in members.Children())
+                {
+                    gppGroupMemberArray.Add(GetAssessedGroupMember(member));
+                }
+            }
+            if (members.Type.ToString() == "Object")
+            {
+                gppGroupMemberArray.Add(GetAssessedGroupMember(members));
+            }
+            else
+            {
+                Utility.DebugWrite("Something went squirrely with Group Memberships");
+                Utility.DebugWrite(members.Type.ToString());
+                Utility.DebugWrite(members.ToString());
+            }
+            assessedGroup.Add("Members", gppGroupMemberArray);
 
             if (interestLevel < GlobalVar.IntLevelToShow)
             {
-                assessedGroupDict = new Dictionary<string, string>();
+                assessedGroup = new JObject();
             }
-            return assessedGroupDict;
-
+            return assessedGroup;
         }
-       
+
+        private JObject GetAssessedGroupMember(JToken member)
+        {
+            JObject assessedMember = new JObject();
+            assessedMember.Add("Name", Utility.GetSafeString(member, "@name"));
+            assessedMember.Add("Action", Utility.GetSafeString(member, "@action"));
+            string memberSid = Utility.GetSafeString(member, "@sid");
+            if (memberSid.Length > 0)
+            {
+                assessedMember.Add("SID", memberSid);
+                string resolvedSID = LDAPstuff.GetUserFromSid(memberSid);
+                assessedMember.Add("Display Name From SID", resolvedSID);
+            }
+            return assessedMember;
+        }
+
        private JObject GetAssessedDrives(JObject gppCategory)
        {
            int interestLevel = 3;

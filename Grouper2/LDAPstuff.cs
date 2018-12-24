@@ -113,9 +113,10 @@ class LDAPstuff
                         }
                     }
                     string trusteeSid = gpoAce.IdentityReference.ToString();
-                    // array of sid endings for the default SIDs
+                    // array of sid endings for the SIDs of default high-priv trustees.
+                    // this is extremely lazy but it will work for now.
                     string[] boringSidEndings = new string[] { "-3-0" , "-5-9", "5-18", "-512", "-519" };
-                    // if the last 4 chars of trusteeSid don't match an entry in boringSidEndings, increase the interest level.
+                    // if the last 4 chars of trusteeSid match an entry in boringSidEndings, reduce the interest level back to default.
                     if (boringSidEndings.Contains(trusteeSid.Substring((trusteeSid.Length - 4), 4)))
                     {
                         aceInterestLevel = 1;
@@ -159,13 +160,8 @@ class LDAPstuff
             }
             return gposData; 
         }
-
-  
-
-
-
-
-public static string GetDomainSid()
+    
+        public static string GetDomainSid()
         {
             WindowsIdentity id = WindowsIdentity.GetCurrent();
             string domainSid = id.User.AccountDomainSid.ToString();
