@@ -82,6 +82,14 @@ namespace Grouper2
                 canWrite = stream.CanWrite;
                 stream.Close();
             }
+            catch (System.UnauthorizedAccessException e)
+            {
+                Utility.DebugWrite("Tested write perms for " + inPath + " and couldn't write.");
+            }
+            catch (System.ArgumentException e)
+            {
+                Utility.DebugWrite("Tested write perms for " + inPath + " but it doesn't seem to be a valid file path.");
+            }
             catch (Exception e)
             {
                 Utility.DebugWrite(e.ToString());

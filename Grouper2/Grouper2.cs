@@ -213,6 +213,8 @@ namespace Grouper2
                 JArray userPolInfResults = ProcessInf(userPolPath);
                 JArray machinePolGppResults = ProcessGpXml(machinePolPath);
                 JArray userPolGppResults = ProcessGpXml(userPolPath);
+                JArray machinePolScriptResults = ProcessScriptsIni(machinePolPath);
+                JArray userPolScriptResults = ProcessScriptsIni(userPolPath);
                 // add all our findings to a JArray
                 JArray gpoFindingsArray = new JArray();
                 if (machinePolGppResults.HasValues)
@@ -278,7 +280,7 @@ namespace Grouper2
                 return null;
             }
 
-            // make a JObject for our results
+            // make a JArray for our results
             JArray processedInfs = new JArray();
             // iterate over the list of inf files we found
             foreach (string infFile in gpttmplInfFiles)
@@ -295,6 +297,39 @@ namespace Grouper2
                 }
             }
             return processedInfs;
+        }
+
+        private static JArray ProcessScriptsIni(string Path)
+        {
+            List<string> scriptsIniFiles = new List<string>();
+
+            try
+            {
+                scriptsIniFiles = Directory.GetFiles(Path, "Scripts.ini", SearchOption.AllDirectories).ToList();
+
+            }
+            catch (System.IO.DirectoryNotFoundException)
+            {
+                return null;
+            }
+
+            JArray processedScriptsIniFiles = new JArray();
+
+            foreach (string iniFile in scriptsIniFiles)
+            {
+                JObject parsedScriptsIniFile = Parsers.ParseInf(iniFile); // Not a typo, the formats are the same.
+                Utility.DebugWrite(parsedScriptsIniFile.ToString());
+                JObject assessedScriptsIniFile = new JObject();
+                    //AssessHandlers.AssessScriptsIni(parsedScriptsIniFile);
+
+
+                if (assessedScriptsIniFile.HasValues)
+                {
+                    processedScriptsIniFiles.Add(assessedScriptsIniFile);
+                }
+            }
+
+            return processedScriptsIniFiles;
         }
 
         private static JArray ProcessGpXml(string Path)
