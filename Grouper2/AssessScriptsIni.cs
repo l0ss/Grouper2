@@ -11,7 +11,15 @@ namespace Grouper2
         public static JObject GetAssessedScriptsIni(JObject parsedScriptsIni)
         {
             JObject assessedScriptsIni = new JObject();
+            int interestLevel = 1;
 
+
+            // does nothing yet, just passes through.
+            if (interestLevel >= GlobalVar.IntLevelToShow)
+            {
+                assessedScriptsIni = parsedScriptsIni;
+            }
+            
             return assessedScriptsIni;
         }
     }

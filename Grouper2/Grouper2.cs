@@ -215,7 +215,7 @@ namespace Grouper2
                 JArray userPolGppResults = ProcessGpXml(userPolPath);
                 JArray machinePolScriptResults = ProcessScriptsIni(machinePolPath);
                 JArray userPolScriptResults = ProcessScriptsIni(userPolPath);
-                // add all our findings to a JArray
+                // add all our findings to a JArray in what seems a very inefficient manner.
                 JArray gpoFindingsArray = new JArray();
                 if (machinePolGppResults.HasValues)
                 {
@@ -241,6 +241,20 @@ namespace Grouper2
                 if (userPolInfResults.HasValues)
                 {
                     foreach (JObject finding in userPolInfResults)
+                    {
+                        gpoFindingsArray.Add(finding);
+                    }
+                }
+                if (machinePolScriptResults.HasValues)
+                {
+                    foreach (JObject finding in machinePolScriptResults)
+                    {
+                        gpoFindingsArray.Add(finding);
+                    }
+                }
+                if (userPolScriptResults.HasValues)
+                {
+                    foreach (JObject finding in machinePolScriptResults)
                     {
                         gpoFindingsArray.Add(finding);
                     }
