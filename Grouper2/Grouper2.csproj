@@ -68,6 +68,7 @@
     <Compile Include="AssessGpp.cs" />
     <Compile Include="AssessHandlers.cs" />
     <Compile Include="AssessInf.cs" />
+    <Compile Include="AssessScriptsIni.cs" />
     <Compile Include="LDAPstuff.cs" />
     <Compile Include="Parsers.cs" />
     <Compile Include="Grouper2.cs" />

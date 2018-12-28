@@ -319,10 +319,7 @@ namespace Grouper2
             {
                 JObject preParsedScriptsIniFile = Parsers.ParseInf(iniFile); // Not a typo, the formats are almost the same.
                 JObject parsedScriptsIniFile = Parsers.ParseScriptsIniJson(preParsedScriptsIniFile);
-                JObject assessedScriptsIniFile = new JObject();
-                    //AssessHandlers.AssessScriptsIni(parsedScriptsIniFile);
-
-
+                JObject assessedScriptsIniFile = AssessScriptsIni.GetAssessedScriptsIni(parsedScriptsIniFile);
                 if (assessedScriptsIniFile.HasValues)
                 {
                     processedScriptsIniFiles.Add(assessedScriptsIniFile);

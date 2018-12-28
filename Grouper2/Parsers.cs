@@ -36,21 +36,35 @@ namespace Grouper2
                         maxIndex = indexInt;
                     }
                 }
-
-                JArray settingsJArray = new JArray();
-                // iterate over each index 
-               /* foreach (int i in Enumerable.Range(0, maxIndex))
+                
+                JObject settingsWithIndexes =new JObject();
+               
+                foreach (int i in Enumerable.Range(0, (maxIndex+1)))
                 {
+                    string iString = i.ToString();
                     
-                    string thing = settingsJObject
-
-                    settingsJArray.Add();
-                }*/
+                    JObject parsedSettings = new JObject();
+                    foreach (KeyValuePair<string, JToken> thing in settingsJObject)
+                    {
+                        string index = thing.Key.Substring(0, 1);
+                        string settingName = thing.Key.Substring(1);
+                        string settingValue = thing.Value.ToString();
+                        int indexInt = Convert.ToInt32(index);
+                        // if the line starts with the int we're currently indexing off, add line setting to Dict.
+                        if (indexInt == i)
+                        {
+                            parsedSettings.Add(settingName, settingValue);
+                        }
+                    }
+                    settingsWithIndexes.Add(iString, parsedSettings);
+                }
                 
                 // put it in a jprop and add it to the output jobj
-                JProperty parsedItemJProp = new JProperty(scriptType, settingsJArray);
+                JProperty parsedItemJProp = new JProperty(scriptType, settingsWithIndexes);
                 parsedScriptsIniJson.Add(parsedItemJProp);
             }
+            //Console.WriteLine("return: ");
+            //Utility.DebugWrite(parsedScriptsIniJson.ToString());
             return parsedScriptsIniJson;
         }
 
