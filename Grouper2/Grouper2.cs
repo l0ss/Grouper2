@@ -317,8 +317,8 @@ namespace Grouper2
 
             foreach (string iniFile in scriptsIniFiles)
             {
-                JObject parsedScriptsIniFile = Parsers.ParseInf(iniFile); // Not a typo, the formats are the same.
-                Utility.DebugWrite(parsedScriptsIniFile.ToString());
+                JObject preParsedScriptsIniFile = Parsers.ParseInf(iniFile); // Not a typo, the formats are almost the same.
+                JObject parsedScriptsIniFile = Parsers.ParseScriptsIniJson(preParsedScriptsIniFile);
                 JObject assessedScriptsIniFile = new JObject();
                     //AssessHandlers.AssessScriptsIni(parsedScriptsIniFile);
 
