@@ -119,7 +119,7 @@ class LDAPstuff
                     // if the last 4 chars of trusteeSid match an entry in boringSidEndings, reduce the interest level back to default.
                     if (boringSidEndings.Contains(trusteeSid.Substring((trusteeSid.Length - 4), 4)))
                     {
-                        aceInterestLevel = 1;
+                        aceInterestLevel = 0;
                     }
                     string trusteeName = GetUserFromSid(trusteeSid);
                     string acType = gpoAce.AccessControlType.ToString();
