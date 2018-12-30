@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.DirectoryServices.ActiveDirectory;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -71,6 +72,20 @@ namespace Grouper2
                 }
             }
             return null;
+        }
+
+        public static bool DoesFileExist(string inPath)
+        {
+            bool fileExists = false;
+            try
+            {
+                fileExists = File.Exists(inPath);
+            }
+            catch (System.ArgumentException e)
+            {
+                Utility.DebugWrite("Checked if file " + inPath + " exists but it doesn't seem to be a valid file path.");
+            }
+            return fileExists;
         }
 
         public static bool CanIWrite(string inPath)
