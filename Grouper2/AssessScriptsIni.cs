@@ -30,7 +30,6 @@ namespace Grouper2
                     JObject assessedScriptIni = new JObject();
                     // get the unique ID of this script
                     string scriptNum = parsedScript.Key;
-                    //assessedScriptIni.Add("Script Number", scriptNum);
                     string parameters = "";
                     string cmdLine = parsedScript.Value["CmdLine"].ToString();
                     // params are optional, handle it if it's missing.
@@ -50,6 +49,7 @@ namespace Grouper2
                         assessedScriptIni.Add("Parameters", parameters);
                     }
                     // check if the target file path is vulnerable
+                    //TODO some logic to enumerate file ACLS
                     if (GlobalVar.OnlineChecks)
                     {
                         if (Utility.DoesFileExist(cmdLine))
@@ -66,6 +66,7 @@ namespace Grouper2
                         else
                         {
                             assessedScriptIni.Add("Target file exists", "False");
+                            interestLevel = 7;
                         }
                     }
                     if (interestLevel >= GlobalVar.IntLevelToShow)
@@ -74,13 +75,25 @@ namespace Grouper2
                     }
                 }
                 // add all the results from the type to the object being returned
-                assessedScriptsIni.Add(scriptType, assessedScriptIniType);
+                if (assessedScriptIniType.HasValues)
+                {
+                    assessedScriptsIni.Add(scriptType, assessedScriptIniType);
+                }
             }
 
-            // does nothing yet, just passes through.
+            if (assessedScriptsIni.HasValues)
+            {
+                JObject scriptsIniResults = new JObject()
+                {
+                    {"Scripts", assessedScriptsIni }
+                };
+                return scriptsIniResults;
+            }
+            else
+            {
+                return null;
+            }
  
-            
-            return assessedScriptsIni;
         }
     }
 }

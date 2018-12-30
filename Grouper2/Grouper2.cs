@@ -216,54 +216,61 @@ namespace Grouper2
                 JArray machinePolScriptResults = ProcessScriptsIni(machinePolPath);
                 JArray userPolScriptResults = ProcessScriptsIni(userPolPath);
                 // add all our findings to a JArray in what seems a very inefficient manner.
-                JArray gpoFindingsArray = new JArray();
+                JArray userFindings = new JArray();
+                JArray machineFindings = new JArray();
                 if (machinePolGppResults.HasValues)
                 {
                     foreach (JObject finding in machinePolGppResults)
                     {
-                        gpoFindingsArray.Add(finding);
+                        machineFindings.Add(finding);
                     }
                 }
                 if (userPolGppResults.HasValues)
                 {
                     foreach (JObject finding in userPolGppResults)
                     {
-                        gpoFindingsArray.Add(finding);
+                        userFindings.Add(finding);
                     }
                 }
                 if (machinePolInfResults.HasValues)
                 {
                     foreach (JObject finding in machinePolInfResults)
                     {
-                        gpoFindingsArray.Add(finding);
+                        machineFindings.Add(finding);
                     }
                 }
                 if (userPolInfResults.HasValues)
                 {
                     foreach (JObject finding in userPolInfResults)
                     {
-                        gpoFindingsArray.Add(finding);
+                        userFindings.Add(finding);
                     }
                 }
                 if (machinePolScriptResults.HasValues)
                 {
                     foreach (JObject finding in machinePolScriptResults)
                     {
-                        gpoFindingsArray.Add(finding);
+                        machineFindings.Add(finding);
                     }
                 }
                 if (userPolScriptResults.HasValues)
                 {
                     foreach (JObject finding in machinePolScriptResults)
                     {
-                        gpoFindingsArray.Add(finding);
+                        userFindings.Add(finding);
                     }
                 }
                 // if there are any Findings, add it to the final output.
-                if (gpoFindingsArray.Any())
+                if (userFindings.HasValues)
                 {
-                    JProperty gpoFindingsProp = new JProperty("Findings", gpoFindingsArray);
-                    gpoResultJson.Add(gpoFindingsProp);
+                    JProperty userFindingsJProp = new JProperty("Findings in User Policy", userFindings);
+                    gpoResultJson.Add(userFindingsJProp);
+                }
+
+                if (machineFindings.HasValues)
+                {
+                    JProperty machineFindingsJProp = new JProperty("Findings in Machine Policy", machineFindings);
+                    gpoResultJson.Add(machineFindingsJProp);
                 }
 
                 // put into final jobj
@@ -334,7 +341,7 @@ namespace Grouper2
                 JObject preParsedScriptsIniFile = Parsers.ParseInf(iniFile); // Not a typo, the formats are almost the same.
                 JObject parsedScriptsIniFile = Parsers.ParseScriptsIniJson(preParsedScriptsIniFile);
                 JObject assessedScriptsIniFile = AssessScriptsIni.GetAssessedScriptsIni(parsedScriptsIniFile);
-                if (assessedScriptsIniFile.HasValues)
+                if (assessedScriptsIniFile != null)
                 {
                     processedScriptsIniFiles.Add(assessedScriptsIniFile);
                 }

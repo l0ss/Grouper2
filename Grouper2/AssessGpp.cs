@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -83,15 +84,28 @@ namespace Grouper2
             string fromPath = gppFileProps["@fromPath"].ToString();
             assessedFile.Add("From Path", fromPath);
             assessedFile.Add("Target Path", gppFileProps["@targetPath"].ToString());
-            //TODO some logic to check from path file perms
+            //TODO some logic to enumerate file ACLS
             if (GlobalVar.OnlineChecks && (fromPath.Length > 0))
             {
-                bool writable = false;
-                writable = Utility.CanIWrite(fromPath);
-                if (writable)
+                if (Utility.DoesFileExist(fromPath))
                 {
-                    interestLevel = 10;
-                    assessedFile.Add("From Path Writable", "True");
+                    assessedFile.Add("Source file exists", "True");
+                    bool writable = false;
+                    writable = Utility.CanIWrite(fromPath);
+                    if (writable)
+                    {
+                        interestLevel = 10;
+                        assessedFile.Add("Source file writable", "True");
+                    }
+                    else
+                    {
+                        assessedFile.Add("Source file writable", "False");
+                    }
+                }
+                else
+                {
+                    assessedFile.Add("Source file exists", "False");
+                    interestLevel = 7;
                 }
             }
 
@@ -288,14 +302,22 @@ namespace Grouper2
            {
                foreach (JObject gppShortcuts in gppCategory["Shortcut"])
                {
-                   assessedShortcuts.Add(gppShortcuts["@uid"].ToString(), GetAssessedShortcut(gppShortcuts));
+                   JObject assessedShortcut = GetAssessedShortcut(gppShortcuts);
+                   if (assessedShortcut.HasValues)
+                   {
+                       assessedShortcuts.Add(gppShortcuts["@uid"].ToString(), assessedShortcut);
+                   }
                }
            }
            else
            {
                JObject gppShortcuts = (JObject)JToken.FromObject(gppCategory["Shortcut"]);
-               assessedShortcuts.Add(gppShortcuts["@uid"].ToString(), GetAssessedShortcut(gppShortcuts));
-           }
+               JObject assessedShortcut = GetAssessedShortcut(gppShortcuts);
+               if (assessedShortcut.HasValues)
+               {
+                   assessedShortcuts.Add(gppShortcuts["@uid"].ToString(), assessedShortcut);
+               }
+            }
 
            return assessedShortcuts;
        }
