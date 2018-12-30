@@ -10,22 +10,20 @@
  */
 
 //  Master TODO list.
-//  unfuck the last of the the back and forthing between Dictionaries and JObjects and just work in straight JSON.
 //  put 'interest levels' into GPP stuff, make them more meaningful in inf stuff.
 //  Parse other inf sections properly:
 //  System Access
 //  Kerberos Policy
 //  Event Audit
 //  Registry Values
+//  Scheduled tasks
 //  Registry Keys
 //  Group Membership
 //  Service General Setting
-//  Parse XML files
-//  Parse ini files
 //  Grep scripts for creds.
+//  grep arguments/cmd line param strings for substrings indicating possible credentials in args
 //  File permissions for referenced files.
 //  Parse Registry.pol
-//  Parse Scripts.ini
 //  Parse Machine\Applications\*.AAS (assigned applications?
 //  figure out what happened to MSI files?
 
@@ -113,7 +111,7 @@ namespace Grouper2
                 }
                 else
                 {
-                    GlobalVar.IntLevelToShow = 0;
+                    GlobalVar.IntLevelToShow = 1;
                 }
 
                 if (sysvolArg.Parsed)

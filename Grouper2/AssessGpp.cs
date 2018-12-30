@@ -363,17 +363,45 @@ namespace Grouper2
        }
 
         private JObject GetAssessedScheduledTasks(JObject gppCategory)
-       {
-           int interestLevel = 4;
-           JProperty assessedGppSchedTasksTaskProp = new JProperty("Task", gppCategory["Task"]);
-           JProperty assessedGppSchedTasksImmediateTaskProp = new JProperty("ImmediateTaskV2", gppCategory["ImmediateTaskV2"]);
-           JObject assessedGppSchedTasksAllJson = new JObject(assessedGppSchedTasksTaskProp, assessedGppSchedTasksImmediateTaskProp);
-           if (interestLevel < GlobalVar.IntLevelToShow)
+        {
+           JObject assessedGppSchedTasksAllJson = new JObject();
+
+           JObject assessedScheduledTasksTasks = GetAssessedScheduledTasksTasks((JObject)gppCategory["Task"]);
+           if (assessedScheduledTasksTasks != null)
            {
-               assessedGppSchedTasksAllJson = new JObject();
+               JProperty assessedGppSchedTasksTaskProp = new JProperty("Scheduled Tasks", assessedScheduledTasksTasks);
+               assessedGppSchedTasksAllJson.Add(assessedGppSchedTasksTaskProp);
            }
-            return assessedGppSchedTasksAllJson;
+           
+           JObject assessedScheduledTasksImmediateTasks = GetAssessedScheduledTasksImmediateTasks((JObject)gppCategory["ImmediateTaskV2"]);
+           if (assessedScheduledTasksImmediateTasks != null)
+           {
+               JProperty assessedGppSchedTasksImmediateTasksProp = new JProperty("Scheduled Tasks (Immediate Tasks)", assessedScheduledTasksImmediateTasks);
+               assessedGppSchedTasksAllJson.Add(assessedGppSchedTasksImmediateTasksProp);
+           }
+            if (assessedGppSchedTasksAllJson.HasValues)
+           {
+               return assessedGppSchedTasksAllJson;
+           }
+           else
+           {
+               return null;
+           }
        }
+
+        private JObject GetAssessedScheduledTasksTasks(JObject scheduledTasks)
+        {
+            JObject assessedScheduledTasksTasks = new JObject();
+            Utility.DebugWrite(scheduledTasks.ToString());
+            return assessedScheduledTasksTasks;
+        }
+
+        private JObject GetAssessedScheduledTasksImmediateTasks(JObject scheduledTasksImmediateTask)
+        {
+            JObject assessedScheduledTasksImmediateTasks = new JObject();
+            Utility.DebugWrite(scheduledTasksImmediateTask.ToString());
+            return assessedScheduledTasksImmediateTasks;
+        }
 
        private JObject GetAssessedRegistrySettings(JObject gppCategory)
        {
