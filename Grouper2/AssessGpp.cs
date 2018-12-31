@@ -387,9 +387,7 @@ namespace Grouper2
 
                 }
             }
-            
-            
-            
+
             if (assessedGppSchedTasksAllJson.HasValues)
             {
                 return assessedGppSchedTasksAllJson;

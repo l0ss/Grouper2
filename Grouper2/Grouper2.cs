@@ -1,28 +1,41 @@
-﻿/***
+﻿/*
  *      .,-:::::/  :::::::..       ...      ...    :::::::::::::. .,::::::  :::::::..     .:::.  
  *    ,;;-'````'   ;;;;``;;;;   .;;;;;;;.   ;;     ;;; `;;;```.;;;;;;;''''  ;;;;``;;;;   ,;'``;. 
  *    [[[   [[[[[[/ [[[,/[[['  ,[[     \[[,[['     [[[  `]]nnn]]'  [[cccc    [[[,/[[['   ''  ,[['
  *    "$$c.    "$$  $$$$$$c    $$$,     $$$$$      $$$   $$$""     $$""""    $$$$$$c     .c$$P'  
  *     `Y8bo,,,o88o 888b "88bo,"888,_ _,88P88    .d888   888o      888oo,__  888b "88bo,d88 _,oo,
  *       `'YMUP"YMM MMMM   "W"   "YMMMMMP"  "YmmMMMM""   YMMMb     """"YUMMM MMMM   "W" MMMUP*"^^
- *                                                                                               
+ *
+ *      Alpha
  *                        By Mike Loss (@mikeloss)                                                
  */
 
 //  Master TODO list.
-//  put 'interest levels' into GPP stuff, make them more meaningful in inf stuff.
-//  Parse other inf sections properly:
-//  System Access
-//  Kerberos Policy
-//  Event Audit
-//  Registry Values
-//  Scheduled tasks
-//  Registry Keys
-//  Group Membership
-//  Service General Setting
+//  Expand use of 'interest levels' and maybe break the definition of interest levels into a config file
+//  Parse and assess other inf sections properly:
+//      System Access
+//      Kerberos Policy
+//      Event Audit
+//      Registry Values
+//      Scheduled tasks
+//      Registry Keys
+//      Group Membership
+//      Service General Setting
+//
+//  Assess more GPP types properly:
+//      Reg Settings
+//      Drives
+//      Environment Variables
+//      NT Services
+//      Network Options
+//      Folders
+//      Network Shares
+//      INI Files
+//      Scheduled Tasks (Work in progress)
+//
 //  Grep scripts for creds.
-//  grep arguments/cmd line param strings for substrings indicating possible credentials in args
-//  File permissions for referenced files.
+//  grep arguments/cmd line param strings for substrings indicating possible credentials
+//  Enumerate File permissions for referenced files.
 //  Parse Registry.pol
 //  Parse Machine\Applications\*.AAS (assigned applications?
 //  figure out what happened to MSI files?
