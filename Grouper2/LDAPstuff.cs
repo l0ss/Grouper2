@@ -56,7 +56,6 @@ class LDAPstuff
             }
         }
         
-
         // new dictionary for data from each GPO to go into
         JObject gposData = new JObject();
 
@@ -98,7 +97,7 @@ class LDAPstuff
                     //Utility.DebugWrite("Fuck, I still have to deal with Extended Rights.");
                     string extendedRightString = guidDict[Convert.ToString(gpoAce.ObjectType)];
                     adRightsList.Add(extendedRightString);
-                    Utility.DebugWrite("Extended Right " + extendedRightString + " found.");
+                    //Utility.DebugWrite("Extended Right " + extendedRightString + " found.");
                 }
                 // an array of interesting privs
                 string[] intRightsArray = new string[]

@@ -154,9 +154,11 @@ namespace Grouper2
 
                 if (assessedGpp != null)
                 {
-                    assessedGppDict.Add(gppCategory, assessedGpp);
+                    if (assessedGpp.HasValues)
+                    {
+                        assessedGppDict.Add(gppCategory, assessedGpp);
+                    }
                 }
-
             }
             JObject assessedGppJson = (JObject)JToken.FromObject(assessedGppDict);
             return assessedGppJson;
