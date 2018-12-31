@@ -152,7 +152,7 @@ namespace Grouper2
                 //JObject gppCategoryJson = (JObject)gppToAssess[gppCategory];
                 JObject assessedGpp = assessGpp.GetAssessed(gppCategory);
 
-                if (assessedGpp.HasValues)
+                if (assessedGpp != null)
                 {
                     assessedGppDict.Add(gppCategory, assessedGpp);
                 }

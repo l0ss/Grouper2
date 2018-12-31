@@ -26,6 +26,7 @@
 //  Parse Registry.pol
 //  Parse Machine\Applications\*.AAS (assigned applications?
 //  figure out what happened to MSI files?
+//  niceify the output, maybe some colours?
 
 using Newtonsoft.Json.Linq;
 using System;
