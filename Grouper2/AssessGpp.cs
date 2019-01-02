@@ -84,13 +84,20 @@ namespace Grouper2
             string fromPath = gppFileProps["@fromPath"].ToString();
             assessedFile.Add("From Path", fromPath);
             assessedFile.Add("Target Path", gppFileProps["@targetPath"].ToString());
-            //TODO some logic to enumerate file ACLS
             if (GlobalVar.OnlineChecks && (fromPath.Length > 0))
             {
                 if (Utility.DoesFileExist(fromPath))
                 {
                     assessedFile.Add("Source file exists", "True");
                     bool writable = false;
+                    // get the file permissions
+                    JObject fileDacls = Utility.GetFileDaclJObject(fromPath);
+                    if (fileDacls.HasValues)
+                    {
+                        interestLevel = 8;
+                        assessedFile.Add("File Permissions", fileDacls);
+                    }
+                    // check if the file is writable
                     writable = Utility.CanIWrite(fromPath);
                     if (writable)
                     {
@@ -101,16 +108,20 @@ namespace Grouper2
                     {
                         assessedFile.Add("Source file writable", "False");
                     }
+
                 }
                 else
                 {
                     assessedFile.Add("Source file exists", "False");
+                    string directoryName = Path.GetDirectoryName(fromPath);
+                    JObject directoryDacls = Utility.GetFileDaclJObject(directoryName);
                     interestLevel = 7;
+                    assessedFile.Add("Directory Permissions", directoryDacls);
                 }
             }
 
             // if it's too boring to be worth showing, return an empty jobj.
-            if (interestLevel < GlobalVar.IntLevelToShow)
+            if (interestLevel <= GlobalVar.IntLevelToShow)
             {
                 assessedFile = new JObject();
             }
@@ -352,6 +363,15 @@ namespace Grouper2
                    interestLevel = 10;
                    assessedShortcut.Add("From Path Writable", "True");
                }
+
+               // get the file permissions
+               JObject fileDacls = Utility.GetFileDaclJObject(targetPath);
+               if (fileDacls.HasValues)
+               {
+                   assessedShortcut.Add("File Permissions", fileDacls);
+                   interestLevel = 8;
+               }
+
            }
 
            // if it's too boring to be worth showing, return an empty jobj.

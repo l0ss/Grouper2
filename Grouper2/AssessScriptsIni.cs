@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Policy;
 using System.Text;
@@ -50,30 +51,50 @@ namespace Grouper2
                     }
                     // check if the target file path is vulnerable
                     //TODO some logic to enumerate file ACLS
-                    if (GlobalVar.OnlineChecks)
+
+                    if (GlobalVar.OnlineChecks && (cmdLine.Length > 0))
                     {
                         if (Utility.DoesFileExist(cmdLine))
                         {
-                            bool cmdLineWritable = Utility.CanIWrite(cmdLine);
-                            if (cmdLineWritable)
+                            assessedScriptIni.Add("Source file exists", "True");
+                            bool writable = false;
+                            // get the file permissions
+                            JObject fileDacls = Utility.GetFileDaclJObject(cmdLine);
+                            if (fileDacls.HasValues)
+                            {
+                                interestLevel = 8;
+                                assessedScriptIni.Add("File Permissions", fileDacls);
+                            }
+                            // check if the file is writable
+                            writable = Utility.CanIWrite(cmdLine);
+                            if (writable)
                             {
                                 interestLevel = 10;
-                                assessedScriptIni.Add("Path is writable", "True");
-                                //Utility.DebugWrite("writable path " + cmdLine);
+                                assessedScriptIni.Add("Source file writable", "True");
                             }
-                            assessedScriptIni.Add("Target file exists", "True");
+                            else
+                            {
+                                assessedScriptIni.Add("Source file writable", "False");
+                            }
+
                         }
                         else
                         {
-                            assessedScriptIni.Add("Target file exists", "False");
+                            assessedScriptIni.Add("Source file exists", "False");
+                            string directoryName = Path.GetDirectoryName(cmdLine);
+                            JObject directoryDacls = Utility.GetFileDaclJObject(directoryName);
                             interestLevel = 7;
+                            assessedScriptIni.Add("Directory Permissions", directoryDacls);
                         }
+
                     }
+
                     if (interestLevel >= GlobalVar.IntLevelToShow)
                     {
                         assessedScriptIniType.Add(scriptNum, assessedScriptIni);
                     }
                 }
+                
                 // add all the results from the type to the object being returned
                 if (assessedScriptIniType.HasValues)
                 {

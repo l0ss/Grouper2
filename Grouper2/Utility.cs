@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.DirectoryServices.ActiveDirectory;
 using System.IO;
+using System.Security.AccessControl;
 using System.Security.Cryptography;
+using System.Security.Principal;
 using System.Text;
 using Newtonsoft.Json.Linq;
 
@@ -10,6 +12,57 @@ namespace Grouper2
 {
     class Utility
     {
+
+        public static JObject GetFileDaclJObject(string filePathString)
+        {
+            JObject fileDaclsJObject = new JObject();
+
+            FileSecurity filePathSecObj = new FileSecurity();
+            try
+            {
+                filePathSecObj = File.GetAccessControl(filePathString);
+            }
+            catch (System.ArgumentException e)
+            {
+                Console.Write("Tried to check file permissions on invalid path: " + filePathString);
+                return fileDaclsJObject;
+            }
+
+            AuthorizationRuleCollection fileAccessRules = filePathSecObj.GetAccessRules(true, true, typeof(NTAccount));
+            
+            foreach (FileSystemAccessRule fileAccessRule in fileAccessRules)
+            {
+                // get inheritance and access control type values
+                string isInheritedString = "False";
+                if (fileAccessRule.IsInherited) isInheritedString = "True";
+                string accessControlTypeString = "Allow";
+                if (fileAccessRule.AccessControlType == AccessControlType.Deny) accessControlTypeString = "Deny";
+
+                // get the user 
+                string identityReferenceString = fileAccessRule.IdentityReference.ToString();
+
+                // get the rights
+                string fileSystemRightsString = fileAccessRule.FileSystemRights.ToString();
+                // strip spaces
+                fileSystemRightsString = fileSystemRightsString.Replace(" ", "");
+                // turn them into an array
+                string[] fileSystemRightsArray = fileSystemRightsString.Split(',');
+                // then into a JArray
+                JArray fileSystemRightsJArray = new JArray();
+                foreach (string x in fileSystemRightsArray)
+                {
+                    fileSystemRightsJArray.Add(x);
+                }
+                JObject fileDaclJObject = new JObject();
+                fileDaclJObject.Add("Allow or Deny?", accessControlTypeString);
+                fileDaclJObject.Add("Inherited?", isInheritedString);
+                fileDaclJObject.Add("Rights", fileSystemRightsJArray);
+                fileDaclsJObject.Add(identityReferenceString, fileDaclJObject);
+            }
+
+            return fileDaclsJObject;
+        }
+
         public static string DecryptCpassword(string cpassword)
         {
             // reimplemented based on @obscuresec's Get-GPPPassword PowerShell
