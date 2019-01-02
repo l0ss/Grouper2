@@ -230,44 +230,44 @@ namespace Grouper2
                 // add all our findings to a JArray in what seems a very inefficient manner.
                 JArray userFindings = new JArray();
                 JArray machineFindings = new JArray();
-                if (machinePolGppResults.HasValues)
+                if (machinePolGppResults != null && machinePolGppResults.HasValues)
                 {
                     foreach (JObject finding in machinePolGppResults)
                     {
                         machineFindings.Add(finding);
                     }
                 }
-                if (userPolGppResults.HasValues)
+                if (userPolGppResults != null && userPolGppResults.HasValues)
                 {
                     foreach (JObject finding in userPolGppResults)
                     {
                         userFindings.Add(finding);
                     }
                 }
-                if (machinePolInfResults.HasValues)
+                if (machinePolGppResults != null && machinePolInfResults.HasValues)
                 {
                     foreach (JObject finding in machinePolInfResults)
                     {
                         machineFindings.Add(finding);
                     }
                 }
-                if (userPolInfResults.HasValues)
+                if (userPolInfResults != null && userPolInfResults.HasValues)
                 {
                     foreach (JObject finding in userPolInfResults)
                     {
                         userFindings.Add(finding);
                     }
                 }
-                if (machinePolScriptResults.HasValues)
+                if (machinePolScriptResults != null && machinePolScriptResults.HasValues)
                 {
                     foreach (JObject finding in machinePolScriptResults)
                     {
                         machineFindings.Add(finding);
                     }
                 }
-                if (userPolScriptResults.HasValues)
+                if (userPolScriptResults != null && userPolScriptResults.HasValues)
                 {
-                    foreach (JObject finding in machinePolScriptResults)
+                    foreach (JObject finding in userPolScriptResults)
                     {
                         userFindings.Add(finding);
                     }

@@ -107,10 +107,11 @@ namespace Grouper2
                     sectionSlices.Add(sectionHeading, sectionFinalLine);
                     fuck++;
                 }
-                catch
+                catch (System.ArgumentOutOfRangeException e)
                 {
+                    //Utility.DebugWrite(e.ToString());
                     int sectionHeading = headingLines[fuck];
-                    int sectionFinalLine = (infContentArray.Length - 1);
+                    int sectionFinalLine = infContentArray.Length - 1;
                     sectionSlices.Add(sectionHeading, sectionFinalLine);
                     break;
                 }
@@ -127,40 +128,54 @@ namespace Grouper2
                 string sectionSliceKey = infContentArray[sectionSlice.Key];
                 string sectionHeading = sectionSliceKey.Trim(squareBrackets);
                 //get the line where the section content starts by adding one to the heading's line
-                int startSection = (sectionSlice.Key + 1);
-                //get the end line of the section
-                int nextSection = sectionSlice.Value;
+                int firstLineOfSection = (sectionSlice.Key + 1);
+                //get the first line of the next section
+                int lastLineOfSection = sectionSlice.Value;
                 //subtract one from the other to get the section length, without the heading.
-                int sectionLength = (nextSection - startSection);
+                int sectionLength = (lastLineOfSection - firstLineOfSection + 1);
                 //get an array segment with the lines
-                ArraySegment<string> sectionContent = new ArraySegment<string>(infContentArray, startSection, sectionLength);
+
+                //if (sectionLength == 0) break;
+
+                ArraySegment<string> sectionContent = new ArraySegment<string>(infContentArray, firstLineOfSection, sectionLength);
                 //Console.WriteLine("This section contains: ");               
                 //Utility.PrintIndexAndValues(sectionContent);
                 //create the dictionary that we're going to put the lines into.
                 JObject section = new JObject();
                 //iterate over the lines in the section
-                
                 for (int b = sectionContent.Offset; b < (sectionContent.Offset + sectionContent.Count); b++)
-                    {
+                {
                     string line = sectionContent.Array[b];
                     // split the line into the key (before the =) and the values (after it)
-                    string[] splitLine = line.Split('=');
-                    string lineKey = (splitLine[0]).Trim();
-                    // then get the values
-                    string lineValues = (splitLine[1]).Trim();
-                    // and split them into an array on ","
-                    string[] splitValues = lineValues.Split(',');
-                    if (splitValues.Length > 1)
+                    string lineKey = "";
+                    List<string> splitValuesList = new List<string>();
+                    if (line.Contains('='))
                     {
-                        JArray splitValuesJArray = JArray.FromObject(splitValues);
-                        //Add the restructured line into the dictionary.
-                        section.Add(lineKey, splitValuesJArray);
+                        string[] splitLine = line.Split('=');
+                        lineKey = (splitLine[0]).Trim();
+                        // then get the values
+                        string lineValues = (splitLine[1]).Trim();
+                        // and split them into an array on ","
+                        string[] splitValues = lineValues.Split(',');
+                        foreach (string thing in splitValues) splitValuesList.Add(thing);
                     }
                     else
                     {
-                        section.Add(lineKey, lineValues);
+                        string[] splitLine = line.Split(',');
+                        lineKey = (splitLine[0]).Trim();
+                        //ArraySegment<string> splitValues = new ArraySegment<string>(splitLine, 1, splitLine.Length);
+                        //foreach (string thing in splitValues)
+                        foreach (int subLine in Enumerable.Range(1, splitLine.Length - 1))
+                        {
+                            splitValuesList.Add(splitLine[subLine]);
+                        }
                     }
-                    }
+
+                    JArray splitValuesJArray = JArray.FromObject(splitValuesList);
+                    //Add the restructured line into the dictionary.
+                    section.Add(lineKey, splitValuesJArray);
+                    
+                }
                 //put the results into the dictionary we're gonna return
                 infResults.Add(sectionHeading, section);
             }
