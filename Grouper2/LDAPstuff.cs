@@ -50,9 +50,9 @@ class LDAPstuff
             {
                 guidDict.Add(extRightGuidString, extRightNameString);
             }
-            catch (Exception e)
+            catch (System.ArgumentException e)
             {
-                Console.WriteLine(e.ToString());
+                Utility.DebugWrite("Hit a duplicate GUID in extRightsResult");
             }
         }
         
