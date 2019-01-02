@@ -150,7 +150,18 @@
 
   "trustees": {
     "item": [
-
+	   {
+	    "SID": "S-1-1-0",
+	    "RID": null,
+	    "friendlyName": null,
+	    "displayName": "Everyone",
+	    "domainTrustee": null,
+	    "localTrustee": null,
+	    "description": "Literally Everyone.",
+	    "highPriv": null,
+	    "lowPriv": true,
+	    "isGroup": null
+	   },
       {
         "SID": "S-1-5-2",
         "RID": null,
@@ -160,7 +171,7 @@
         "localTrustee": null,
         "description": "A group that includes all users that have logged on through a network connection. Membership is controlled by the operating system.",
         "highPriv": null,
-        "lowPriv": null,
+        "lowPriv": true,
         "isGroup": null
       },
       {
@@ -183,7 +194,7 @@
         "domainTrustee": null,
         "localTrustee": null,
         "description": "A group that includes all domain controllers in a forest that uses an Active Directory directory service. Membership is controlled by the operating system.",
-        "highPriv": null,
+        "highPriv": true,
         "lowPriv": null,
         "isGroup": null
       },
@@ -196,7 +207,7 @@
         "localTrustee": null,
         "description": "A group that includes all users whose identities were authenticated when they logged on. Membership is controlled by the operating system.",
         "highPriv": null,
-        "lowPriv": null,
+        "lowPriv": true,
         "isGroup": null
       },
       {
@@ -207,7 +218,7 @@
         "domainTrustee": null,
         "localTrustee": null,
         "description": "A service account that is used by the operating system.",
-        "highPriv": null,
+        "highPriv": true,
         "lowPriv": null,
         "isGroup": null
       },
@@ -267,7 +278,7 @@
         "domainTrustee": null,
         "localTrustee": null,
         "description": "A user account for the system administrator. By default, it is the only user account that is given full control over the system.",
-        "highPriv": null,
+        "highPriv": true,
         "lowPriv": null,
         "isGroup": null
       },
@@ -280,7 +291,7 @@
         "localTrustee": null,
         "description": "A user account for people who do not have individual accounts. This user account does not require a password. By default, the Guest account is disabled.",
         "highPriv": null,
-        "lowPriv": null,
+        "lowPriv": true,
         "isGroup": null
       },
       {
@@ -303,7 +314,7 @@
         "domainTrustee": null,
         "localTrustee": null,
         "description": "A global group whose members are authorized to administer the domain. By default, the Domain Admins group is a member of the Administrators group on all computers that have joined a domain, including the domain controllers. Domain Admins is the default owner of any object that is created by any member of the group.",
-        "highPriv": null,
+        "highPriv": true,
         "lowPriv": null,
         "isGroup": null
       },
@@ -328,7 +339,7 @@
         "localTrustee": null,
         "description": "A global group that, by default, has only one member, the domain’s built-in Guest account.",
         "highPriv": null,
-        "lowPriv": null,
+        "lowPriv": true,
         "isGroup": null
       },
       {
@@ -351,7 +362,7 @@
         "domainTrustee": null,
         "localTrustee": null,
         "description": "A global group that includes all domain controllers in the domain. New domain controllers are added to this group by default.",
-        "highPriv": null,
+        "highPriv": true,
         "lowPriv": null,
         "isGroup": null
       },
@@ -399,7 +410,7 @@
         "domainTrustee": null,
         "localTrustee": null,
         "description": "A universal group in a native-mode domain; a global group in a mixed-mode domain. The group is authorized to make schema changes in Active Directory. By default, the only member of the group is the Administrator account for the forest root domain.",
-        "highPriv": null,
+        "highPriv": true,
         "lowPriv": null,
         "isGroup": null
       },
@@ -411,7 +422,7 @@
         "domainTrustee": null,
         "localTrustee": null,
         "description": "A universal group in a native-mode domain; a global group in a mixed-mode domain. The group is authorized to make forest-wide changes in Active Directory, such as adding child domains. By default, the only member of the group is the Administrator account for the forest root domain.",
-        "highPriv": null,
+        "highPriv": true,
         "lowPriv": null,
         "isGroup": null
       },
@@ -423,7 +434,7 @@
         "domainTrustee": null,
         "localTrustee": null,
         "description": "A global group that is authorized to create new Group Policy objects in Active Directory. By default, the only member of the group is Administrator.",
-        "highPriv": null,
+        "highPriv": true,
         "lowPriv": null,
         "isGroup": null
       },
@@ -435,7 +446,7 @@
         "domainTrustee": null,
         "localTrustee": null,
         "description": "A built-in group. After the initial installation of the operating system, the only member of the group is the Administrator account. When a computer joins a domain, the Domain Admins group is added to the Administrators group. When a server becomes a domain controller, the Enterprise Admins group also is added to the Administrators group.",
-        "highPriv": null,
+        "highPriv": true,
         "lowPriv": null,
         "isGroup": null
       },
@@ -448,7 +459,7 @@
         "localTrustee": null,
         "description": "A built-in group. After the initial installation of the operating system, the only member is the Authenticated Users group. When a computer joins a domain, the Domain Users group is added to the Users group on the computer.",
         "highPriv": null,
-        "lowPriv": null,
+        "lowPriv": true,
         "isGroup": null
       },
       {
@@ -460,7 +471,7 @@
         "localTrustee": null,
         "description": "A built-in group. By default, the only member is the Guest account. The Guests group allows occasional or one-time users to log on with limited privileges to a computer’s built-in Guest account.",
         "highPriv": null,
-        "lowPriv": null,
+        "lowPriv": true,
         "isGroup": null
       },
       {
@@ -596,7 +607,7 @@
         "isGroup": null
       },
       {
-        "SID": "S-1-5-21-<DOMAIN>–522",
+        "SID": "S-1-5-21-<DOMAIN>-522",
         "RID": null,
         "friendlyName": null,
         "displayName": "Cloneable Domain Controllers",
@@ -1152,97 +1163,6 @@
         "intLevel": null,
         "regKey": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon",
         "intValue": null
-      }
-    ]
-  },
-
-  "EnvironmentVariables": {
-    "item": [
-      {
-        "searchString": "Thing1",
-        "intValue": "1"
-      },
-      {
-        "searchString": "Thing2",
-        "intValue": "2"
-      }
-    ]
-  },
-
-  "NTServices": {
-    "item": [
-      {
-        "searchString": "Thing1",
-        "intValue": "1"
-      },
-      {
-        "searchString": "Thing2",
-        "intValue": "2"
-      }
-    ]
-  },
-
-  "Folders": {
-    "item": [
-      {
-        "searchString": "Thing1",
-        "intValue": "1"
-      },
-      {
-        "searchString": "Thing2",
-        "intValue": "2"
-      }
-    ]
-  },
-
-  "Files": {
-    "item": [
-      {
-        "searchString": "Thing1",
-        "intValue": "1"
-      },
-      {
-        "searchString": "Thing2",
-        "intValue": "2"
-      }
-    ]
-  },
-
-  "ScheduledTasks": {
-    "item": [
-      {
-        "searchString": "Thing1",
-        "intValue": "1"
-      },
-      {
-        "searchString": "Thing2",
-        "intValue": "2"
-      }
-    ]
-  },
-
-  "NetworkOptions": {
-    "item": [
-      {
-        "searchString": "Thing1",
-        "intValue": "1"
-      },
-      {
-        "searchString": "Thing2",
-        "intValue": "2"
-      }
-    ]
-  },
-
-  "Groups": {
-    "item": [
-      {
-        "searchString": "Thing1",
-        "intValue": "1"
-      },
-      {
-        "searchString": "Thing2",
-        "intValue": "2"
       }
     ]
   },

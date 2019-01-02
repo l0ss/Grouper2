@@ -59,13 +59,21 @@ namespace Grouper2
             {
                 foreach (JObject gppFile in gppCategory["File"])
                 {
-                    assessedFiles.Add(gppFile["@uid"].ToString(), GetAssessedFile(gppFile));
+                    JObject assessedFile = GetAssessedFile(gppFile);
+                    if (assessedFile.HasValues)
+                    {
+                        assessedFiles.Add(gppFile["@uid"].ToString(), assessedFile);
+                    }
                 }
             }
             else
             {
                 JObject gppFile = (JObject)JToken.FromObject(gppCategory["File"]);
-                assessedFiles.Add(gppFile["@uid"].ToString(), GetAssessedFile(gppFile));
+                JObject assessedFile = GetAssessedFile(gppFile);
+                if (assessedFile.HasValues)
+                {
+                    assessedFiles.Add(gppFile["@uid"].ToString(), assessedFile);
+                }
             }
             
             return assessedFiles;
@@ -351,7 +359,7 @@ namespace Grouper2
            assessedShortcut.Add("Shortcut Path", gppShortcutProps["@shortcutPath"]);
            assessedShortcut.Add("Comment", gppShortcutProps["@comment"]);
 
-            string targetPath = gppShortcutProps["@targetPath"].ToString();
+            string targetPath = gppShortcutProps["@targetPath"].ToString().Trim();
            assessedShortcut.Add("Target Path", targetPath);
            //TODO some logic to check target path file perms and icon Path file perms
            if (GlobalVar.OnlineChecks && (targetPath.Length > 0))
@@ -396,15 +404,29 @@ namespace Grouper2
             schedTaskTypes.Add("ImmediateTask");
             schedTaskTypes.Add("ImmediateTaskV2");
 
-            foreach (string taskType in schedTaskTypes)
-            {
-                if (gppCategory[taskType] is JArray)
+            foreach (string schedTaskType in schedTaskTypes)
+            { 
+                if (gppCategory[schedTaskType] is JArray)
                 {
-                    Utility.DebugWrite("");
+                    foreach (JToken taskJToken in gppCategory[schedTaskType])
+                    {
+                        JProperty schedTaskToAssess = new JProperty(schedTaskType, taskJToken);
+                        JObject assessedGppSchedTask = GetAssessedScheduledTask(schedTaskToAssess);
+                        if (assessedGppSchedTask != null)
+                        {
+                            assessedGppSchedTasksAllJson.Add(assessedGppSchedTask["@uid"].ToString(),
+                                assessedGppSchedTask);
+                        }
+                    }
                 }
-                else if (gppCategory[taskType] is JObject)
+                else if (gppCategory[schedTaskType] is JObject)
                 {
-
+                    JProperty schedTaskToAssess = new JProperty(schedTaskType, gppCategory[schedTaskType]);
+                    JObject assessedGppSchedTask = GetAssessedScheduledTask(schedTaskToAssess);
+                    if (assessedGppSchedTask != null)
+                    {
+                        assessedGppSchedTasksAllJson.Add(assessedGppSchedTask["@uid"].ToString(), assessedGppSchedTask);
+                    }
                 }
             }
 
@@ -420,11 +442,11 @@ namespace Grouper2
 
         private JObject GetAssessedScheduledTask(JProperty scheduledTask)
         {
-            JObject assessedScheduledTask = new JObject();
-            Console.WriteLine("SchedTask");
+            JProperty assessedScheduledTask = scheduledTask;
+            //Console.WriteLine("SchedTask");
             Utility.DebugWrite(scheduledTask.ToString());
             //TODO actually write this
-            return assessedScheduledTask;
+            return null;
         }
 
 

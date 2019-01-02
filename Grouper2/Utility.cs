@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.DirectoryServices.ActiveDirectory;
 using System.IO;
+using System.Linq;
 using System.Security.AccessControl;
 using System.Security.Cryptography;
 using System.Security.Principal;
@@ -12,11 +13,9 @@ namespace Grouper2
 {
     class Utility
     {
-
         public static JObject GetFileDaclJObject(string filePathString)
         {
             JObject fileDaclsJObject = new JObject();
-
             FileSecurity filePathSecObj = new FileSecurity();
             try
             {
@@ -24,12 +23,13 @@ namespace Grouper2
             }
             catch (System.ArgumentException e)
             {
-                Console.Write("Tried to check file permissions on invalid path: " + filePathString);
+                Console.WriteLine("Tried to check file permissions on invalid path: " + filePathString.ToString());
                 return fileDaclsJObject;
             }
 
-            AuthorizationRuleCollection fileAccessRules = filePathSecObj.GetAccessRules(true, true, typeof(NTAccount));
-            
+            AuthorizationRuleCollection fileAccessRules =
+                filePathSecObj.GetAccessRules(true, true, typeof(SecurityIdentifier));
+
             foreach (FileSystemAccessRule fileAccessRule in fileAccessRules)
             {
                 // get inheritance and access control type values
@@ -38,9 +38,9 @@ namespace Grouper2
                 string accessControlTypeString = "Allow";
                 if (fileAccessRule.AccessControlType == AccessControlType.Deny) accessControlTypeString = "Deny";
 
-                // get the user 
+                // get the user's SID
                 string identityReferenceString = fileAccessRule.IdentityReference.ToString();
-
+                string displayNameString = LDAPstuff.GetUserFromSid(identityReferenceString);
                 // get the rights
                 string fileSystemRightsString = fileAccessRule.FileSystemRights.ToString();
                 // strip spaces
@@ -53,7 +53,9 @@ namespace Grouper2
                 {
                     fileSystemRightsJArray.Add(x);
                 }
+
                 JObject fileDaclJObject = new JObject();
+                fileDaclJObject.Add("Display Name", displayNameString);
                 fileDaclJObject.Add("Allow or Deny?", accessControlTypeString);
                 fileDaclJObject.Add("Inherited?", isInheritedString);
                 fileDaclJObject.Add("Rights", fileSystemRightsJArray);
@@ -63,7 +65,31 @@ namespace Grouper2
             return fileDaclsJObject;
         }
 
-        public static string DecryptCpassword(string cpassword)
+        public static string SidPrivHighOrLow(string sid)
+        // checks if a Sid belongs to a user who is canonically 'high' or 'low' priv.
+        // by canonically, I mean 'I Reckon'.
+        {
+            string highOrLow = null;
+            JToken checkedSid = Utility.CheckSid(sid);
+            if (checkedSid != null)
+            {
+                string highPriv = checkedSid["highPriv"].ToString();
+                string lowPriv = checkedSid["lowPriv"].ToString();
+                if (highPriv == "True")
+                {
+                    highOrLow = "High";
+                }
+
+                if (lowPriv == "True")
+                {
+                    highOrLow = "Low";
+                }
+            }
+            
+            return highOrLow;
+        }
+
+    public static string DecryptCpassword(string cpassword)
         {
             // reimplemented based on @obscuresec's Get-GPPPassword PowerShell
             int cpassMod = cpassword.Length % 4;
@@ -83,10 +109,10 @@ namespace Grouper2
             string cpasswordPadded = cpassword + padding;
             byte[] decodedCpassword = Convert.FromBase64String(cpasswordPadded);
             AesCryptoServiceProvider aesProvider = new AesCryptoServiceProvider();
-            byte[] AesKey = {0x4e, 0x99, 0x06, 0xe8, 0xfc, 0xb6, 0x6c, 0xc9, 0xfa, 0xf4, 0x93, 0x10, 0x62, 0x0f, 0xfe, 0xe8,
+            byte[] aesKey = {0x4e, 0x99, 0x06, 0xe8, 0xfc, 0xb6, 0x6c, 0xc9, 0xfa, 0xf4, 0x93, 0x10, 0x62, 0x0f, 0xfe, 0xe8,
                                  0xf4, 0x96, 0xe8, 0x06, 0xcc, 0x05, 0x79, 0x90, 0x20, 0x9b, 0x09, 0xa4, 0x33, 0xb6, 0x6c, 0x1b };
             aesProvider.IV = new byte[aesProvider.IV.Length];
-            aesProvider.Key = AesKey;
+            aesProvider.Key = aesKey;
             ICryptoTransform decryptor = aesProvider.CreateDecryptor();
             byte[] decryptedBytes = decryptor.TransformFinalBlock(decodedCpassword, 0, decodedCpassword.Length);
             string decryptedCpassword = Encoding.Unicode.GetString(decryptedBytes);

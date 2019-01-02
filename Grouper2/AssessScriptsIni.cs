@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Policy;
+using System.Security.Principal;
 using System.Text;
 using Newtonsoft.Json.Linq;
 
@@ -63,6 +64,7 @@ namespace Grouper2
                             if (fileDacls.HasValues)
                             {
                                 interestLevel = 8;
+                                // TODO fucken figure out how to flag 'interesting' ACLs
                                 assessedScriptIni.Add("File Permissions", fileDacls);
                             }
                             // check if the file is writable
@@ -76,15 +78,24 @@ namespace Grouper2
                             {
                                 assessedScriptIni.Add("Source file writable", "False");
                             }
-
                         }
                         else
                         {
                             assessedScriptIni.Add("Source file exists", "False");
-                            string directoryName = Path.GetDirectoryName(cmdLine);
-                            JObject directoryDacls = Utility.GetFileDaclJObject(directoryName);
-                            interestLevel = 7;
-                            assessedScriptIni.Add("Directory Permissions", directoryDacls);
+                            try
+                            {
+                                string directoryName = Path.GetDirectoryName(cmdLine);
+                                if (directoryName.Length > 0)
+                                {
+                                    JObject directoryDacls = Utility.GetFileDaclJObject(directoryName);
+                                    interestLevel = 7;
+                                    assessedScriptIni.Add("Directory Permissions", directoryDacls);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                Utility.DebugWrite(e.ToString());
+                            }
                         }
 
                     }
