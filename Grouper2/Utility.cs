@@ -13,6 +13,11 @@ namespace Grouper2
 {
     class Utility
     {
+        public static bool IsEmptyOrWhiteSpace(string inString)
+        {
+           return inString.All(char.IsWhiteSpace);
+        }
+
         public static JObject GetFileDaclJObject(string filePathString)
         {
             JObject fileDaclsJObject = new JObject();

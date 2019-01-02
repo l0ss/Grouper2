@@ -103,7 +103,7 @@ namespace Grouper2
             try
             {
                 parser.ParseCommandLine(args);
-                parser.ShowParsedArguments();
+                //parser.ShowParsedArguments();
 
                 if (offlineArg.Parsed && offlineArg.Value && sysvolArg.Parsed)
                 {
@@ -351,11 +351,14 @@ namespace Grouper2
             foreach (string iniFile in scriptsIniFiles)
             {
                 JObject preParsedScriptsIniFile = Parsers.ParseInf(iniFile); // Not a typo, the formats are almost the same.
-                JObject parsedScriptsIniFile = Parsers.ParseScriptsIniJson(preParsedScriptsIniFile);
-                JObject assessedScriptsIniFile = AssessScriptsIni.GetAssessedScriptsIni(parsedScriptsIniFile);
-                if (assessedScriptsIniFile != null)
+                if (preParsedScriptsIniFile != null)
                 {
-                    processedScriptsIniFiles.Add(assessedScriptsIniFile);
+                    JObject parsedScriptsIniFile = Parsers.ParseScriptsIniJson(preParsedScriptsIniFile);
+                    JObject assessedScriptsIniFile = AssessScriptsIni.GetAssessedScriptsIni(parsedScriptsIniFile);
+                    if (assessedScriptsIniFile != null)
+                    {
+                        processedScriptsIniFiles.Add(assessedScriptsIniFile);
+                    }
                 }
             }
 

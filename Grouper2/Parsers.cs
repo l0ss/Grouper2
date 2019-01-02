@@ -72,12 +72,20 @@ namespace Grouper2
         {
             //define what a heading looks like
             Regex headingRegex = new Regex(@"^\[(\w+\s?)+\]$");
-            string[] infContent = File.ReadAllLines(infFile);
+            string[] infContentArray = File.ReadAllLines(infFile);
+
+            string infContentString = String.Join(Environment.NewLine, infContentArray);
+
+            if (Utility.IsEmptyOrWhiteSpace(infContentString))
+            {
+                return null;
+            }
+
             var headingLines = new List<int>();
 
             //find all the lines that look like a heading and put the line numbers in an array.
             int i = 0;
-            foreach (string infLine in infContent)
+            foreach (string infLine in infContentArray)
             {
                 Match headingMatch = headingRegex.Match(infLine);
                 if (headingMatch.Success)
@@ -102,7 +110,7 @@ namespace Grouper2
                 catch
                 {
                     int sectionHeading = headingLines[fuck];
-                    int sectionFinalLine = (infContent.Length - 1);
+                    int sectionFinalLine = (infContentArray.Length - 1);
                     sectionSlices.Add(sectionHeading, sectionFinalLine);
                     break;
                 }
@@ -116,7 +124,7 @@ namespace Grouper2
             {
                 //get the section heading
                 char[] squareBrackets = { '[', ']' };
-                string sectionSliceKey = infContent[sectionSlice.Key];
+                string sectionSliceKey = infContentArray[sectionSlice.Key];
                 string sectionHeading = sectionSliceKey.Trim(squareBrackets);
                 //get the line where the section content starts by adding one to the heading's line
                 int startSection = (sectionSlice.Key + 1);
@@ -125,7 +133,7 @@ namespace Grouper2
                 //subtract one from the other to get the section length, without the heading.
                 int sectionLength = (nextSection - startSection);
                 //get an array segment with the lines
-                ArraySegment<string> sectionContent = new ArraySegment<string>(infContent, startSection, sectionLength);
+                ArraySegment<string> sectionContent = new ArraySegment<string>(infContentArray, startSection, sectionLength);
                 //Console.WriteLine("This section contains: ");               
                 //Utility.PrintIndexAndValues(sectionContent);
                 //create the dictionary that we're going to put the lines into.
