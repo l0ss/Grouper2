@@ -83,6 +83,7 @@ namespace Grouper2
     {
         public static bool OnlineChecks;
         public static int IntLevelToShow;
+        public static bool DebugMode;
     }
 
     internal class Grouper2
@@ -92,6 +93,7 @@ namespace Grouper2
             Utility.PrintBanner();
 
             CommandLineParser.CommandLineParser parser = new CommandLineParser.CommandLineParser();
+            SwitchArgument debugArg = new SwitchArgument('d', "debug", "Enables debug mode. Will also show you the names of any categories of policies that Grouper saw but didn't have any means of processing. I eagerly await your pull request.", false);
             SwitchArgument offlineArg = new SwitchArgument('o', "offline", "Disables checks that require LDAP comms with a DC or SMB comms with file shares found in policy settings. Requires that you define a value for --sysvol.", false);
             ValueArgument<string> sysvolArg = new ValueArgument<string>('s', "sysvol", "Set the path to a domain SYSVOL directory.");
             ValueArgument<int> intlevArg = new ValueArgument<int>('i', "interestlevel", "The minimum interest level to display. i.e. findings with an interest level lower than x will not be seen in output. Defaults to 1, i.e. show everything except some extremely dull defaults. If you want to see those too, do -i 0.");
@@ -101,6 +103,7 @@ namespace Grouper2
             //parser.Arguments.Add(domainArg);
             //parser.Arguments.Add(usernameArg);
             //parser.Arguments.Add(passwordArg);
+            parser.Arguments.Add(debugArg);
             parser.Arguments.Add(intlevArg);
             parser.Arguments.Add(sysvolArg);
             parser.Arguments.Add(offlineArg);
@@ -113,7 +116,10 @@ namespace Grouper2
             {
                 parser.ParseCommandLine(args);
                 //parser.ShowParsedArguments();
-
+                if (debugArg.Parsed && debugArg.Value)
+                {
+                    GlobalVar.DebugMode = true;
+                }
                 if (offlineArg.Parsed && offlineArg.Value && sysvolArg.Parsed)
                 {
                     // args config for valid offline run.
@@ -235,6 +241,7 @@ namespace Grouper2
                 JArray userPolGppResults = ProcessGpXml(userPolPath);
                 JArray machinePolScriptResults = ProcessScriptsIni(machinePolPath);
                 JArray userPolScriptResults = ProcessScriptsIni(userPolPath);
+
                 // add all our findings to a JArray in what seems a very inefficient manner.
                 JArray userFindings = new JArray();
                 JArray machineFindings = new JArray();

@@ -40,7 +40,10 @@ namespace Grouper2
                 }
                 else
                 {
-                    Utility.DebugWrite("Failed to find method: GetAssessed" + assessName);
+                    if (GlobalVar.DebugMode)
+                    {
+                        Utility.DebugWrite("Failed to find method: GetAssessed" + assessName);
+                    }
                     return null;
                 }
             }

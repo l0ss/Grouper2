@@ -21,7 +21,7 @@ namespace Grouper2
             foreach (KeyValuePair<string, JToken> item in scriptsIniJson)
             {
                 //get the type of the script into a string for output.
-                string scriptType = item.Key.ToString();
+                string scriptType = item.Key;
                 // cast the settings from JToken to JObject.
                 JObject settingsJObject = (JObject)item.Value;
 

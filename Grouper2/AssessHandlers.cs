@@ -125,7 +125,7 @@ namespace Grouper2
                 headingsInInf.Add(sectionName);
             }
             var slippedThrough = headingsInInf.Except(knownKeys);
-            if (slippedThrough.Any())
+            if (slippedThrough.Any() && GlobalVar.DebugMode)
             {
                 Console.WriteLine("We didn't parse any of these sections:");
                 foreach (var unparsedHeader in slippedThrough)
