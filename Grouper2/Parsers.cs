@@ -146,6 +146,7 @@ namespace Grouper2
                 for (int b = sectionContent.Offset; b < (sectionContent.Offset + sectionContent.Count); b++)
                 {
                     string line = sectionContent.Array[b];
+                    if (line == "") break;
                     // split the line into the key (before the =) and the values (after it)
                     string lineKey = "";
                     List<string> splitValuesList = new List<string>();
@@ -171,6 +172,10 @@ namespace Grouper2
                         }
                     }
 
+                    if (lineKey == "")
+                    {
+                        Utility.DebugWrite("Something has gone wrong.");
+                    }
                     JArray splitValuesJArray = JArray.FromObject(splitValuesList);
                     //Add the restructured line into the dictionary.
                     section.Add(lineKey, splitValuesJArray);

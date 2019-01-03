@@ -89,42 +89,53 @@ namespace Grouper2
             assessedFile.Add("Changed", gppFile["@changed"].ToString());
             string gppFileAction = Utility.GetActionString(gppFileProps["@action"].ToString());
             assessedFile.Add("Action", gppFileAction);
-            string fromPath = gppFileProps["@fromPath"].ToString();
-            assessedFile.Add("From Path", fromPath);
-            assessedFile.Add("Target Path", gppFileProps["@targetPath"].ToString());
-            if (GlobalVar.OnlineChecks && (fromPath.Length > 0))
+            JToken targetPathJToken = gppFileProps["@targetPath"];
+            if (targetPathJToken != null)
             {
-                if (Utility.DoesFileExist(fromPath))
+                assessedFile.Add("Target Path", gppFileProps["@targetPath"].ToString());
+            }
+
+            JToken fromPathJToken = gppFileProps["@fromPath"];
+            if (fromPathJToken != null)
+            {
+                string fromPath = gppFileProps["@fromPath"].ToString();
+                assessedFile.Add("From Path", fromPath);
+                
+                if (GlobalVar.OnlineChecks && (fromPath.Length > 0))
                 {
-                    assessedFile.Add("Source file exists", "True");
-                    bool writable = false;
-                    // get the file permissions
-                    JObject fileDacls = Utility.GetFileDaclJObject(fromPath);
-                    if (fileDacls.HasValues)
+                    if (Utility.DoesFileExist(fromPath))
                     {
-                        interestLevel = 8;
-                        assessedFile.Add("File Permissions", fileDacls);
-                    }
-                    // check if the file is writable
-                    writable = Utility.CanIWrite(fromPath);
-                    if (writable)
-                    {
-                        interestLevel = 10;
-                        assessedFile.Add("Source file writable", "True");
+                        assessedFile.Add("Source file exists", "True");
+                        bool writable = false;
+                        // get the file permissions
+                        JObject fileDacls = Utility.GetFileDaclJObject(fromPath);
+                        if (fileDacls.HasValues)
+                        {
+                            interestLevel = 8;
+                            assessedFile.Add("File Permissions", fileDacls);
+                        }
+
+                        // check if the file is writable
+                        writable = Utility.CanIWrite(fromPath);
+                        if (writable)
+                        {
+                            interestLevel = 10;
+                            assessedFile.Add("Source file writable", "True");
+                        }
+                        else
+                        {
+                            assessedFile.Add("Source file writable", "False");
+                        }
+
                     }
                     else
                     {
-                        assessedFile.Add("Source file writable", "False");
+                        assessedFile.Add("Source file exists", "False");
+                        string directoryName = Path.GetDirectoryName(fromPath);
+                        JObject directoryDacls = Utility.GetFileDaclJObject(directoryName);
+                        interestLevel = 7;
+                        assessedFile.Add("Directory Permissions", directoryDacls);
                     }
-
-                }
-                else
-                {
-                    assessedFile.Add("Source file exists", "False");
-                    string directoryName = Path.GetDirectoryName(fromPath);
-                    JObject directoryDacls = Utility.GetFileDaclJObject(directoryName);
-                    interestLevel = 7;
-                    assessedFile.Add("Directory Permissions", directoryDacls);
                 }
             }
 
@@ -141,10 +152,22 @@ namespace Grouper2
             JObject assessedGroups = new JObject();
             JObject assessedUsers = new JObject();
 
-            if (gppCategory["Group"] is JArray)
+            if (gppCategory["Group"] != null)
             {
-                foreach (JObject gppGroup in gppCategory["Group"])
+                if (gppCategory["Group"] is JArray)
                 {
+                    foreach (JObject gppGroup in gppCategory["Group"])
+                    {
+                        JObject assessedGroup = GetAssessedGroup(gppGroup);
+                        if (assessedGroup.Count > 0)
+                        {
+                            assessedGroups.Add(gppGroup["@uid"].ToString(), assessedGroup);
+                        }
+                    }
+                }
+                else
+                {
+                    JObject gppGroup = (JObject) JToken.FromObject(gppCategory["Group"]);
                     JObject assessedGroup = GetAssessedGroup(gppGroup);
                     if (assessedGroup.Count > 0)
                     {
@@ -152,21 +175,25 @@ namespace Grouper2
                     }
                 }
             }
-            else
-            {
-                JObject gppGroup = (JObject)JToken.FromObject(gppCategory["Group"]);
-                JObject assessedGroup = GetAssessedGroup(gppGroup);
-                if (assessedGroup.Count > 0)
-                {
-                    assessedGroups.Add(gppGroup["@uid"].ToString(), assessedGroup);
-                }
-            }
+
             JObject assessedGppGroups = (JObject)JToken.FromObject(assessedGroups);
 
-            if (gppCategory["User"] is JArray)
+            if (gppCategory["User"] != null)
             {
-                foreach (JObject gppUser in gppCategory["User"])
+                if (gppCategory["User"] is JArray)
                 {
+                    foreach (JObject gppUser in gppCategory["User"])
+                    {
+                        JObject assessedUser = GetAssessedUser(gppUser);
+                        if (assessedUser.Count > 0)
+                        {
+                            assessedUsers.Add(gppUser["@uid"].ToString(), assessedUser);
+                        }
+                    }
+                }
+                else
+                {
+                    JObject gppUser = (JObject) JToken.FromObject(gppCategory["User"]);
                     JObject assessedUser = GetAssessedUser(gppUser);
                     if (assessedUser.Count > 0)
                     {
@@ -174,15 +201,7 @@ namespace Grouper2
                     }
                 }
             }
-            else
-            {
-                JObject gppUser = (JObject)JToken.FromObject(gppCategory["User"]);
-                JObject assessedUser = GetAssessedUser(gppUser);
-                if (assessedUser.Count > 0)
-                {
-                    assessedUsers.Add(gppUser["@uid"].ToString(), assessedUser);
-                }
-            }
+
             JObject assessedGppUsers = (JObject)JToken.FromObject(assessedUsers);
             
             JProperty assessedUsersJson = new JProperty("GPPUserSettings", assessedGppUsers);
@@ -307,8 +326,11 @@ namespace Grouper2
             if (memberSid.Length > 0)
             {
                 assessedMember.Add("SID", memberSid);
-                string resolvedSID = LDAPstuff.GetUserFromSid(memberSid);
-                assessedMember.Add("Display Name From SID", resolvedSID);
+                if (GlobalVar.OnlineChecks)
+                {
+                    string resolvedSID = LDAPstuff.GetUserFromSid(memberSid);
+                    assessedMember.Add("Display Name From SID", resolvedSID);
+                }
             }
             return assessedMember;
         }
@@ -442,24 +464,54 @@ namespace Grouper2
 
         private JObject GetAssessedScheduledTask(JProperty scheduledTask)
         {
-            JProperty assessedScheduledTask = scheduledTask;
+            JObject assessedScheduledTask = (JObject) scheduledTask.Value;
             //Console.WriteLine("SchedTask");
-            Utility.DebugWrite(scheduledTask.ToString());
+            //Utility.DebugWrite(scheduledTask.ToString());
             //TODO actually write this
-            return null;
+
+            return assessedScheduledTask;
         }
 
 
        private JObject GetAssessedRegistrySettings(JObject gppCategory)
        {
            int interestLevel = 2;
-           JProperty gppRegSettingsProp = new JProperty("RegSettings", gppCategory["Registry"]);
-           JObject assessedGppRegSettings = new JObject(gppRegSettingsProp);
-           if (interestLevel < GlobalVar.IntLevelToShow)
+           if (gppCategory["Collection"] != null)
            {
-               assessedGppRegSettings = new JObject();
+               JProperty gppRegSettingsProp = new JProperty("RegSettingsColl", gppCategory["Collection"]);
+               JObject assessedGppRegSettings = new JObject(gppRegSettingsProp);
+               if (interestLevel < GlobalVar.IntLevelToShow)
+               {
+                   assessedGppRegSettings = new JObject();
+               }
+               return assessedGppRegSettings;
+            }
+           if (gppCategory["Registry"] != null)
+           {
+               JProperty gppRegSettingsProp = new JProperty("RegSettingsReg", gppCategory["Registry"]);
+               JObject assessedGppRegSettings = new JObject(gppRegSettingsProp);
+               if (interestLevel < GlobalVar.IntLevelToShow)
+               {
+                   assessedGppRegSettings = new JObject();
+               }
+               return assessedGppRegSettings;
            }
-            return assessedGppRegSettings;
+           if (gppCategory["RegistrySettings"] != null)
+           {
+               JProperty gppRegSettingsProp = new JProperty("RegSettingsRegSet", gppCategory["RegistrySettings"]);
+               JObject assessedGppRegSettings = new JObject(gppRegSettingsProp);
+               if (interestLevel < GlobalVar.IntLevelToShow)
+               {
+                   assessedGppRegSettings = new JObject();
+               }
+               return assessedGppRegSettings;
+            }
+           else
+           {
+               Utility.DebugWrite("something fucked up");
+               Utility.DebugWrite(gppCategory.ToString());
+               return null;
+           }
        }
 
 

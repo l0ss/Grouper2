@@ -176,6 +176,7 @@ internal static class AssessInf
         JObject svcGenSettingJson = new JObject();
         if (interestLevel >= GlobalVar.IntLevelToShow)
         {
+            //Utility.DebugWrite(svcGenSetting.ToString());
             svcGenSettingJson = (JObject)JToken.FromObject(svcGenSetting);
         }
         return svcGenSettingJson;

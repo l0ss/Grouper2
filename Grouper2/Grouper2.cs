@@ -12,7 +12,11 @@
 
 //  Master TODO list.
 //  Expand use of 'interest levels' and maybe break the definition of interest levels into a config file
-//  Parse and assess other inf sections properly:
+//
+//  Parse missing inf sections:
+//      File Security
+//
+//  Assess other inf sections properly:
 //      System Access
 //      Kerberos Policy
 //      Event Audit
@@ -39,6 +43,11 @@
 //  Parse Registry.pol
 //  Parse Machine\Applications\*.AAS (assigned applications?
 //  figure out what happened to MSI files?
+//  Parse SDDL in 'Service General Settings'
+//  Figure out file ACL checks on file paths found in Scheduled Task arguments or Startup Scripts etc
+//  Parse 'Comment.cmtx' files?
+//  Parse or at least identify the presence of custom adm templates.
+//  Resolve SIDS in inf file GroupMemberships as part of OnlineChecks
 //  niceify the output, maybe some colours?
 
 using Newtonsoft.Json.Linq;
@@ -173,35 +182,34 @@ namespace Grouper2
                 Environment.Exit(1);
             }
 
-            // create a dict to put all our output goodies in.
-            Dictionary<string, JObject> grouper2OutputDict = new Dictionary<string, JObject>();
+            // create a JObject to put all our output goodies in.
+            JObject grouper2Output = new JObject();
             // so for each uid directory (including ones with that dumb broken domain replication condition)
             // we're going to gather up all our goodies and put them into that dict we just created.
             foreach (var gpoPath in gpoPaths)
             {
                 // create a dict to put the stuff we find for this GPO into.
-                Dictionary<string, JObject> gpoResultDict = new Dictionary<string, JObject>();
+                JObject gpoResult = new JObject();
                 // Get the UID of the GPO from the file path.
                 string[] splitPath = gpoPath.Split(Path.DirectorySeparatorChar);
                 string gpoUid = splitPath[splitPath.Length - 1];
 
                 // Make a JObject for GPO metadata
-                JObject gpoPropsJson = new JObject();
+                JObject gpoProps = new JObject();
                 // If we're online and talking to the domain, just use that data
                 if (GlobalVar.OnlineChecks)
                 {
                     JToken domainGpo = domainGpos[gpoUid];
-                    gpoPropsJson = (JObject) JToken.FromObject(domainGpo);
+                    gpoProps = (JObject) JToken.FromObject(domainGpo);
                 }
                 // otherwise do what we can with what we have
                 else
                 {
-                    Dictionary<string, string> gpoPropsDict = new Dictionary<string, string>
+                    gpoProps = new JObject()
                     {
                         { "gpoUID", gpoUid },
                         { "gpoPath", gpoPath }
                     };
-                    gpoPropsJson = (JObject)JToken.FromObject(gpoPropsDict);
                 }
 
                 // TODO (and put in GPOProps)
@@ -210,9 +218,9 @@ namespace Grouper2
                 // get whether it's enabled
 
                 // Add all this crap into a dict, if we found anything of interest.
-                gpoResultDict.Add("GPOProps", gpoPropsJson);
+                gpoResult.Add("GPOProps", gpoProps);
                 // turn dict of data for this gpo into jobj
-                JObject gpoResultJson = (JObject)JToken.FromObject(gpoResultDict);
+                JObject gpoResultJson = (JObject)JToken.FromObject(gpoResult);
 
                 // if I were smarter I would have done this shit with the machine and user dirs inside the Process methods instead of calling each one twice out here.
                 // @liamosaur you reckon you can see how to clean it up after the fact?
@@ -285,15 +293,17 @@ namespace Grouper2
                     gpoResultJson.Add(machineFindingsJProp);
                 }
 
-                // put into final jobj
-                grouper2OutputDict.Add(gpoPath, gpoResultJson);
+                // put into final output
+                if (userFindings.HasValues || machineFindings.HasValues)
+                {
+                    grouper2Output.Add(gpoPath, gpoResultJson);
+                }
             }
 
             // Final output is finally happening finally here:
             Utility.DebugWrite("Final Output:");
-            JObject grouper2OutputJson = (JObject) JToken.FromObject(grouper2OutputDict);
             Console.WriteLine("");
-            Console.WriteLine(grouper2OutputJson);
+            Console.WriteLine(grouper2Output);
             Console.WriteLine("");
             // wait for 'anykey'
             Console.ReadKey();

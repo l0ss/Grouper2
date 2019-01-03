@@ -107,7 +107,7 @@ namespace Grouper2
             // Service General Setting
             ///////////////////////////////////////////////////////////////
             JToken svcGenSetting = infToAssess["Service General Setting"];
-            if (regKeys != null)
+            if (svcGenSetting != null)
             {
                 JObject assessedSvcGenSetting = AssessInf.AssessServiceGenSetting(svcGenSetting);
                 if (assessedSvcGenSetting.Count > 0)

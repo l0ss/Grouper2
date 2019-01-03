@@ -281,6 +281,9 @@ namespace Grouper2
                 case "C":
                     actionString = "Create";
                     break;
+                case "R":
+                    actionString = "Remove";
+                    break;
                 default:
                     Utility.DebugWrite("oh no this is new");
                     Utility.DebugWrite(actionChar);
