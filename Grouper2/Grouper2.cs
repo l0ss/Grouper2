@@ -309,7 +309,7 @@ namespace Grouper2
             }
 
             // Final output is finally happening finally here:
-            Utility.DebugWrite("Final Output:");
+            Console.WriteLine("RESULT!");
             Console.WriteLine("");
             Console.WriteLine(grouper2Output);
             Console.WriteLine("");

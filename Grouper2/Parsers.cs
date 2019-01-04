@@ -177,9 +177,6 @@ namespace Grouper2
                     {
                         string[] splitLine = line.Split(',');
                         lineKey = (splitLine[0]).Trim();
-                        //ArraySegment<string> splitValues = new ArraySegment<string>(splitLine, 1, splitLine.Length);
-                        //foreach (string thing in splitValues)
-
                         JArray splitValuesJArray = new JArray();
                         foreach (string value in splitLine)
                         {

@@ -1,10 +1,12 @@
+Output-Build.txt
 Grouper2/bin/Release/*
-Grouper2/bin/Debug/*.exe
-Grouper2/bin/Debug/*.dll
-Grouper2/bin/Debug/*.pdb
+Grouper2/bin/Debug/*
+Grouper2/bin/DebugFromTestPolicies/*
+Grouper2/bin/DebugFromTestPath/*
 Grouper2/bin/DebugLiveFromDC/*
 Grouper2/obj/*
-.vs/*
+.vscode/
+.vs/
 .DS_Store
 */.DS_Store
 
