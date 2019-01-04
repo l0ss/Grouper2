@@ -1,4 +1,5 @@
 Output-Build.txt
+*.user
 Grouper2/bin/Release/*
 Grouper2/bin/Debug/*
 Grouper2/bin/DebugFromTestPolicies/*
