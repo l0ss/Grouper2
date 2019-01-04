@@ -291,26 +291,30 @@ namespace Grouper2
             assessedGroup.Add("Action", groupAction);
 
             JArray gppGroupMemberArray = new JArray();
-            JToken members = gppGroupProps["Members"]["Member"];
-            string membersType = members.Type.ToString();
-            if (membersType == "Array")
+            if (gppGroupProps["Members"] != null)
             {
-                foreach (JToken member in members.Children())
+                JToken members = gppGroupProps["Members"]["Member"];
+                string membersType = members.Type.ToString();
+                if (membersType == "Array")
                 {
-                    gppGroupMemberArray.Add(GetAssessedGroupMember(member));
+                    foreach (JToken member in members.Children())
+                    {
+                        gppGroupMemberArray.Add(GetAssessedGroupMember(member));
+                    }
+                }
+                else if (membersType == "Object")
+                {
+                    gppGroupMemberArray.Add(GetAssessedGroupMember(members));
+                }
+                else
+                {
+                    Utility.DebugWrite("Something went squirrely with Group Memberships");
+                    Utility.DebugWrite(members.Type.ToString());
+                    Utility.DebugWrite(" " + membersType + " ");
+                    Utility.DebugWrite(members.ToString());
                 }
             }
-            else if (membersType == "Object")
-            {
-                gppGroupMemberArray.Add(GetAssessedGroupMember(members));
-            }
-            else
-            {
-                Utility.DebugWrite("Something went squirrely with Group Memberships");
-                Utility.DebugWrite(members.Type.ToString());
-                Utility.DebugWrite(" " + membersType + " ");
-                Utility.DebugWrite(members.ToString());
-            }
+
             assessedGroup.Add("Members", gppGroupMemberArray);
 
             if (interestLevel < GlobalVar.IntLevelToShow)

@@ -1,0 +1,1205 @@
+{
+  "privRights": {
+    "item": [
+      {
+        "privRight": "SeTrustedCredManAccessPrivilege",
+        "msDesc": null,
+        "humanDesc": null,
+        "goodValue": null,
+        "badValue": null,
+        "interestLevel": null,
+        "remotelyExploitable": null
+      },
+      {
+        "privRight": "SeTcbPrivilege",
+        "msDesc": null,
+        "humanDesc": null,
+        "goodValue": null,
+        "badValue": null,
+        "interestLevel": null,
+        "remotelyExploitable": null
+      },
+      {
+        "privRight": "SeMachineAccountPrivilege",
+        "msDesc": null,
+        "humanDesc": null,
+        "goodValue": null,
+        "badValue": null,
+        "interestLevel": null,
+        "remotelyExploitable": null
+      },
+      {
+        "privRight": "SeBackupPrivilege",
+        "msDesc": null,
+        "humanDesc": null,
+        "goodValue": null,
+        "badValue": null,
+        "interestLevel": null,
+        "remotelyExploitable": null
+      },
+      {
+        "privRight": "SeCreateTokenPrivilege",
+        "msDesc": null,
+        "humanDesc": null,
+        "goodValue": null,
+        "badValue": null,
+        "interestLevel": null,
+        "remotelyExploitable": null
+      },
+      {
+        "privRight": "SeAssignPrimaryTokenPrivilege",
+        "msDesc": null,
+        "humanDesc": null,
+        "goodValue": null,
+        "badValue": null,
+        "interestLevel": null,
+        "remotelyExploitable": null
+      },
+      {
+        "privRight": "SeRestorePrivilege",
+        "msDesc": null,
+        "humanDesc": null,
+        "goodValue": null,
+        "badValue": null,
+        "interestLevel": null,
+        "remotelyExploitable": null
+      },
+      {
+        "privRight": "SeDebugPrivilege",
+        "msDesc": null,
+        "humanDesc": null,
+        "goodValue": null,
+        "badValue": null,
+        "interestLevel": null,
+        "remotelyExploitable": null
+      },
+      {
+        "privRight": "SeTakeOwnershipPrivilege",
+        "msDesc": null,
+        "humanDesc": null,
+        "goodValue": null,
+        "badValue": null,
+        "interestLevel": null,
+        "remotelyExploitable": null
+      },
+      {
+        "privRight": "SeLoadDriverPrivilege",
+        "msDesc": null,
+        "humanDesc": null,
+        "goodValue": null,
+        "badValue": null,
+        "interestLevel": null,
+        "remotelyExploitable": null
+      },
+      {
+        "privRight": "SeImpersonatePrivilege",
+        "msDesc": null,
+        "humanDesc": null,
+        "goodValue": null,
+        "badValue": null,
+        "interestLevel": null,
+        "remotelyExploitable": null
+      },
+      {
+        "privRight": "SeSecurityPrivilege",
+        "msDesc": null,
+        "humanDesc": null,
+        "goodValue": null,
+        "badValue": null,
+        "interestLevel": null,
+        "remotelyExploitable": null
+      },
+      {
+        "privRight": "SeNetworkLogonRight",
+        "msDesc": null,
+        "humanDesc": null,
+        "goodValue": null,
+        "badValue": null,
+        "interestLevel": null,
+        "remotelyExploitable": null
+      },
+      {
+        "privRight": "SeDenyNetworkLogonRight",
+        "msDesc": null,
+        "humanDesc": null,
+        "goodValue": null,
+        "badValue": null,
+        "interestLevel": null,
+        "remotelyExploitable": null
+      },
+      {
+        "privRight": "SeDelegateSessionUserImpersonatePrivilege",
+        "msDesc": null,
+        "humanDesc": null,
+        "goodValue": null,
+        "badValue": null,
+        "interestLevel": null,
+        "remotelyExploitable": null
+      },
+      {
+        "privRight": "SeRemoteInteractiveLogonRight",
+        "msDesc": null,
+        "humanDesc": null,
+        "goodValue": null,
+        "badValue": null,
+        "interestLevel": null,
+        "remotelyExploitable": null
+      }
+    ]
+  },
+
+  "trustees": {
+    "item": [
+	   {
+	    "SID": "S-1-1-0",
+	    "RID": null,
+	    "friendlyName": null,
+	    "displayName": "Everyone",
+	    "domainTrustee": null,
+	    "localTrustee": null,
+	    "description": "Literally Everyone.",
+	    "highPriv": null,
+	    "lowPriv": true,
+	    "isGroup": null
+	   },
+      {
+        "SID": "S-1-5-2",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Network",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A group that includes all users that have logged on through a network connection. Membership is controlled by the operating system.",
+        "highPriv": null,
+        "lowPriv": true,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-6",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Service",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A group that includes all security principals that have logged on as a service. Membership is controlled by the operating system.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-9",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Enterprise Domain Controllers",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A group that includes all domain controllers in a forest that uses an Active Directory directory service. Membership is controlled by the operating system.",
+        "highPriv": true,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-11",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Authenticated Users",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A group that includes all users whose identities were authenticated when they logged on. Membership is controlled by the operating system.",
+        "highPriv": null,
+        "lowPriv": true,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-18",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Local System",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A service account that is used by the operating system.",
+        "highPriv": true,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-19",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "NT Authority Local Service",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "Local Service",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-20",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "NT Authority Network Service",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "Network Service",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-113",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "LOCAL_ACCOUNT",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A local account",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-114",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "LOCAL ACCOUNT_AND_MEMBER_OF_ADMINISTRATORS_GROUP",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "Pretty much what it says on the tin.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21<DOMAIN>-500",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Administrator",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A user account for the system administrator. By default, it is the only user account that is given full control over the system.",
+        "highPriv": true,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21<DOMAIN>-501",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Guest",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A user account for people who do not have individual accounts. This user account does not require a password. By default, the Guest account is disabled.",
+        "highPriv": null,
+        "lowPriv": true,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21<DOMAIN>-502",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "KRBTGT",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A service account that is used by the Key Distribution Center (KDC) service.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21<DOMAIN>-512",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Domain Admins",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A global group whose members are authorized to administer the domain. By default, the Domain Admins group is a member of the Administrators group on all computers that have joined a domain, including the domain controllers. Domain Admins is the default owner of any object that is created by any member of the group.",
+        "highPriv": true,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21<DOMAIN>-513",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Domain Users",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A global group that, by default, includes all user accounts in a domain. When you create a user account in a domain, it is added to this group by default.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21<DOMAIN>-514",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Domain Guests",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A global group that, by default, has only one member, the domain’s built-in Guest account.",
+        "highPriv": null,
+        "lowPriv": true,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21<DOMAIN>-515",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Domain Computers",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A global group that includes all clients and servers that have joined the domain.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21<DOMAIN>-516",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Domain Controllers",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A global group that includes all domain controllers in the domain. New domain controllers are added to this group by default.",
+        "highPriv": true,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21<DOMAIN>-498",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Enterprise Read-only Domain Controllers",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A Universal group. Members of this group are Read-Only Domain Controllers in the enterprise",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21<DOMAIN>-521",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Read-only Domain Controllers",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A Global group. Members of this group are Read-Only Domain Controllers in the domain",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21<DOMAIN>-517",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Cert Publishers",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A global group that includes all computers that are running an enterprise certification authority. Cert Publishers are authorized to publish certificates for User objects in Active Directory.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21<ROOTDOMAIN>-518",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Schema Admins",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A universal group in a native-mode domain; a global group in a mixed-mode domain. The group is authorized to make schema changes in Active Directory. By default, the only member of the group is the Administrator account for the forest root domain.",
+        "highPriv": true,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21<ROOTDOMAIN>-519",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Enterprise Admins",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A universal group in a native-mode domain; a global group in a mixed-mode domain. The group is authorized to make forest-wide changes in Active Directory, such as adding child domains. By default, the only member of the group is the Administrator account for the forest root domain.",
+        "highPriv": true,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21<DOMAIN>-520",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Group Policy Creator Owners",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A global group that is authorized to create new Group Policy objects in Active Directory. By default, the only member of the group is Administrator.",
+        "highPriv": true,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-544",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Administrators",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A built-in group. After the initial installation of the operating system, the only member of the group is the Administrator account. When a computer joins a domain, the Domain Admins group is added to the Administrators group. When a server becomes a domain controller, the Enterprise Admins group also is added to the Administrators group.",
+        "highPriv": true,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-545",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Users",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A built-in group. After the initial installation of the operating system, the only member is the Authenticated Users group. When a computer joins a domain, the Domain Users group is added to the Users group on the computer.",
+        "highPriv": null,
+        "lowPriv": true,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-546",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Guests",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A built-in group. By default, the only member is the Guest account. The Guests group allows occasional or one-time users to log on with limited privileges to a computer’s built-in Guest account.",
+        "highPriv": null,
+        "lowPriv": true,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-548",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Account Operators",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A built-in group that exists only on domain controllers. By default, the group has no members. By default, Account Operators have permission to create, modify, and delete accounts for users, groups, and computers in all containers and organizational units of Active Directory except the Builtin container and the Domain Controllers OU. Account Operators do not have permission to modify the Administrators and Domain Admins groups, nor do they have permission to modify the accounts for members of those groups.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-549",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Server Operators",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A built-in group that exists only on domain controllers. By default, the group has no members. Server Operators can log on to a server interactively; create and delete network shares; start and stop services; back up and restore files; format the hard disk of the computer; and shut down the computer.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-550",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Print Operators",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A built-in group that exists only on domain controllers. By default, the only member is the Domain Users group. Print Operators can manage printers and document queues.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-551",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Backup Operators",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A built-in group. By default, the group has no members. Backup Operators can back up and restore all files on a computer, regardless of the permissions that protect those files. Backup Operators also can log on to the computer and shut it down.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-552",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Replicators",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A built-in group that is used by the File Replication service on domain controllers. By default, the group has no members. Do not add users to this group",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-557",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "BUILTIN\\Incoming Forest Trust Builders",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "An alias. Members of this group can create incoming, one-way trusts to this forest.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-569",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "BUILTIN\\Cryptographic Operators",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A Builtin Local group. Members are authorized to perform cryptographic operations.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21<DOMAIN>-571",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Allowed RODC Password Replication Group",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A Domain Local group. Members in this group can have their passwords replicated to all read-only domain controllers in the domain.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21<DOMAIN>-572",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Denied RODC Password Replication Group",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A Domain Local group. Members in this group cannot have their passwords replicated to any read-only domain controllers in the domain",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-573",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "BUILTIN\\Event Log Readers",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A Builtin Local group. Members of this group can read event logs from local machine.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-574",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "BUILTIN\\Certificate Service DCOM Access",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A Builtin Local group. Members of this group are allowed to connect to Certification Authorities in the enterprise.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-21-<DOMAIN>-522",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Cloneable Domain Controllers",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A Global group. Members of this group that are domain controllers may be cloned.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-578",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "BUILTIN\\Hyper-V Administrators",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A Builtin Local group. Members of this group have complete and unrestricted access to all features of Hyper-V.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-579",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "BUILTIN\\Access Control Assistance Operators",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A Builtin Local group. Members of this group can remotely query authorization attributes and permissions for resources on this computer.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-580",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "BUILTIN\\Remote Management Users",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A Builtin Local group. Members of this group can access WMI resources over management protocols (such as WS-Management via the Windows Remote Management service). This applies only to WMI namespaces that grant access to the user.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-64-10",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "NTLM Authentication",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A SID that is used when the NTLM authentication package authenticated the client",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-64-14",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "SChannel Authentication",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A SID that is used when the SChannel authentication package authenticated the client.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-64-21",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Digest Authentication",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A SID that is used when the Digest authentication package authenticated the client.",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-80",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "NT Service",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "An NT Service account prefix",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-80-0",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "NT SERVICES\\ALL SERVICES",
+        "FriendlyName": "All Services",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "A group that includes all service processes that are configured on the system. Membership is controlled by the operating system."
+      }
+    ]
+  },
+
+  "regKeys": {
+    "item": [
+      {
+        "msDesc": "User Account Control: Run all administrators in Admin Approval Mode",
+        "friendlyDesc": null,
+        "intLevel": "2",
+        "regKey": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System!EnableLUA",
+        "defVal": "1",
+        "intValue": null
+      },
+      {
+        "msDesc": "User Account Control: Admin Approval Mode for the Built-in Administrator account",
+        "friendlyDesc": null,
+        "intLevel": "2",
+        "regKey": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System!FilterAdministratorToken",
+        "defVal": "0",
+        "intValue": null
+      },
+      {
+        "msDesc": "Local Account Token Filter Policy",
+        "friendlyDesc": null,
+        "intLevel": "2",
+        "regKey": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System!LocalAccountTokenFilterPolicy",
+        "defVal": "0",
+        "intValue": null
+      },
+      {
+        "msDesc": "Include command line in process creation events",
+        "friendlyDesc": null,
+        "intLevel": "3",
+        "regKey": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\Audit!ProcessCreationIncludeCmdLine_Enabled",
+        "defVal": "0",
+        "intValue": null
+      },
+      {
+        "msDesc": "Network security: Configure encryption types allowed for Kerberos",
+        "friendlyDesc": null,
+        "intLevel": "4",
+        "regKey": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\Kerberos\\Parameters!SupportedEncryptionTypes",
+        "defVal": "0",
+        "intValue": null
+      },
+      {
+        "msDesc": "Turn off downloading of print drivers over HTTP",
+        "friendlyDesc": null,
+        "intLevel": "3",
+        "regKey": "HKEY_LOCAL_MACHINE\\Software\\Policies\\Microsoft\\Windows NT\\Printers!DisableWebPnPDownload",
+        "defVal": "0",
+        "intValue": null
+      },
+      {
+        "msDesc": "Restrict Unauthenticated RPC clients",
+        "friendlyDesc": null,
+        "intLevel": "2",
+        "regKey": "HKEY_LOCAL_MACHINE\\Software\\Policies\\Microsoft\\Windows NT\\Rpc!RestrictRemoteClients",
+        "defVal": "0",
+        "intValue": null
+      },
+      {
+        "msDesc": "Do not allow passwords to be saved",
+        "friendlyDesc": null,
+        "intLevel": "2",
+        "regKey": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services!DisablePasswordSaving",
+        "defVal": "0",
+        "intValue": null
+      },
+      {
+        "msDesc": "Enable insecure guest logons",
+        "friendlyDesc": null,
+        "intLevel": "2",
+        "regKey": "HKEY_LOCAL_MACHINE\\Software\\Policies\\Microsoft\\Windows\\LanmanWorkstation!AllowInsecureGuestAuth",
+        "defVal": "1",
+        "intValue": null
+      },
+      {
+        "msDesc": "Turn on PowerShell Script Block Logging",
+        "friendlyDesc": null,
+        "intLevel": "3",
+        "regKey": "HKEY_LOCAL_MACHINE\\Software\\Policies\\Microsoft\\Windows\\PowerShell\\ScriptBlockLogging!EnableScriptBlockLogging",
+        "defVal": "0",
+        "intValue": null
+      },
+      {
+        "msDesc": "Allow Basic authentication (Client)",
+        "friendlyDesc": null,
+        "intLevel": "2",
+        "regKey": "HKEY_LOCAL_MACHINE\\Software\\Policies\\Microsoft\\Windows\\WinRM\\Client!AllowBasic",
+        "defVal": "0",
+        "intValue": null
+      },
+      {
+        "msDesc": "Disallow Digest authentication",
+        "friendlyDesc": null,
+        "intLevel": "2",
+        "regKey": "HKEY_LOCAL_MACHINE\\Software\\Policies\\Microsoft\\Windows\\WinRM\\Client!AllowDigest",
+        "defVal": "1",
+        "intValue": null
+      },
+      {
+        "msDesc": "Allow unencrypted traffic (Client)",
+        "friendlyDesc": null,
+        "intLevel": "2",
+        "regKey": "HKEY_LOCAL_MACHINE\\Software\\Policies\\Microsoft\\Windows\\WinRM\\Client!AllowUnencryptedTraffic",
+        "defVal": "0",
+        "intValue": null
+      },
+      {
+        "msDesc": "Allow Basic authentication (Server)",
+        "friendlyDesc": null,
+        "intLevel": "2",
+        "regKey": "HKEY_LOCAL_MACHINE\\Software\\Policies\\Microsoft\\Windows\\WinRM\\Service!AllowBasic",
+        "defVal": "0",
+        "intValue": null
+      },
+      {
+        "msDesc": "Allow unencrypted traffic (Server)",
+        "friendlyDesc": null,
+        "intLevel": "2",
+        "regKey": "HKEY_LOCAL_MACHINE\\Software\\Policies\\Microsoft\\Windows\\WinRM\\Service!AllowUnencryptedTraffic",
+        "defVal": "0",
+        "intValue": null
+      },
+      {
+        "msDesc": "Disallow WinRM from storing RunAs credentials",
+        "friendlyDesc": null,
+        "intLevel": "2",
+        "regKey": "HKEY_LOCAL_MACHINE\\Software\\Policies\\Microsoft\\Windows\\WinRM\\Service!DisableRunAs",
+        "defVal": "0",
+        "intValue": null
+      },
+      {
+        "msDesc": "Network access: Let Everyone permissions apply to anonymous users",
+        "friendlyDesc": null,
+        "intLevel": "1",
+        "regKey": "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Lsa!everyoneincludesanonymous",
+        "defVal": "0",
+        "intValue": null
+      },
+      {
+        "msDesc": "Network security: Do not store LAN Manager hash value on next password change",
+        "friendlyDesc": null,
+        "intLevel": "2",
+        "regKey": "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Lsa!NoLmHash",
+        "defVal": "1",
+        "intValue": null
+      },
+      {
+        "msDesc": "Network access: Do not allow anonymous enumeration of SAM accounts",
+        "friendlyDesc": null,
+        "intLevel": "2",
+        "regKey": "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Lsa!restrictanonymoussam",
+        "defVal": "1",
+        "intValue": null
+      },
+      {
+        "msDesc": "Network access: Restrict clients allowed to make remote calls to SAM",
+        "friendlyDesc": null,
+        "intLevel": "2",
+        "regKey": "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Lsa!RestrictRemoteSAM",
+        "defVal": "\"O:BAG:BAD:(A;;RC;;;BA)",
+        "intValue": null
+      },
+      {
+        "msDesc": "Network security: Minimum session security for NTLM SSP based (including secure RPC) clients",
+        "friendlyDesc": null,
+        "intLevel": "",
+        "regKey": "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Lsa\\MSV1_0!NtlmMinClientSec",
+        "defVal": "\"536870912",
+        "intValue": null
+      },
+      {
+        "msDesc": "WDigest Authentication Disabled",
+        "friendlyDesc": null,
+        "intLevel": "2",
+        "regKey": "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\SecurityProviders\\WDigest!UseLogonCredentials",
+        "defVal": "0",
+        "intValue": null
+      },
+      {
+        "msDesc": "Microsoft network server: Digitally sign communications (if client agrees)",
+        "friendlyDesc": null,
+        "intLevel": "2",
+        "regKey": "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\LanmanServer\\Parameters!EnableSecuritySignature",
+        "defVal": "0",
+        "intValue": null
+      },
+      {
+        "msDesc": "Microsoft network server: Digitally sign communications (always)",
+        "friendlyDesc": null,
+        "intLevel": "2",
+        "regKey": "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\LanmanServer\\Parameters!RequireSecuritySignature",
+        "defVal": "0",
+        "intValue": null
+      },
+      {
+        "msDesc": "Network access: Restrict anonymous access to Named Pipes and Shares",
+        "friendlyDesc": null,
+        "intLevel": "2",
+        "regKey": "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\LanmanServer\\Parameters!RestrictNullSessAccess",
+        "defVal": "1",
+        "intValue": null
+      },
+      {
+        "msDesc": "Microsoft network client: Send unencrypted password to third-party SMB servers",
+        "friendlyDesc": null,
+        "intLevel": "2",
+        "regKey": "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\LanmanWorkstation\\Parameters!EnablePlainTextPassword",
+        "defVal": "0",
+        "intValue": null
+      },
+      {
+        "msDesc": "Microsoft network client: Digitally sign communications (if server agrees)",
+        "friendlyDesc": null,
+        "intLevel": "2",
+        "regKey": "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\LanmanWorkstation\\Parameters!EnableSecuritySignature",
+        "defVal": "1",
+        "intValue": null
+      },
+      {
+        "msDesc": "Microsoft network client: Digitally sign communications (always)",
+        "friendlyDesc": null,
+        "intLevel": "2",
+        "regKey": "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\LanmanWorkstation\\Parameters!RequireSecuritySignature",
+        "defVal": "0",
+        "intValue": null
+      },
+      {
+        "msDesc": "Network security: LDAP client signing requirements",
+        "friendlyDesc": null,
+        "intLevel": "2",
+        "regKey": "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\ldap!ldapclientintegrity",
+        "defVal": "1",
+        "intValue": null
+      },
+      {
+        "msDesc": "Domain member: Digitally encrypt or sign secure channel data (always)",
+        "friendlyDesc": null,
+        "intLevel": "2",
+        "regKey": "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Netlogon\\Parameters!RequireSignOrSeal",
+        "defVal": "1",
+        "intValue": null
+      },
+      {
+        "msDesc": "Domain member: Digitally encrypt secure channel data (when possible)",
+        "friendlyDesc": null,
+        "intLevel": "2",
+        "regKey": "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Netlogon\\Parameters!SealSecureChannel",
+        "defVal": "1",
+        "intValue": null
+      },
+      {
+        "msDesc": "Domain member: Digitally sign secure channel data (when possible)",
+        "friendlyDesc": null,
+        "intLevel": "2",
+        "regKey": "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Netlogon\\Parameters!SignSecureChannel",
+        "defVal": "1",
+        "intValue": null
+      },
+      {
+        "msDesc": "WPAD Disabled",
+        "friendlyDesc": null,
+        "intLevel": "2",
+        "regKey": "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\WinHttpAutoProxySvc!Start",
+        "defVal": "3",
+        "intValue": null
+      },
+      {
+        "msDesc": null,
+        "friendlyDesc": null,
+        "intLevel": null,
+        "regKey": "MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\DisableDomainCreds",
+        "defVal": null,
+        "intValue": "false"
+      },
+      {
+        "msDesc": null,
+        "friendlyDesc": null,
+        "intLevel": null,
+        "regKey": "MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\EveryoneIncludesAnonymous",
+        "intValue": "true"
+      },
+      {
+        "msDesc": null,
+        "friendlyDesc": null,
+        "intLevel": null,
+        "regKey": "MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\LimitBlankPasswordUse",
+        "intValue": "false"
+      },
+      {
+        "msDesc": null,
+        "friendlyDesc": null,
+        "intLevel": null,
+        "regKey": "MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\NoLMHash",
+        "intValue": "false"
+      },
+      {
+        "msDesc": null,
+        "friendlyDesc": null,
+        "intLevel": null,
+        "regKey": "MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\RestrictAnonymous",
+        "intValue": "false"
+      },
+      {
+        "msDesc": null,
+        "friendlyDesc": null,
+        "intLevel": null,
+        "regKey": "MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\RestrictAnonymousSAM",
+        "intValue": "false"
+      },
+      {
+        "msDesc": null,
+        "friendlyDesc": null,
+        "intLevel": null,
+        "regKey": "MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\SubmitControl",
+        "intValue": "true"
+      },
+      {
+        "msDesc": null,
+        "friendlyDesc": null,
+        "intLevel": null,
+        "regKey": "MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\UseMachineId",
+        "intValue": "true"
+      },
+      {
+        "msDesc": null,
+        "friendlyDesc": null,
+        "intLevel": null,
+        "regKey": "MACHINE\\System\\CurrentControlSet\\Control\\Print\\Providers\\LanMan Print Services\\Servers\\AddPrinterDrivers",
+        "intValue": false
+      },
+      {
+        "msDesc": null,
+        "friendlyDesc": null,
+        "intLevel": null,
+        "regKey": "MACHINE\\System\\CurrentControlSet\\Control\\SecurePipeServers\\Winreg\\AllowedExactPaths\\Machine",
+        "intValue": null
+      },
+      {
+        "msDesc": null,
+        "friendlyDesc": null,
+        "intLevel": null,
+        "regKey": "MACHINE\\System\\CurrentControlSet\\Control\\SecurePipeServers\\Winreg\\AllowedPaths\\Machine",
+        "intValue": null
+      },
+      {
+        "msDesc": null,
+        "friendlyDesc": null,
+        "intLevel": null,
+        "regKey": "MACHINE\\System\\CurrentControlSet\\Services\\LanManServer\\Parameters\\NullSessionPipes",
+        "intValue": null
+      },
+      {
+        "msDesc": null,
+        "friendlyDesc": null,
+        "intLevel": null,
+        "regKey": "MACHINE\\System\\CurrentControlSet\\Services\\LanManServer\\Parameters\\NullSessionShares",
+        "intValue": null
+      },
+      {
+        "msDesc": null,
+        "friendlyDesc": null,
+        "intLevel": null,
+        "regKey": "MACHINE\\System\\CurrentControlSet\\Services\\LanManServer\\Parameters\\RestrictNullSessAccess",
+        "intValue": null
+      },
+      {
+        "msDesc": null,
+        "friendlyDesc": null,
+        "intLevel": null,
+        "regKey": "SOFTWARE\\Network Associates\\ePolicy Orchestrator",
+        "intValue": null
+      },
+      {
+        "msDesc": null,
+        "friendlyDesc": null,
+        "intLevel": null,
+        "regKey": "SOFTWARE\\FileZilla Server",
+        "intValue": null
+      },
+      {
+        "msDesc": null,
+        "friendlyDesc": null,
+        "intLevel": null,
+        "regKey": "SOFTWARE\\Wow6432Node\\FileZilla Server",
+        "intValue": null
+      },
+      {
+        "msDesc": null,
+        "friendlyDesc": null,
+        "intLevel": null,
+        "regKey": "SOFTWARE\\Wow6432Node\\McAfee\\DesktopProtection - McAfee VSE",
+        "intValue": null
+      },
+      {
+        "msDesc": null,
+        "friendlyDesc": null,
+        "intLevel": null,
+        "regKey": "SOFTWARE\\McAfee\\DesktopProtection - McAfee VSE",
+        "intValue": null
+      },
+      {
+        "msDesc": null,
+        "friendlyDesc": null,
+        "intLevel": null,
+        "regKey": "SOFTWARE\\ORL\\WinVNC3",
+        "intValue": null
+      },
+      {
+        "msDesc": null,
+        "friendlyDesc": null,
+        "intLevel": null,
+        "regKey": "SOFTWARE\\ORL\\WinVNC3\\Default",
+        "intValue": null
+      },
+      {
+        "msDesc": null,
+        "friendlyDesc": null,
+        "intLevel": null,
+        "regKey": "SOFTWARE\\ORL\\WinVNC\\Default",
+        "intValue": null
+      },
+      {
+        "msDesc": null,
+        "friendlyDesc": null,
+        "intLevel": null,
+        "regKey": "SOFTWARE\\RealVNC\\WinVNC4",
+        "intValue": null
+      },
+      {
+        "msDesc": null,
+        "friendlyDesc": null,
+        "intLevel": null,
+        "regKey": "SOFTWARE\\RealVNC\\Default",
+        "intValue": null
+      },
+      {
+        "msDesc": null,
+        "friendlyDesc": null,
+        "intLevel": null,
+        "regKey": "SOFTWARE\\TightVNC\\Server",
+        "intValue": null
+      },
+      {
+        "msDesc": null,
+        "friendlyDesc": null,
+        "intLevel": null,
+        "regKey": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon",
+        "intValue": null
+      }
+    ]
+  },
+
+  "Other Settings": {
+    "item": [
+      {
+        "searchString": "EnableGuestAccount",
+        "intValue": "1"
+      },
+      {
+        "searchString": "EnableAdminAccount",
+        "intValue": "1"
+      },
+      {
+        "searchString": "LSAAnonymousNameLookup",
+        "intValue": "1"
+      },
+      {
+        "searchString": "NewAdministratorName",
+        "intValue": null
+      },
+      {
+        "searchString": "NewGuestName",
+        "intValue": null
+      }
+    ]
+  },
+
+
+
+  "InterestingWords": [
+    "vnc",
+    "vpn",
+    "pwd",
+    "cred",
+    "key",
+    "pass"
+  ]
+}

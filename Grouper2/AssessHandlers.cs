@@ -131,7 +131,6 @@ namespace Grouper2
                 foreach (var unparsedHeader in slippedThrough)
                 {
                     Console.WriteLine(unparsedHeader);
-                    //  Event Audit ?
                 }
             }
             //mangle our json thing into a jobject and return it

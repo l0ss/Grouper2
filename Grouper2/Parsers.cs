@@ -48,7 +48,7 @@ namespace Grouper2
                     {
                         string index = thing.Key.Substring(0, 1);
                         string settingName = thing.Key.Substring(1);
-                        string settingValue = thing.Value.ToString();
+                        JToken settingValue = thing.Value;
                         int indexInt = Convert.ToInt32(index);
                         // if the line starts with the int we're currently indexing off, add line setting to Dict.
                         if (indexInt == i)
@@ -146,19 +146,32 @@ namespace Grouper2
                 for (int b = sectionContent.Offset; b < (sectionContent.Offset + sectionContent.Count); b++)
                 {
                     string line = sectionContent.Array[b];
-                    if (line == "") break;
+                    if (line.Trim() == "") break;
                     // split the line into the key (before the =) and the values (after it)
                     string lineKey = "";
-                    List<string> splitValuesList = new List<string>();
+
+                    
                     if (line.Contains('='))
                     {
                         string[] splitLine = line.Split('=');
                         lineKey = (splitLine[0]).Trim();
+                        lineKey = lineKey.Trim('\\','"');
                         // then get the values
                         string lineValues = (splitLine[1]).Trim();
                         // and split them into an array on ","
                         string[] splitValues = lineValues.Split(',');
-                        foreach (string thing in splitValues) splitValuesList.Add(thing);
+                        //Add the restructured line into the dictionary.
+                        JArray splitValuesJArray = new JArray();
+                        foreach (string thing in splitValues) splitValuesJArray.Add(thing);
+
+                        if (splitValuesJArray.Count == 1)
+                        {
+                            section.Add(lineKey, splitValues[0]);
+                        }
+                        else
+                        {
+                            section.Add(lineKey, splitValuesJArray);
+                        }
                     }
                     else
                     {
@@ -166,19 +179,37 @@ namespace Grouper2
                         lineKey = (splitLine[0]).Trim();
                         //ArraySegment<string> splitValues = new ArraySegment<string>(splitLine, 1, splitLine.Length);
                         //foreach (string thing in splitValues)
-                        foreach (int subLine in Enumerable.Range(1, splitLine.Length - 1))
+
+                        JArray splitValuesJArray = new JArray();
+                        foreach (string value in splitLine)
                         {
-                            splitValuesList.Add(splitLine[subLine]);
+                            if (value == splitLine[0])
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                splitValuesJArray.Add(value);
+                            }
+                        }
+
+                        if (splitValuesJArray.Count == 1)
+                        {
+                            section.Add(lineKey, splitLine[0]);
+                        }
+                        else
+                        {
+                            section.Add(lineKey, splitValuesJArray);
                         }
                     }
 
                     if (lineKey == "")
                     {
-                        Utility.DebugWrite("Something has gone wrong.");
+                        Utility.DebugWrite("Something has gone wrong parsing an Inf/Ini file.");
                     }
-                    JArray splitValuesJArray = JArray.FromObject(splitValuesList);
-                    //Add the restructured line into the dictionary.
-                    section.Add(lineKey, splitValuesJArray);
+                    
+
+                    
                     
                 }
                 //put the results into the dictionary we're gonna return

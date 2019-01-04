@@ -1,17 +1,31 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <StartArguments>-o -s "C:\users\mike.testing2016\desktop\testgpos\sysvol\Policies"</StartArguments>
+    <StartArguments>-o -s ".\TestPolicies"</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'Default' ">
     <StartAction>Project</StartAction>
-    <StartArguments>./TestPolicies/</StartArguments>
+    <StartArguments>
+    </StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugFromTestPolicies|AnyCPU'">
-    <StartArguments>./TestPolicies</StartArguments>
+    <StartArguments>-o -s ".\TestPolicies" -d</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugLiveFromDC|AnyCPU'">
     <StartArguments>
     </StartArguments>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PublishUrlHistory>publish\</PublishUrlHistory>
+    <InstallUrlHistory />
+    <SupportUrlHistory />
+    <UpdateUrlHistory />
+    <BootstrapperUrlHistory />
+    <ErrorReportUrlHistory />
+    <FallbackCulture>en-US</FallbackCulture>
+    <VerifyUploadedFiles>false</VerifyUploadedFiles>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugFromTestPath|AnyCPU'">
+    <StartArguments>-o -s "C:\users\mike.testing2016\desktop\testgpos\sysvol\policies"</StartArguments>
   </PropertyGroup>
 </Project>
