@@ -97,7 +97,7 @@ namespace Grouper2
             if (grpMembership != null)
             {
                 JObject assessedgrpMembership = AssessInf.AssessGroupMembership(grpMembership);
-                if (assessedgrpMembership.Count > 0)
+                if (assessedgrpMembership != null)
                 {
                     assessedGpTmpl.Add("Group Membership", assessedgrpMembership);
                 }

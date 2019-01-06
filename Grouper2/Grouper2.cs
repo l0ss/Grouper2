@@ -37,7 +37,7 @@
 //      INI Files
 //      Scheduled Tasks (Work in progress)
 //
-//  unfuck scripts.ini 'over-escaping' file paths etc.
+//  
 //  Grep scripts for creds.
 //  grep arguments/cmd line param strings for substrings indicating possible credentials
 //  Enumerate File permissions for referenced files.

@@ -150,18 +150,18 @@
 
   "trustees": {
     "item": [
-	   {
-	    "SID": "S-1-1-0",
-	    "RID": null,
-	    "friendlyName": null,
-	    "displayName": "Everyone",
-	    "domainTrustee": null,
-	    "localTrustee": null,
-	    "description": "Literally Everyone.",
-	    "highPriv": null,
-	    "lowPriv": true,
-	    "isGroup": null
-	   },
+      {
+        "SID": "S-1-1-0",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Everyone",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "Literally Everyone.",
+        "highPriv": null,
+        "lowPriv": true,
+        "isGroup": null
+      },
       {
         "SID": "S-1-5-2",
         "RID": null,
@@ -530,6 +530,18 @@
         "domainTrustee": null,
         "localTrustee": null,
         "description": "A built-in group that is used by the File Replication service on domain controllers. By default, the group has no members. Do not add users to this group",
+        "highPriv": null,
+        "lowPriv": null,
+        "isGroup": null
+      },
+      {
+        "SID": "S-1-5-32-555",
+        "RID": null,
+        "friendlyName": null,
+        "displayName": "Remote Desktop Users",
+        "domainTrustee": null,
+        "localTrustee": null,
+        "description": "An alias. Members in this group are granted the right to logon remotely.",
         "highPriv": null,
         "lowPriv": null,
         "isGroup": null
