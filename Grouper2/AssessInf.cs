@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Security.Principal;
 using Grouper2;
 using Newtonsoft.Json.Linq;
@@ -125,9 +126,9 @@ internal static class AssessInf
 
     public static JObject AssessGroupMembership(JToken parsedGrpMemberships)
     {
-        // really not sure about this one at all. Think it's ok now but could use a recheck.
         // base interest level
-        int interestLevel = 5;
+        int interestLevel = 4;
+        // really not sure about this one at all. Think it's ok now but could use a recheck.
         // output object
         JObject assessedGrpMemberships = new JObject();
         // cast input object
@@ -184,7 +185,7 @@ internal static class AssessInf
                             assessedGrpMemberships.Add(
                                 new JProperty(assessedGrpMemberItem.Name,
                                     new JObject(
-                                        new JProperty("SID", cleanSid),
+                                        new JProperty("SID", assessedGrpMemberItem.Value),
                                         new JProperty("Members", new JObject())))
                                 
                             );
@@ -196,14 +197,19 @@ internal static class AssessInf
                 }
                 else
                 {
+
+
+                    // get a cleaned up version of the memberof
                     JProperty assessedGrpMemberValue = AssessGrpMemberItem(parsedGrpMembershipJProp.Value.ToString());
+
+
                     if (!(assessedGrpMemberships.ContainsKey(assessedGrpMemberValue.Name)))
                     {
                         // create one
                         assessedGrpMemberships.Add(
                             new JProperty(assessedGrpMemberValue.Name,
                                 new JObject(
-                                new JProperty("SID", cleanSid),
+                                new JProperty("SID", assessedGrpMemberValue.Value),
                                 new JProperty("Members", new JObject())))
                         );
                     }
@@ -259,11 +265,8 @@ internal static class AssessInf
                 }
             }
             
-
-            //Utility.DebugWrite(assessedGrpMemberships.ToString());
-            
-            // if the resulting interest level of this line is sufficient, add it to the output JObject.
-            if (interestLevel >= GlobalVar.IntLevelToShow)
+            // if the resulting interest level of this shit is sufficient, add it to the output JObject.
+            if (GlobalVar.IntLevelToShow <= interestLevel)
             {
                 return assessedGrpMemberships;
             }
