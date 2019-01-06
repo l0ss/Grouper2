@@ -141,7 +141,6 @@ internal static class AssessInf
             // break immediately if there's no value.
             if (parsedGrpMembershipJProp.Value.ToString() == "")
             {
-                Console.WriteLine(parsedGrpMembership.ToString());
                 continue;
             }
             // strip the asterisk off the front of the line

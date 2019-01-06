@@ -12,6 +12,7 @@
 
 //  Master TODO list.
 //  Expand use of 'interest levels' and maybe break the definition of interest levels into a config file
+//      inf Group memberships
 //
 //  Parse missing inf sections:
 //      File Security
@@ -23,7 +24,6 @@
 //      Registry Values
 //      Scheduled tasks
 //      Registry Keys
-//      Group Membership
 //      Service General Setting
 //
 //  Assess more GPP types properly:
