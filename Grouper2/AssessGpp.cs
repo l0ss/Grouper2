@@ -268,28 +268,37 @@ namespace Grouper2
             assessedGroup.Add("Remove Accounts", Utility.GetSafeString(gppGroupProps,"@removeAccounts"));
             assessedGroup.Add("Action", groupAction);
 
+
             JArray gppGroupMemberArray = new JArray();
-            JToken members = gppGroupProps["Members"]["Member"];
-            string membersType = members.Type.ToString();
-            if (membersType == "Array")
+            try
             {
-                foreach (JToken member in members.Children())
+                JToken members = gppGroupProps["Members"]["Member"];
+                string membersType = members.Type.ToString();
+                if (membersType == "Array")
                 {
-                    gppGroupMemberArray.Add(GetAssessedGroupMember(member));
+                    foreach (JToken member in members.Children())
+                    {
+                        gppGroupMemberArray.Add(GetAssessedGroupMember(member));
+                    }
                 }
+                else if (membersType == "Object")
+                {
+                    gppGroupMemberArray.Add(GetAssessedGroupMember(members));
+                }
+                else
+                {
+                    Utility.DebugWrite("Something went squirrely with Group Memberships");
+                    Utility.DebugWrite(members.Type.ToString());
+                    Utility.DebugWrite(" " + membersType + " ");
+                    Utility.DebugWrite(members.ToString());
+                }
+
+                assessedGroup.Add("Members", gppGroupMemberArray);
             }
-            else if (membersType == "Object")
+            catch (NullReferenceException e)
             {
-                gppGroupMemberArray.Add(GetAssessedGroupMember(members));
+                //Utility.DebugWrite(e.ToString());
             }
-            else
-            {
-                Utility.DebugWrite("Something went squirrely with Group Memberships");
-                Utility.DebugWrite(members.Type.ToString());
-                Utility.DebugWrite(" " + membersType + " ");
-                Utility.DebugWrite(members.ToString());
-            }
-            assessedGroup.Add("Members", gppGroupMemberArray);
 
             if (interestLevel < GlobalVar.IntLevelToShow)
             {
@@ -425,7 +434,7 @@ namespace Grouper2
                     JObject assessedGppSchedTask = GetAssessedScheduledTask(schedTaskToAssess);
                     if (assessedGppSchedTask != null)
                     {
-                        assessedGppSchedTasksAllJson.Add(assessedGppSchedTask["@uid"].ToString(), assessedGppSchedTask);
+                        assessedGppSchedTasksAllJson.Add(assessedGppSchedTask[schedTaskType]["@uid"].ToString(), assessedGppSchedTask[schedTaskType]);
                     }
                 }
             }
@@ -442,11 +451,10 @@ namespace Grouper2
 
         private JObject GetAssessedScheduledTask(JProperty scheduledTask)
         {
-            JProperty assessedScheduledTask = scheduledTask;
-            //Console.WriteLine("SchedTask");
-            Utility.DebugWrite(scheduledTask.ToString());
+            JObject assessedScheduledTask = new JObject(scheduledTask);
+            
             //TODO actually write this
-            return null;
+            return assessedScheduledTask;
         }
 
 
