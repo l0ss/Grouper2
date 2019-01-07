@@ -13,6 +13,11 @@ namespace Grouper2
 {
     class Utility
     {
+        public static bool IsEmptyOrWhiteSpace(string inString)
+        {
+           return inString.All(char.IsWhiteSpace);
+        }
+
         public static JObject GetFileDaclJObject(string filePathString)
         {
             JObject fileDaclsJObject = new JObject();
@@ -275,6 +280,9 @@ namespace Grouper2
                     break;
                 case "C":
                     actionString = "Create";
+                    break;
+                case "R":
+                    actionString = "Remove";
                     break;
                 default:
                     Utility.DebugWrite("oh no this is new");

@@ -97,7 +97,7 @@ namespace Grouper2
             if (grpMembership != null)
             {
                 JObject assessedgrpMembership = AssessInf.AssessGroupMembership(grpMembership);
-                if (assessedgrpMembership.Count > 0)
+                if (assessedgrpMembership != null)
                 {
                     assessedGpTmpl.Add("Group Membership", assessedgrpMembership);
                 }
@@ -107,7 +107,7 @@ namespace Grouper2
             // Service General Setting
             ///////////////////////////////////////////////////////////////
             JToken svcGenSetting = infToAssess["Service General Setting"];
-            if (regKeys != null)
+            if (svcGenSetting != null)
             {
                 JObject assessedSvcGenSetting = AssessInf.AssessServiceGenSetting(svcGenSetting);
                 if (assessedSvcGenSetting.Count > 0)
@@ -125,13 +125,12 @@ namespace Grouper2
                 headingsInInf.Add(sectionName);
             }
             var slippedThrough = headingsInInf.Except(knownKeys);
-            if (slippedThrough.Any())
+            if (slippedThrough.Any() && GlobalVar.DebugMode)
             {
                 Console.WriteLine("We didn't parse any of these sections:");
                 foreach (var unparsedHeader in slippedThrough)
                 {
                     Console.WriteLine(unparsedHeader);
-                    //  Event Audit ?
                 }
             }
             //mangle our json thing into a jobject and return it

@@ -12,14 +12,18 @@
 
 //  Master TODO list.
 //  Expand use of 'interest levels' and maybe break the definition of interest levels into a config file
-//  Parse and assess other inf sections properly:
+//      inf Group memberships
+//
+//  Parse missing inf sections:
+//      File Security
+//
+//  Assess other inf sections properly:
 //      System Access
 //      Kerberos Policy
 //      Event Audit
 //      Registry Values
 //      Scheduled tasks
 //      Registry Keys
-//      Group Membership
 //      Service General Setting
 //
 //  Assess more GPP types properly:
@@ -33,12 +37,18 @@
 //      INI Files
 //      Scheduled Tasks (Work in progress)
 //
+//  
 //  Grep scripts for creds.
 //  grep arguments/cmd line param strings for substrings indicating possible credentials
 //  Enumerate File permissions for referenced files.
 //  Parse Registry.pol
 //  Parse Machine\Applications\*.AAS (assigned applications?
 //  figure out what happened to MSI files?
+//  Parse SDDL in 'Service General Settings'
+//  Figure out file ACL checks on file paths found in Scheduled Task arguments or Startup Scripts etc
+//  Parse 'Comment.cmtx' files?
+//  Parse or at least identify the presence of custom adm templates.
+//  Resolve SIDS in inf file GroupMemberships as part of OnlineChecks
 //  niceify the output, maybe some colours?
 
 using Newtonsoft.Json.Linq;
@@ -74,6 +84,7 @@ namespace Grouper2
     {
         public static bool OnlineChecks;
         public static int IntLevelToShow;
+        public static bool DebugMode;
     }
 
     internal class Grouper2
@@ -83,6 +94,7 @@ namespace Grouper2
             Utility.PrintBanner();
 
             CommandLineParser.CommandLineParser parser = new CommandLineParser.CommandLineParser();
+            SwitchArgument debugArg = new SwitchArgument('d', "debug", "Enables debug mode. Will also show you the names of any categories of policies that Grouper saw but didn't have any means of processing. I eagerly await your pull request.", false);
             SwitchArgument offlineArg = new SwitchArgument('o', "offline", "Disables checks that require LDAP comms with a DC or SMB comms with file shares found in policy settings. Requires that you define a value for --sysvol.", false);
             ValueArgument<string> sysvolArg = new ValueArgument<string>('s', "sysvol", "Set the path to a domain SYSVOL directory.");
             ValueArgument<int> intlevArg = new ValueArgument<int>('i', "interestlevel", "The minimum interest level to display. i.e. findings with an interest level lower than x will not be seen in output. Defaults to 1, i.e. show everything except some extremely dull defaults. If you want to see those too, do -i 0.");
@@ -92,6 +104,7 @@ namespace Grouper2
             //parser.Arguments.Add(domainArg);
             //parser.Arguments.Add(usernameArg);
             //parser.Arguments.Add(passwordArg);
+            parser.Arguments.Add(debugArg);
             parser.Arguments.Add(intlevArg);
             parser.Arguments.Add(sysvolArg);
             parser.Arguments.Add(offlineArg);
@@ -103,8 +116,11 @@ namespace Grouper2
             try
             {
                 parser.ParseCommandLine(args);
-                parser.ShowParsedArguments();
-
+                //parser.ShowParsedArguments();
+                if (debugArg.Parsed && debugArg.Value)
+                {
+                    GlobalVar.DebugMode = true;
+                }
                 if (offlineArg.Parsed && offlineArg.Value && sysvolArg.Parsed)
                 {
                     // args config for valid offline run.
@@ -180,35 +196,34 @@ namespace Grouper2
                 Environment.Exit(1);
             }
 
-            // create a dict to put all our output goodies in.
-            Dictionary<string, JObject> grouper2OutputDict = new Dictionary<string, JObject>();
+            // create a JObject to put all our output goodies in.
+            JObject grouper2Output = new JObject();
             // so for each uid directory (including ones with that dumb broken domain replication condition)
             // we're going to gather up all our goodies and put them into that dict we just created.
             foreach (var gpoPath in gpoPaths)
             {
                 // create a dict to put the stuff we find for this GPO into.
-                Dictionary<string, JObject> gpoResultDict = new Dictionary<string, JObject>();
+                JObject gpoResult = new JObject();
                 // Get the UID of the GPO from the file path.
                 string[] splitPath = gpoPath.Split(Path.DirectorySeparatorChar);
                 string gpoUid = splitPath[splitPath.Length - 1];
 
                 // Make a JObject for GPO metadata
-                JObject gpoPropsJson = new JObject();
+                JObject gpoProps = new JObject();
                 // If we're online and talking to the domain, just use that data
                 if (GlobalVar.OnlineChecks)
                 {
                     JToken domainGpo = domainGpos[gpoUid];
-                    gpoPropsJson = (JObject) JToken.FromObject(domainGpo);
+                    gpoProps = (JObject) JToken.FromObject(domainGpo);
                 }
                 // otherwise do what we can with what we have
                 else
                 {
-                    Dictionary<string, string> gpoPropsDict = new Dictionary<string, string>
+                    gpoProps = new JObject()
                     {
                         { "gpoUID", gpoUid },
                         { "gpoPath", gpoPath }
                     };
-                    gpoPropsJson = (JObject)JToken.FromObject(gpoPropsDict);
                 }
 
                 // TODO (and put in GPOProps)
@@ -217,9 +232,9 @@ namespace Grouper2
                 // get whether it's enabled
 
                 // Add all this crap into a dict, if we found anything of interest.
-                gpoResultDict.Add("GPOProps", gpoPropsJson);
+                gpoResult.Add("GPOProps", gpoProps);
                 // turn dict of data for this gpo into jobj
-                JObject gpoResultJson = (JObject)JToken.FromObject(gpoResultDict);
+                JObject gpoResultJson = (JObject)JToken.FromObject(gpoResult);
 
                 // if I were smarter I would have done this shit with the machine and user dirs inside the Process methods instead of calling each one twice out here.
                 // @liamosaur you reckon you can see how to clean it up after the fact?
@@ -234,47 +249,48 @@ namespace Grouper2
                 JArray userPolGppResults = ProcessGpXml(userPolPath);
                 JArray machinePolScriptResults = ProcessScriptsIni(machinePolPath);
                 JArray userPolScriptResults = ProcessScriptsIni(userPolPath);
+
                 // add all our findings to a JArray in what seems a very inefficient manner.
                 JArray userFindings = new JArray();
                 JArray machineFindings = new JArray();
-                if (machinePolGppResults.HasValues)
+                if (machinePolGppResults != null && machinePolGppResults.HasValues)
                 {
                     foreach (JObject finding in machinePolGppResults)
                     {
                         machineFindings.Add(finding);
                     }
                 }
-                if (userPolGppResults.HasValues)
+                if (userPolGppResults != null && userPolGppResults.HasValues)
                 {
                     foreach (JObject finding in userPolGppResults)
                     {
                         userFindings.Add(finding);
                     }
                 }
-                if (machinePolInfResults.HasValues)
+                if (machinePolGppResults != null && machinePolInfResults.HasValues)
                 {
                     foreach (JObject finding in machinePolInfResults)
                     {
                         machineFindings.Add(finding);
                     }
                 }
-                if (userPolInfResults.HasValues)
+                if (userPolInfResults != null && userPolInfResults.HasValues)
                 {
                     foreach (JObject finding in userPolInfResults)
                     {
                         userFindings.Add(finding);
                     }
                 }
-                if (machinePolScriptResults.HasValues)
+                if (machinePolScriptResults != null && machinePolScriptResults.HasValues)
                 {
                     foreach (JObject finding in machinePolScriptResults)
                     {
                         machineFindings.Add(finding);
                     }
                 }
-                if (userPolScriptResults.HasValues)
+                if (userPolScriptResults != null && userPolScriptResults.HasValues)
                 {
-                    foreach (JObject finding in machinePolScriptResults)
+                    foreach (JObject finding in userPolScriptResults)
                     {
                         userFindings.Add(finding);
                     }
@@ -292,15 +308,17 @@ namespace Grouper2
                     gpoResultJson.Add(machineFindingsJProp);
                 }
 
-                // put into final jobj
-                grouper2OutputDict.Add(gpoPath, gpoResultJson);
+                // put into final output
+                if (userFindings.HasValues || machineFindings.HasValues)
+                {
+                    grouper2Output.Add(gpoPath, gpoResultJson);
+                }
             }
 
             // Final output is finally happening finally here:
-            Utility.DebugWrite("Final Output:");
-            JObject grouper2OutputJson = (JObject) JToken.FromObject(grouper2OutputDict);
+            Console.WriteLine("RESULT!");
             Console.WriteLine("");
-            Console.WriteLine(grouper2OutputJson);
+            Console.WriteLine(grouper2Output);
             Console.WriteLine("");
             // wait for 'anykey'
             Console.ReadKey();
@@ -358,11 +376,14 @@ namespace Grouper2
             foreach (string iniFile in scriptsIniFiles)
             {
                 JObject preParsedScriptsIniFile = Parsers.ParseInf(iniFile); // Not a typo, the formats are almost the same.
-                JObject parsedScriptsIniFile = Parsers.ParseScriptsIniJson(preParsedScriptsIniFile);
-                JObject assessedScriptsIniFile = AssessScriptsIni.GetAssessedScriptsIni(parsedScriptsIniFile);
-                if (assessedScriptsIniFile != null)
+                if (preParsedScriptsIniFile != null)
                 {
-                    processedScriptsIniFiles.Add(assessedScriptsIniFile);
+                    JObject parsedScriptsIniFile = Parsers.ParseScriptsIniJson(preParsedScriptsIniFile);
+                    JObject assessedScriptsIniFile = AssessScriptsIni.GetAssessedScriptsIni(parsedScriptsIniFile);
+                    if (assessedScriptsIniFile != null)
+                    {
+                        processedScriptsIniFiles.Add(assessedScriptsIniFile);
+                    }
                 }
             }
 

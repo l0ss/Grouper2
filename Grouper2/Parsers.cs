@@ -21,7 +21,7 @@ namespace Grouper2
             foreach (KeyValuePair<string, JToken> item in scriptsIniJson)
             {
                 //get the type of the script into a string for output.
-                string scriptType = item.Key.ToString();
+                string scriptType = item.Key;
                 // cast the settings from JToken to JObject.
                 JObject settingsJObject = (JObject)item.Value;
 
@@ -48,7 +48,7 @@ namespace Grouper2
                     {
                         string index = thing.Key.Substring(0, 1);
                         string settingName = thing.Key.Substring(1);
-                        string settingValue = thing.Value.ToString();
+                        JToken settingValue = thing.Value;
                         int indexInt = Convert.ToInt32(index);
                         // if the line starts with the int we're currently indexing off, add line setting to Dict.
                         if (indexInt == i)
@@ -72,12 +72,20 @@ namespace Grouper2
         {
             //define what a heading looks like
             Regex headingRegex = new Regex(@"^\[(\w+\s?)+\]$");
-            string[] infContent = File.ReadAllLines(infFile);
+            string[] infContentArray = File.ReadAllLines(infFile);
+
+            string infContentString = String.Join(Environment.NewLine, infContentArray);
+
+            if (Utility.IsEmptyOrWhiteSpace(infContentString))
+            {
+                return null;
+            }
+
             var headingLines = new List<int>();
 
             //find all the lines that look like a heading and put the line numbers in an array.
             int i = 0;
-            foreach (string infLine in infContent)
+            foreach (string infLine in infContentArray)
             {
                 Match headingMatch = headingRegex.Match(infLine);
                 if (headingMatch.Success)
@@ -99,10 +107,11 @@ namespace Grouper2
                     sectionSlices.Add(sectionHeading, sectionFinalLine);
                     fuck++;
                 }
-                catch
+                catch (System.ArgumentOutOfRangeException e)
                 {
+                    //Utility.DebugWrite(e.ToString());
                     int sectionHeading = headingLines[fuck];
-                    int sectionFinalLine = (infContent.Length - 1);
+                    int sectionFinalLine = infContentArray.Length - 1;
                     sectionSlices.Add(sectionHeading, sectionFinalLine);
                     break;
                 }
@@ -116,43 +125,90 @@ namespace Grouper2
             {
                 //get the section heading
                 char[] squareBrackets = { '[', ']' };
-                string sectionSliceKey = infContent[sectionSlice.Key];
+                string sectionSliceKey = infContentArray[sectionSlice.Key];
                 string sectionHeading = sectionSliceKey.Trim(squareBrackets);
                 //get the line where the section content starts by adding one to the heading's line
-                int startSection = (sectionSlice.Key + 1);
-                //get the end line of the section
-                int nextSection = sectionSlice.Value;
+                int firstLineOfSection = (sectionSlice.Key + 1);
+                //get the first line of the next section
+                int lastLineOfSection = sectionSlice.Value;
                 //subtract one from the other to get the section length, without the heading.
-                int sectionLength = (nextSection - startSection);
+                int sectionLength = (lastLineOfSection - firstLineOfSection + 1);
                 //get an array segment with the lines
-                ArraySegment<string> sectionContent = new ArraySegment<string>(infContent, startSection, sectionLength);
+
+                //if (sectionLength == 0) break;
+
+                ArraySegment<string> sectionContent = new ArraySegment<string>(infContentArray, firstLineOfSection, sectionLength);
                 //Console.WriteLine("This section contains: ");               
                 //Utility.PrintIndexAndValues(sectionContent);
                 //create the dictionary that we're going to put the lines into.
                 JObject section = new JObject();
                 //iterate over the lines in the section
-                
                 for (int b = sectionContent.Offset; b < (sectionContent.Offset + sectionContent.Count); b++)
-                    {
+                {
                     string line = sectionContent.Array[b];
+                    if (line.Trim() == "") break;
                     // split the line into the key (before the =) and the values (after it)
-                    string[] splitLine = line.Split('=');
-                    string lineKey = (splitLine[0]).Trim();
-                    // then get the values
-                    string lineValues = (splitLine[1]).Trim();
-                    // and split them into an array on ","
-                    string[] splitValues = lineValues.Split(',');
-                    if (splitValues.Length > 1)
+                    string lineKey = "";
+
+                    
+                    if (line.Contains('='))
                     {
-                        JArray splitValuesJArray = JArray.FromObject(splitValues);
+                        string[] splitLine = line.Split('=');
+                        lineKey = (splitLine[0]).Trim();
+                        lineKey = lineKey.Trim('\\','"');
+                        // then get the values
+                        string lineValues = (splitLine[1]).Trim();
+                        // and split them into an array on ","
+                        string[] splitValues = lineValues.Split(',');
                         //Add the restructured line into the dictionary.
-                        section.Add(lineKey, splitValuesJArray);
+                        JArray splitValuesJArray = new JArray();
+                        foreach (string thing in splitValues) splitValuesJArray.Add(thing);
+
+                        if (splitValuesJArray.Count == 1)
+                        {
+                            section.Add(lineKey, splitValues[0]);
+                        }
+                        else
+                        {
+                            section.Add(lineKey, splitValuesJArray);
+                        }
                     }
                     else
                     {
-                        section.Add(lineKey, lineValues);
+                        string[] splitLine = line.Split(',');
+                        lineKey = (splitLine[0]).Trim();
+                        JArray splitValuesJArray = new JArray();
+                        foreach (string value in splitLine)
+                        {
+                            if (value == splitLine[0])
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                splitValuesJArray.Add(value);
+                            }
+                        }
+
+                        if (splitValuesJArray.Count == 1)
+                        {
+                            section.Add(lineKey, splitLine[0]);
+                        }
+                        else
+                        {
+                            section.Add(lineKey, splitValuesJArray);
+                        }
                     }
+
+                    if (lineKey == "")
+                    {
+                        Utility.DebugWrite("Something has gone wrong parsing an Inf/Ini file.");
                     }
+                    
+
+                    
+                    
+                }
                 //put the results into the dictionary we're gonna return
                 infResults.Add(sectionHeading, section);
             }
