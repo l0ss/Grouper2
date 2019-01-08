@@ -304,7 +304,7 @@ internal static class AssessInf
     public static JObject AssessSysAccess(JToken sysAccess)
     {
         // this bit kind of works backwards on the placeholders. Fix as you fill these out.
-        int interestLevel = 1;
+        int interestLevel = 10;
         JObject sysAccessJson = new JObject();
         if (interestLevel >= GlobalVar.IntLevelToShow)
         {

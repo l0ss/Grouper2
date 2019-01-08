@@ -59,6 +59,7 @@ using System.IO;
 using System.Linq;
 using CommandLineParser.Arguments;
 using CommandLineParser.Exceptions;
+using Grouper2.Properties;
 
 namespace Grouper2
 {
@@ -73,7 +74,7 @@ namespace Grouper2
             {
                 if(_instance == null)
                 {
-                    _instance = JObject.Parse(File.ReadAllText("PolData.Json"));
+                    _instance = JObject.Parse(Resources.PolData);
                 }
                 return _instance;
             }

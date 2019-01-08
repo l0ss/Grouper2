@@ -164,7 +164,18 @@ class LDAPstuff
 
         public static string GetUserFromSid(string sid)
         {
-            string account = new System.Security.Principal.SecurityIdentifier(sid).Translate(typeof(System.Security.Principal.NTAccount)).ToString();
+            string account = "failed to resolve SID";
+            try
+            {
+                account = new System.Security.Principal.SecurityIdentifier(sid)
+                    .Translate(typeof(System.Security.Principal.NTAccount)).ToString();
+            }
+            catch (Exception e)
+            {
+                Utility.DebugWrite(e.ToString());
+                Utility.DebugWrite("Failed to resolve SID: " + sid);
+            }
+
             return account;
         }
 }
