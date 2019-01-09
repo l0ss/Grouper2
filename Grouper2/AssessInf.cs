@@ -52,8 +52,8 @@ internal static class AssessInf
                         // tbh it would probably be better to do this the other way around and prefer the resolved sid output over the contents of jankydb. @liamosaur?
                         else
                         {
-                            if (GlobalVar.OnlineChecks)
-                            {
+                            //if (GlobalVar.OnlineChecks)
+                            //{
                                 try
                                 {
                                     if (trusteeClean.StartsWith(domainSid))
@@ -66,7 +66,7 @@ internal static class AssessInf
                                 {
                                     displayName = "Failed to resolve SID with domain.";
                                 }
-                            }
+                            //}
                         }
                         trustees.Add(trusteeClean, displayName);
                     }

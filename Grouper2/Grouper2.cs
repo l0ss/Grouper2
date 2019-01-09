@@ -11,6 +11,13 @@
  */
 
 //  Master TODO list.
+//
+//  System.ArgumentNullException: Value cannot be null.
+//  at Newtonsoft.Json.Linq.JToken.FromObjectInternal(Object o, JsonSerializer jsonSerialiser
+//
+//  Handle access denied for each policy dir
+//  seeing system.io.directory.getfiles barf an unauthorisedaccessexception
+//
 //  Expand use of 'interest levels' and maybe break the definition of interest levels into a config file
 //      inf Group memberships
 //
@@ -95,7 +102,7 @@ namespace Grouper2
             Utility.PrintBanner();
 
             CommandLineParser.CommandLineParser parser = new CommandLineParser.CommandLineParser();
-            SwitchArgument debugArg = new SwitchArgument('d', "debug", "Enables debug mode. Will also show you the names of any categories of policies that Grouper saw but didn't have any means of processing. I eagerly await your pull request.", false);
+            //SwitchArgument debugArg = new SwitchArgument('d', "debug", "Enables debug mode. Will also show you the names of any categories of policies that Grouper saw but didn't have any means of processing. I eagerly await your pull request.", false);
             SwitchArgument offlineArg = new SwitchArgument('o', "offline", "Disables checks that require LDAP comms with a DC or SMB comms with file shares found in policy settings. Requires that you define a value for --sysvol.", false);
             ValueArgument<string> sysvolArg = new ValueArgument<string>('s', "sysvol", "Set the path to a domain SYSVOL directory.");
             ValueArgument<int> intlevArg = new ValueArgument<int>('i', "interestlevel", "The minimum interest level to display. i.e. findings with an interest level lower than x will not be seen in output. Defaults to 1, i.e. show everything except some extremely dull defaults. If you want to see those too, do -i 0.");
@@ -105,7 +112,7 @@ namespace Grouper2
             //parser.Arguments.Add(domainArg);
             //parser.Arguments.Add(usernameArg);
             //parser.Arguments.Add(passwordArg);
-            parser.Arguments.Add(debugArg);
+            //parser.Arguments.Add(debugArg);
             parser.Arguments.Add(intlevArg);
             parser.Arguments.Add(sysvolArg);
             parser.Arguments.Add(offlineArg);
@@ -118,10 +125,10 @@ namespace Grouper2
             {
                 parser.ParseCommandLine(args);
                 //parser.ShowParsedArguments();
-                if (debugArg.Parsed && debugArg.Value)
-                {
-                    GlobalVar.DebugMode = true;
-                }
+                //if (debugArg.Parsed && debugArg.Value)
+                //{
+                //    GlobalVar.DebugMode = true;
+                //}
                 if (offlineArg.Parsed && offlineArg.Value && sysvolArg.Parsed)
                 {
                     // args config for valid offline run.
@@ -177,12 +184,23 @@ namespace Grouper2
             Console.WriteLine("Targeting SYSVOL at: " + sysvolPolDir);
 
             // if we're online, get a bunch of metadata about the GPOs via LDAP
-            if (GlobalVar.OnlineChecks) domainGpos = LDAPstuff.GetDomainGpos();
+            if (GlobalVar.OnlineChecks)
+            {
+                try
+                {
+                    domainGpos = LDAPstuff.GetDomainGpos();
+                }
+                catch (Exception e)
+                {
+                    Utility.DebugWrite("Failed to get Domain GPO Data from DC.");
+                    Utility.DebugWrite(e.ToString());
+                }
+            }
 
-            string[] gpoPaths = new string[0];
+            List<string> gpoPaths = new List<string>();
             try
             {
-                gpoPaths = Directory.GetDirectories(sysvolPolDir);
+                gpoPaths = Directory.GetDirectories(sysvolPolDir).ToList();
             }
             catch
             {
@@ -196,126 +214,154 @@ namespace Grouper2
             // we're going to gather up all our goodies and put them into that dict we just created.
             foreach (var gpoPath in gpoPaths)
             {
-                // create a dict to put the stuff we find for this GPO into.
-                JObject gpoResult = new JObject();
-                // Get the UID of the GPO from the file path.
-                string[] splitPath = gpoPath.Split(Path.DirectorySeparatorChar);
-                string gpoUid = splitPath[splitPath.Length - 1];
+                try
+                {
+                    // create a dict to put the stuff we find for this GPO into.
+                    JObject gpoResult = new JObject();
+                    // Get the UID of the GPO from the file path.
+                    string[] splitPath = gpoPath.Split(Path.DirectorySeparatorChar);
+                    string gpoUid = splitPath[splitPath.Length - 1];
 
-                // Make a JObject for GPO metadata
-                JObject gpoProps = new JObject();
-                // If we're online and talking to the domain, just use that data
-                if (GlobalVar.OnlineChecks)
-                {
-                    JToken domainGpo = domainGpos[gpoUid];
-                    gpoProps = (JObject) JToken.FromObject(domainGpo);
-                }
-                // otherwise do what we can with what we have
-                else
-                {
-                    gpoProps = new JObject()
+                    // Make a JObject for GPO metadata
+                    JObject gpoProps = new JObject();
+                    // If we're online and talking to the domain, just use that data
+                    if (GlobalVar.OnlineChecks)
                     {
-                        { "gpoUID", gpoUid },
-                        { "gpoPath", gpoPath }
-                    };
-                }
-
-                // TODO (and put in GPOProps)
-                // get the policy owner
-                // get whether it's linked and where
-                // get whether it's enabled
-
-                // Add all this crap into a dict, if we found anything of interest.
-                gpoResult.Add("GPOProps", gpoProps);
-                // turn dict of data for this gpo into jobj
-                JObject gpoResultJson = (JObject)JToken.FromObject(gpoResult);
-
-                // if I were smarter I would have done this shit with the machine and user dirs inside the Process methods instead of calling each one twice out here.
-                // @liamosaur you reckon you can see how to clean it up after the fact?
-                // Get the paths for the machine policy and user policy dirs
-                string machinePolPath = Path.Combine(gpoPath, "Machine");
-                string userPolPath = Path.Combine(gpoPath, "User");
-                
-                // Process Inf and Xml Policy data for machine and user
-                JArray machinePolInfResults = ProcessInf(machinePolPath);
-                JArray userPolInfResults = ProcessInf(userPolPath);
-                JArray machinePolGppResults = ProcessGpXml(machinePolPath);
-                JArray userPolGppResults = ProcessGpXml(userPolPath);
-                JArray machinePolScriptResults = ProcessScriptsIni(machinePolPath);
-                JArray userPolScriptResults = ProcessScriptsIni(userPolPath);
-
-                // add all our findings to a JArray in what seems a very inefficient manner.
-                JArray userFindings = new JArray();
-                JArray machineFindings = new JArray();
-                if (machinePolGppResults != null && machinePolGppResults.HasValues)
-                {
-                    foreach (JObject finding in machinePolGppResults)
+                        try
+                        {
+                            JToken domainGpo = domainGpos[gpoUid];
+                            gpoProps = (JObject) JToken.FromObject(domainGpo);
+                        }
+                        catch (Exception e)
+                        {
+                            Utility.DebugWrite("Failed to select GPO Properties for GPO: " + gpoUid);
+                            Utility.DebugWrite(e.ToString());
+                        }
+                    }
+                    // otherwise do what we can with what we have
+                    else
                     {
-                        machineFindings.Add(finding);
+                        gpoProps = new JObject()
+                        {
+                            {"gpoUID", gpoUid},
+                            {"gpoPath", gpoPath}
+                        };
+                    }
+
+                    // TODO (and put in GPOProps)
+                    // get the policy owner
+                    // get whether it's linked and where
+                    // get whether it's enabled
+
+                    // Add all this crap into a dict, if we found anything of interest.
+                    gpoResult.Add("GPOProps", gpoProps);
+                    // turn dict of data for this gpo into jobj
+                    JObject gpoResultJson = (JObject) JToken.FromObject(gpoResult);
+
+                    // if I were smarter I would have done this shit with the machine and user dirs inside the Process methods instead of calling each one twice out here.
+                    // @liamosaur you reckon you can see how to clean it up after the fact?
+                    // Get the paths for the machine policy and user policy dirs
+                    string machinePolPath = Path.Combine(gpoPath, "Machine");
+                    string userPolPath = Path.Combine(gpoPath, "User");
+
+                    // Process Inf and Xml Policy data for machine and user
+                    JArray machinePolInfResults = ProcessInf(machinePolPath);
+                    JArray userPolInfResults = ProcessInf(userPolPath);
+                    JArray machinePolGppResults = ProcessGpXml(machinePolPath);
+                    JArray userPolGppResults = ProcessGpXml(userPolPath);
+                    JArray machinePolScriptResults = ProcessScriptsIni(machinePolPath);
+                    JArray userPolScriptResults = ProcessScriptsIni(userPolPath);
+
+                    // add all our findings to a JArray in what seems a very inefficient manner.
+                    JArray userFindings = new JArray();
+                    JArray machineFindings = new JArray();
+                    if (machinePolGppResults != null && machinePolGppResults.HasValues)
+                    {
+                        foreach (JObject finding in machinePolGppResults)
+                        {
+                            machineFindings.Add(finding);
+                        }
+                    }
+
+                    if (userPolGppResults != null && userPolGppResults.HasValues)
+                    {
+                        foreach (JObject finding in userPolGppResults)
+                        {
+                            userFindings.Add(finding);
+                        }
+                    }
+
+                    if (machinePolGppResults != null && machinePolInfResults.HasValues)
+                    {
+                        foreach (JObject finding in machinePolInfResults)
+                        {
+                            machineFindings.Add(finding);
+                        }
+                    }
+
+                    if (userPolInfResults != null && userPolInfResults.HasValues)
+                    {
+                        foreach (JObject finding in userPolInfResults)
+                        {
+                            userFindings.Add(finding);
+                        }
+                    }
+
+                    if (machinePolScriptResults != null && machinePolScriptResults.HasValues)
+                    {
+                        foreach (JObject finding in machinePolScriptResults)
+                        {
+                            machineFindings.Add(finding);
+                        }
+                    }
+
+                    if (userPolScriptResults != null && userPolScriptResults.HasValues)
+                    {
+                        foreach (JObject finding in userPolScriptResults)
+                        {
+                            userFindings.Add(finding);
+                        }
+                    }
+
+                    // if there are any Findings, add it to the final output.
+                    if (userFindings.HasValues)
+                    {
+                        JProperty userFindingsJProp = new JProperty("Findings in User Policy", userFindings);
+                        gpoResultJson.Add(userFindingsJProp);
+                    }
+
+                    if (machineFindings.HasValues)
+                    {
+                        JProperty machineFindingsJProp = new JProperty("Findings in Machine Policy", machineFindings);
+                        gpoResultJson.Add(machineFindingsJProp);
+                    }
+
+                    // put into final output
+                    if (userFindings.HasValues || machineFindings.HasValues)
+                    {
+                        grouper2Output.Add(gpoPath, gpoResultJson);
                     }
                 }
-                if (userPolGppResults != null && userPolGppResults.HasValues)
+                catch (UnauthorizedAccessException e)
                 {
-                    foreach (JObject finding in userPolGppResults)
-                    {
-                        userFindings.Add(finding);
-                    }
-                }
-                if (machinePolGppResults != null && machinePolInfResults.HasValues)
-                {
-                    foreach (JObject finding in machinePolInfResults)
-                    {
-                        machineFindings.Add(finding);
-                    }
-                }
-                if (userPolInfResults != null && userPolInfResults.HasValues)
-                {
-                    foreach (JObject finding in userPolInfResults)
-                    {
-                        userFindings.Add(finding);
-                    }
-                }
-                if (machinePolScriptResults != null && machinePolScriptResults.HasValues)
-                {
-                    foreach (JObject finding in machinePolScriptResults)
-                    {
-                        machineFindings.Add(finding);
-                    }
-                }
-                if (userPolScriptResults != null && userPolScriptResults.HasValues)
-                {
-                    foreach (JObject finding in userPolScriptResults)
-                    {
-                        userFindings.Add(finding);
-                    }
-                }
-                // if there are any Findings, add it to the final output.
-                if (userFindings.HasValues)
-                {
-                    JProperty userFindingsJProp = new JProperty("Findings in User Policy", userFindings);
-                    gpoResultJson.Add(userFindingsJProp);
-                }
-
-                if (machineFindings.HasValues)
-                {
-                    JProperty machineFindingsJProp = new JProperty("Findings in Machine Policy", machineFindings);
-                    gpoResultJson.Add(machineFindingsJProp);
-                }
-
-                // put into final output
-                if (userFindings.HasValues || machineFindings.HasValues)
-                {
-                    grouper2Output.Add(gpoPath, gpoResultJson);
+                    Utility.DebugWrite(e.ToString());
                 }
             }
 
-            // Final output is finally happening finally here:
-            Console.WriteLine("RESULT!");
-            Console.WriteLine("");
-            Console.WriteLine(grouper2Output);
-            Console.WriteLine("");
-            // wait for 'anykey'
-            Console.ReadKey();
+            try
+            {
+                // Final output is finally happening finally here:
+                Console.WriteLine("RESULT!");
+                Console.WriteLine("");
+                Console.WriteLine(grouper2Output);
+                Console.WriteLine("");
+                // wait for 'anykey'
+                Console.ReadKey();
+            }
+            catch (Exception e)
+            {
+                Utility.DebugWrite(e.ToString());
+            }
         }
 
 
