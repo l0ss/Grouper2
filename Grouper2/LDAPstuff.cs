@@ -46,10 +46,10 @@ class LDAPstuff
         SID_NAME_USE sidUse;
         // Sid for BUILTIN\Administrators
         SecurityIdentifier sidObj = new SecurityIdentifier(sidString);
-        byte[] Sid = new byte[sidObj.BinaryLength];
-
+        byte[] sidBytes = new byte[sidObj.BinaryLength];
+        sidObj.GetBinaryForm(sidBytes, 0);
         int err = NO_ERROR;
-        if (!LookupAccountSid(null, Sid, name, ref cchName, referencedDomainName, ref cchReferencedDomainName, out sidUse))
+        if (!LookupAccountSid(null, sidBytes, name, ref cchName, referencedDomainName, ref cchReferencedDomainName, out sidUse))
         {
             err = System.Runtime.InteropServices.Marshal.GetLastWin32Error();
             if (err == ERROR_INSUFFICIENT_BUFFER)
@@ -57,7 +57,7 @@ class LDAPstuff
                 name.EnsureCapacity((int)cchName);
                 referencedDomainName.EnsureCapacity((int)cchReferencedDomainName);
                 err = NO_ERROR;
-                if (!LookupAccountSid(null, Sid, name, ref cchName, referencedDomainName, ref cchReferencedDomainName, out sidUse))
+                if (!LookupAccountSid(null, sidBytes, name, ref cchName, referencedDomainName, ref cchReferencedDomainName, out sidUse))
                     err = System.Runtime.InteropServices.Marshal.GetLastWin32Error();
             }
         }
@@ -66,7 +66,16 @@ class LDAPstuff
         else
             Console.WriteLine(@"Error : {0}", err);
 
-        string lookupResult = sidUse + referencedDomainName.ToString() + name.ToString();
+        string lookupResult = "";
+        if (referencedDomainName.ToString().Length > 0)
+        {
+            lookupResult = referencedDomainName.ToString() + "\\" + name.ToString();
+        }
+        else
+        {
+            lookupResult = name.ToString();
+        } 
+
         return lookupResult;
     }
 
