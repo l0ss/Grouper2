@@ -175,6 +175,13 @@ namespace Grouper2
                 Console.WriteLine("Trying to figure out what AD domain we're working with.");
                 string currentDomainString = Domain.GetCurrentDomain().ToString();
                 Console.WriteLine("Current AD Domain is: " + currentDomainString);
+
+                string[] sysvolPolDirs =
+                    Directory.GetDirectories(@"\\" + currentDomainString + @"\sysvol\" + currentDomainString);
+                Console.WriteLine("SYSVOL dir has this stuff in it. If you see NTFRS in any of the folder names there is probably some value in manually targeting each of those dirs for closer looks.\r\n");
+                foreach (string line in sysvolPolDirs) { Console.WriteLine(line);}
+                Console.WriteLine("");
+
                 if (sysvolPolDir == "")
                 {
                     sysvolPolDir = @"\\" + currentDomainString + @"\sysvol\" + currentDomainString + @"\Policies\";
