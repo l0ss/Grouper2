@@ -41,64 +41,31 @@ namespace Grouper2
                     }
                     catch (System.NullReferenceException e)
                     {
-                        //Utility.DebugWrite(e.ToString());
+                        if (GlobalVar.DebugMode)
+                        {
+                            Utility.DebugWrite(e.ToString());
+                        }
                     }
 
                     // add cmdLine to result
-                    assessedScriptIni.Add("Command Line", cmdLine);
-                    if (parameters.Length > 0)
+                    if (GlobalVar.OnlineChecks && (cmdLine.Length > 0))
+                    {
+                        assessedScriptIni.Add("Command Line", Utility.InvestigatePath(cmdLine));
+                    }
+                    else
+                    {
+                        assessedScriptIni.Add("Command Line", cmdLine);
+                    }
+
+                    if (GlobalVar.OnlineChecks && (parameters.Length > 0))
+                    {
+                        assessedScriptIni.Add("Parameters", Utility.InvestigateString(parameters));
+                    }
+                    else
                     {
                         assessedScriptIni.Add("Parameters", parameters);
                     }
-                    // check if the target file path is vulnerable
-                    //TODO some logic to enumerate file ACLS
-
-                    if (GlobalVar.OnlineChecks && (cmdLine.Length > 0))
-                    {
-                        if (Utility.DoesFileExist(cmdLine))
-                        {
-                            assessedScriptIni.Add("Source file exists", "True");
-                            bool writable = false;
-                            // get the file permissions
-                            JObject fileDacls = Utility.GetFileDaclJObject(cmdLine);
-                            if (fileDacls.HasValues)
-                            {
-                                interestLevel = 8;
-                                // TODO fucken figure out how to flag 'interesting' ACLs
-                                assessedScriptIni.Add("File Permissions", fileDacls);
-                            }
-                            // check if the file is writable
-                            writable = Utility.CanIWrite(cmdLine);
-                            if (writable)
-                            {
-                                interestLevel = 10;
-                                assessedScriptIni.Add("Source file writable", "True");
-                            }
-                            else
-                            {
-                                assessedScriptIni.Add("Source file writable", "False");
-                            }
-                        }
-                        else
-                        {
-                            assessedScriptIni.Add("Source file exists", "False");
-                            try
-                            {
-                                string directoryName = Path.GetDirectoryName(cmdLine);
-                                if (directoryName.Length > 0)
-                                {
-                                    JObject directoryDacls = Utility.GetFileDaclJObject(directoryName);
-                                    interestLevel = 7;
-                                    assessedScriptIni.Add("Directory Permissions", directoryDacls);
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                Utility.DebugWrite(e.ToString());
-                            }
-                        }
-
-                    }
+                    
 
                     if (interestLevel >= GlobalVar.IntLevelToShow)
                     {

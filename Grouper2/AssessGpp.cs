@@ -102,43 +102,14 @@ namespace Grouper2
             if (fromPathJToken != null)
             {
                 string fromPath = gppFileProps["@fromPath"].ToString();
-                assessedFile.Add("From Path", fromPath);
                 
                 if (GlobalVar.OnlineChecks && (fromPath.Length > 0))
                 {
-                    if (Utility.DoesFileExist(fromPath))
-                    {
-                        assessedFile.Add("Source file exists", "True");
-                        bool writable = false;
-                        // get the file permissions
-                        JObject fileDacls = Utility.GetFileDaclJObject(fromPath);
-                        if (fileDacls.HasValues)
-                        {
-                            interestLevel = 8;
-                            assessedFile.Add("File Permissions", fileDacls);
-                        }
-
-                        // check if the file is writable
-                        writable = Utility.CanIWrite(fromPath);
-                        if (writable)
-                        {
-                            interestLevel = 10;
-                            assessedFile.Add("Source file writable", "True");
-                        }
-                        else
-                        {
-                            assessedFile.Add("Source file writable", "False");
-                        }
-
-                    }
-                    else
-                    {
-                        assessedFile.Add("Source file exists", "False");
-                        string directoryName = Path.GetDirectoryName(fromPath);
-                        JObject directoryDacls = Utility.GetFileDaclJObject(directoryName);
-                        interestLevel = 7;
-                        assessedFile.Add("Directory Permissions", directoryDacls);
-                    }
+                    assessedFile.Add("From Path", Utility.InvestigatePath(gppFileProps["@fromPath"].ToString()));
+                }
+                else
+                {
+                    assessedFile.Add("From Path", fromPath);
                 }
             }
 
@@ -308,10 +279,13 @@ namespace Grouper2
                 }
                 else
                 {
-                    Utility.DebugWrite("Something went squirrely with Group Memberships");
-                    Utility.DebugWrite(members.Type.ToString());
-                    Utility.DebugWrite(" " + membersType + " ");
-                    Utility.DebugWrite(members.ToString());
+                    if (GlobalVar.DebugMode)
+                    {
+                        Utility.DebugWrite("Something went squirrely with Group Memberships");
+                        Utility.DebugWrite(members.Type.ToString());
+                        Utility.DebugWrite(" " + membersType + " ");
+                        Utility.DebugWrite(members.ToString());
+                    }
                 }
             }
 
@@ -366,7 +340,6 @@ namespace Grouper2
                    assessedShortcuts.Add(gppShortcuts["@uid"].ToString(), assessedShortcut);
                }
             }
-
            return assessedShortcuts;
        }
 
@@ -381,35 +354,26 @@ namespace Grouper2
            string gppShortcutAction = Utility.GetActionString(gppShortcutProps["@action"].ToString());
            assessedShortcut.Add("Action", gppShortcutAction);
            assessedShortcut.Add("Target Type", gppShortcutProps["@targetType"]);
-           assessedShortcut.Add("Arguments", gppShortcutProps["@arguments"]);
-           assessedShortcut.Add("Icon Path", gppShortcutProps["@iconPath"]);
+           string arguments = gppShortcutProps["@arguments"].ToString();
+           assessedShortcut.Add("Arguments", arguments);
+           assessedShortcut.Add("Icon Path", Utility.InvestigatePath(gppShortcutProps["@iconPath"].ToString()));
            assessedShortcut.Add("Icon Index", gppShortcutProps["@iconIndex"]);
            assessedShortcut.Add("Working Directory", gppShortcutProps["@startIn"]);
-           assessedShortcut.Add("Shortcut Path", gppShortcutProps["@shortcutPath"]);
            assessedShortcut.Add("Comment", gppShortcutProps["@comment"]);
 
-            string targetPath = gppShortcutProps["@targetPath"].ToString().Trim();
-           assessedShortcut.Add("Target Path", targetPath);
-           //TODO some logic to check target path file perms and icon Path file perms
-           if (GlobalVar.OnlineChecks && (targetPath.Length > 0))
+           if (GlobalVar.OnlineChecks)
            {
-               bool writable = false;
-               writable = Utility.CanIWrite(targetPath);
-               if (writable)
-               {
-                   interestLevel = 10;
-                   assessedShortcut.Add("From Path Writable", "True");
-               }
-
-               // get the file permissions
-               JObject fileDacls = Utility.GetFileDaclJObject(targetPath);
-               if (fileDacls.HasValues)
-               {
-                   assessedShortcut.Add("File Permissions", fileDacls);
-                   interestLevel = 8;
-               }
-
+               assessedShortcut.Add("Shortcut Path",
+                   Utility.InvestigatePath(gppShortcutProps["@shortcutPath"].ToString()));
+               assessedShortcut.Add("Target Path", Utility.InvestigatePath(gppShortcutProps["@targetPath"].ToString()));
            }
+           else
+           {
+               assessedShortcut.Add("Shortcut Path", gppShortcutProps["@shortcutPath"].ToString());
+               assessedShortcut.Add("Target Path", gppShortcutProps["@targetPath"].ToString());
+            }
+
+           // TODO get the interest levels from the results of InvestigatePath
 
            // if it's too boring to be worth showing, return an empty jobj.
            if (interestLevel < GlobalVar.IntLevelToShow)

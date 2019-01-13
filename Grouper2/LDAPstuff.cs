@@ -33,18 +33,19 @@ class LDAPstuff
       [MarshalAs(UnmanagedType.LPArray)] byte[] Sid,
       StringBuilder lpName,
       ref uint cchName,
-      StringBuilder ReferencedDomainName,
+      StringBuilder referencedDomainName,
       ref uint cchReferencedDomainName,
       out SID_NAME_USE peUse);
 
     public static string GetUserFromSid(string sidString)
     {
+        // stolen wholesale from http://www.pinvoke.net/default.aspx/advapi32.LookupAccountSid
+
         StringBuilder name = new StringBuilder();
         uint cchName = (uint)name.Capacity;
         StringBuilder referencedDomainName = new StringBuilder();
         uint cchReferencedDomainName = (uint)referencedDomainName.Capacity;
         SID_NAME_USE sidUse;
-        // Sid for BUILTIN\Administrators
         SecurityIdentifier sidObj = new SecurityIdentifier(sidString);
         byte[] sidBytes = new byte[sidObj.BinaryLength];
         sidObj.GetBinaryForm(sidBytes, 0);
@@ -61,9 +62,7 @@ class LDAPstuff
                     err = System.Runtime.InteropServices.Marshal.GetLastWin32Error();
             }
         }
-        if (err == 0)
-            Console.WriteLine(@"Found account {0} : {1}\{2}", sidUse, referencedDomainName.ToString(), name.ToString());
-        else
+        if (err != 0)
             Console.WriteLine(@"Error : {0}", err);
 
         string lookupResult = "";

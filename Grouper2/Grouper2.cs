@@ -12,11 +12,14 @@
 
 //  Master TODO list.
 //
-//  System.ArgumentNullException: Value cannot be null.
-//  at Newtonsoft.Json.Linq.JToken.FromObjectInternal(Object o, JsonSerializer jsonSerialiser
+//  AssessPath function
+//  AssessString should feed it.
 //
-//  Handle access denied for each policy dir
-//  seeing system.io.directory.getfiles barf an unauthorisedaccessexception
+//  Add to PolData 'interesting file extensions' list
+//
+//  Write Utility.AreFileContentsInteresting(inPath);
+//
+//  Decide if thing is to interesting at the ‘finding’ level.Do the whole thing on points. 
 //
 //  Expand use of 'interest levels' and maybe break the definition of interest levels into a config file
 //      inf Group memberships
@@ -57,6 +60,11 @@
 //  Parse or at least identify the presence of custom adm templates.
 //  Resolve SIDS in inf file GroupMemberships as part of OnlineChecks
 //  niceify the output, maybe some colours?
+
+// put in GPOProperties
+// get the policy owner
+// get whether it's linked and where
+// get whether it's enabled
 
 using Newtonsoft.Json.Linq;
 using System;
@@ -124,11 +132,6 @@ namespace Grouper2
             try
             {
                 parser.ParseCommandLine(args);
-                //parser.ShowParsedArguments();
-                //if (debugArg.Parsed && debugArg.Value)
-                //{
-                //    GlobalVar.DebugMode = true;
-                //}
                 if (offlineArg.Parsed && offlineArg.Value && sysvolArg.Parsed)
                 {
                     // args config for valid offline run.
@@ -141,6 +144,7 @@ namespace Grouper2
                     Console.WriteLine("Offline mode requires you to provide a value for -s, the path where Grouper2 can find the domain SYSVOL share, or a copy of it at least.");
                     Environment.Exit(1);
                 }
+
                 if (intlevArg.Parsed)
                 {
                     // handle interest level parsing
@@ -156,11 +160,6 @@ namespace Grouper2
                 {
                     sysvolPolDir = sysvolArg.Value;
                 }
-                //if (domainArg.Parsed || usernameArg.Parsed || passwordArg.Parsed)
-                //{
-                //    Console.WriteLine("I haven't set up anything to handle the domain/password stuff yet, so it won't work");
-                //    Environment.Exit(1);
-                //}
             }
             catch (CommandLineException e)
             {
@@ -199,7 +198,7 @@ namespace Grouper2
                 }
                 catch (Exception e)
                 {
-                    Utility.DebugWrite("Failed to get Domain GPO Data from DC.");
+                    Utility.DebugWrite("Failed to get all the GPO Data from DC.");
                     Utility.DebugWrite(e.ToString());
                 }
             }
@@ -236,13 +235,22 @@ namespace Grouper2
                     {
                         try
                         {
+                            // select the GPO's details from the gpo data we got
                             JToken domainGpo = domainGpos[gpoUid];
                             gpoProps = (JObject) JToken.FromObject(domainGpo);
                         }
-                        catch (Exception e)
+                        catch (ArgumentNullException e)
                         {
-                            Utility.DebugWrite("Failed to select GPO Properties for GPO: " + gpoUid);
-                            Utility.DebugWrite(e.ToString());
+                            Utility.DebugWrite("Couldn't get GPO Properties from the domain for the following GPO: " + gpoUid);
+                            if (GlobalVar.DebugMode) {
+                                Utility.DebugWrite(e.ToString());
+                            }
+                            // if we weren't able to select the GPO's details, do what we can with what we have.
+                            gpoProps = new JObject()
+                            {
+                                {"gpoUID", gpoUid},
+                                {"gpoPath", gpoPath}
+                            };
                         }
                     }
                     // otherwise do what we can with what we have
@@ -255,10 +263,6 @@ namespace Grouper2
                         };
                     }
 
-                    // TODO (and put in GPOProps)
-                    // get the policy owner
-                    // get whether it's linked and where
-                    // get whether it's enabled
 
                     // Add all this crap into a dict, if we found anything of interest.
                     gpoResult.Add("GPOProps", gpoProps);
@@ -279,7 +283,7 @@ namespace Grouper2
                     JArray machinePolScriptResults = ProcessScriptsIni(machinePolPath);
                     JArray userPolScriptResults = ProcessScriptsIni(userPolPath);
 
-                    // add all our findings to a JArray in what seems a very inefficient manner.
+                    // add all our findings to a JArray in what seems a very inefficient manner but it's the only way i could see to avoid having a JArray of JArrays of Findings.
                     JArray userFindings = new JArray();
                     JArray machineFindings = new JArray();
                     if (machinePolGppResults != null && machinePolGppResults.HasValues)
@@ -380,8 +384,20 @@ namespace Grouper2
             {
                 gpttmplInfFiles = Directory.GetFiles(Path, "GptTmpl.inf", SearchOption.AllDirectories).ToList();
             }
-            catch (System.IO.DirectoryNotFoundException)
+            catch (System.IO.DirectoryNotFoundException e)
             {
+                if (GlobalVar.DebugMode)
+                {
+                    Utility.DebugWrite(e.ToString());
+                }
+                return null;
+            }
+            catch (System.UnauthorizedAccessException e)
+            {
+                if (GlobalVar.DebugMode)
+                {
+                    Utility.DebugWrite(e.ToString());
+                }
                 return null;
             }
 

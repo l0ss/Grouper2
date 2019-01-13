@@ -1169,14 +1169,34 @@
     ]
   },
 
+  "interestingExtensions": [
+    "exe",
+    "msi",
+    "bat",
+    "lnk",
+    "hta",
+    "ps1",
+	"vba",
+	"vbs",
+	"config",
+	"ini",
+	"cfg",
+	"conf",
+	"scr"
+  ],
 
-
-  "InterestingWords": [
+  "interestingWords": [
     "vnc",
     "vpn",
     "pwd",
     "cred",
     "key",
-    "pass"
+    "pass",
+	"powershell",
+	"cmd",
+	"command",
+	"path",
+	"config",
+	"conf"
   ]
 }
