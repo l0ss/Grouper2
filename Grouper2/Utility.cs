@@ -94,9 +94,9 @@ namespace Grouper2
                 return new JObject(new JProperty("I don't think there's a path here", inPath));
             }
 
-            if (fileName.Contains("http"))
+            if (fileName.Contains("http://"))
             {
-
+                return new JObject(new JProperty("I think this is a URL not a file path", inPath));
             }
 
             if (fileName.Contains('%'))
@@ -137,7 +137,7 @@ namespace Grouper2
                     if (fileReadable)
                     {
                         // TODO write this method
-                        //fileContentsInteresting = Utility.AreFileContentsInteresting(inPath);
+                        //interestingWordsFromFile = Utility.GetInterestingWordsFromFile(inPath);
                     }
                     // get the file permissions
                     fileDacls = Utility.GetFileDaclJObject(inPath);
@@ -149,7 +149,7 @@ namespace Grouper2
                     {
                         dirDacls = Utility.GetFileDaclJObject(dirPath);
                         string dirWriteTestPath = Path.Combine(dirPath, "testFileFromGrouper2Assessment.txt");
-                        // this is fucking gross and messy but I can't think of a better way of doing it. ideally I want to delete these if i create them but putting File.Delete anywhere in this gives me the willies.
+                        //TODO this is fucking gross and messy but I can't think of a better way of doing it. ideally I want to delete these if i create them but putting File.Delete anywhere in this gives me the willies.
                         dirWritable = Utility.CanIWrite(dirWriteTestPath);
                     }
                 }
@@ -295,7 +295,6 @@ namespace Grouper2
                     }
                 }
             }
-
             return filePathAssessment;
         }
 
@@ -398,10 +397,12 @@ namespace Grouper2
 
         public static JObject InvestigateString(string inString)
         // general purpose method for returning some information about why a string might be interesting.
+        // TODO finish this
         {
-            
+
+            JObject investigationResults = new JObject();
             // make a list to put any interesting words we find in it
-            List<string> interestingWordsFound = new List<string>();
+            JArray interestingWordsFound = new JArray();
             // refer to our master list of interesting words
             JArray interestingWords = (JArray) JankyDb.Instance["interestingWords"];
             foreach (string interestingWord in interestingWords)
@@ -425,12 +426,9 @@ namespace Grouper2
 
             foreach (string word in interestingWordsFound)
             {
-                Utility.DebugWrite(word);
+                Utility.DebugWrite("I found the word " + word + " in the string: " + inString);
             }
-
-            JObject investigationResults = new JObject();
-
-
+            
             return investigationResults;
         }
 

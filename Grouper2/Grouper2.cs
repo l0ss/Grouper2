@@ -12,7 +12,6 @@
 
 //  Master TODO list.
 //
-//  AssessPath function
 //  AssessString should feed it.
 //
 //  Add to PolData 'interesting file extensions' list
