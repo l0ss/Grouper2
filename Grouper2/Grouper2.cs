@@ -10,60 +10,6 @@
  *                        By Mike Loss (@mikeloss)                                                
  */
 
-//  Master TODO list.
-//
-//  AssessString should feed it.
-//
-//  Add to PolData 'interesting file extensions' list
-//
-//  Write Utility.AreFileContentsInteresting(inPath);
-//
-//  Decide if thing is to interesting at the ‘finding’ level.Do the whole thing on points. 
-//
-//  Expand use of 'interest levels' and maybe break the definition of interest levels into a config file
-//      inf Group memberships
-//
-//  Parse missing inf sections:
-//      File Security
-//
-//  Assess other inf sections properly:
-//      System Access
-//      Kerberos Policy
-//      Event Audit
-//      Registry Values
-//      Scheduled tasks
-//      Registry Keys
-//      Service General Setting
-//
-//  Assess more GPP types properly:
-//      Reg Settings
-//      Drives
-//      Environment Variables
-//      NT Services
-//      Network Options
-//      Folders
-//      Network Shares
-//      INI Files
-//      Scheduled Tasks (Work in progress)
-//
-//  
-//  Grep scripts for creds.
-//  grep arguments/cmd line param strings for substrings indicating possible credentials
-//  Enumerate File permissions for referenced files.
-//  Parse Registry.pol
-//  Parse Machine\Applications\*.AAS (assigned applications?
-//  figure out what happened to MSI files?
-//  Parse SDDL in 'Service General Settings'
-//  Figure out file ACL checks on file paths found in Scheduled Task arguments or Startup Scripts etc
-//  Parse 'Comment.cmtx' files?
-//  Parse or at least identify the presence of custom adm templates.
-//  Resolve SIDS in inf file GroupMemberships as part of OnlineChecks
-//  niceify the output, maybe some colours?
-
-// put in GPOProperties
-// get the policy owner
-// get whether it's linked and where
-// get whether it's enabled
 
 using Newtonsoft.Json.Linq;
 using System;
