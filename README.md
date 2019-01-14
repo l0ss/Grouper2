@@ -14,8 +14,11 @@ It might also be useful for other people doing other stuff, but it is explicitly
 Where Grouper required you to:
 
 a) have GPMC/RSAT/whatever installed on a domain-joined computer
+
 b) generate an xml report with the Get-GPOReport PowerShell cmdlet
+
 c) feed the report to Grouper
+
 d) a bunch of gibberish falls out and hopefully you understand what it means enough to 
 
 Grouper2 does like Mr Ed suggests and goes straight to the source, i.e. SYSVOL. This means you don't have the horrible dependency on Get-GPOReport (hooray!) but it also means that it has to do a bunch of parsing of different file formats and so on (booo!).
@@ -49,41 +52,5 @@ At a high level Grouper2 does like this:
 
 ## What remains to be done?
 
-Heaps. I'm writing this rough outline first but then I'm going to start writing up issues so hopefully people can chip in.
-
-- Nicen up the output. Json is nice and structured but it's not SUPER legible. Something 'columns n colours' like Grouper had would be fine I guess?
-
-- Assessment functions are still needed for the following categories:
-  - System Access
-  - Kerberos Policy
-  - Registry Values
-  - Registry Keys (not the same as registry values)
-  - Service General Setting
-  - GPP Registry Settings (not the same as registry values or registry keys)
-  - GPP Drives
-  - GPP NT Services
-  - GPP Network Options
-  - GPP Folders
-  - GPP Network Shares
-  - GPP INI Files
-  - GPP Scheduled Tasks (this one is a real pig)
-
-- Finish the half-written Utility.InvestigateString method. This is meant to be a general purpose method for assessing stuff like cmdline parameters for scheduled tasks or shortcuts etc to see if they're passing passwords or passing scripts as arguments.
-  
-- Unfuck the 'interest level' system and reimplement it in some of the assess functions that are missing it.
-
-- Parse a few of the file types in SYSVOL that I haven't yet written parsers for:
-  - Write a parser for Comment.cmtx files
-  - Write a parser for Registry.pol files
-  - Write a parser for .AAS files
-  - Figure out where MSI files went. Are they AAS files?
-  - Parse or at least identify the presence of custom adm/admx templates
-
-- Gather more detail on each GPO via LDAP, particularly:
-  - Policy Owner
-  - Is the GPO linked? Where?
-  - Is the GPO enabled?
-
-- Implement multithreading. G2 is pretty slow and "Online Mode" in particular will benefit a lot from it. To the extent that multithreading is ever straightforward, it should be reasonably straightforward to just have each thread process a single GPO.
-
-- Generally unfuck my awful code.
+Heaps. Have a look in the Issues for the repo and just start chewing I guess.
+If you want to discuss via Slack you can ping me (l0ss) on the BloodHound Slack, joinable at https://bloodhoundgang.herokuapp.com/.
