@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Grouper2")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Vagrant")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Grouper2")]
 [assembly: AssemblyCopyright("Copyright © Mike Loss 2018")]
 [assembly: AssemblyTrademark("")]

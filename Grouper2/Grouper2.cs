@@ -41,6 +41,35 @@ namespace Grouper2
         }
     }
 
+    public static class GetDomainGpoData
+    {
+        private static JObject _domainGpoData;
+
+        public static JObject DomainGpoData
+        {
+            get
+            {
+                if (_domainGpoData == null)
+                {
+                    try
+                    {
+                        _domainGpoData = LDAPstuff.GetDomainGpos();
+                    }
+                    catch (Exception e)
+                    {
+                        Utility.DebugWrite("Failed to get all the GPO Data from DC.");
+                        Utility.DebugWrite(e.ToString());
+                        _domainGpoData = new JObject();
+                    }
+                    
+                    //do stuff
+                }
+
+                return _domainGpoData;
+            }
+        }
+    }
+
     public class GlobalVar
     {
         public static bool OnlineChecks;
@@ -111,7 +140,6 @@ namespace Grouper2
                 Console.WriteLine(e.Message);
             }
 
-            JObject domainGpos = new JObject();
 
             // Ask the DC for GPO details
             if (GlobalVar.OnlineChecks)
@@ -135,17 +163,11 @@ namespace Grouper2
             Console.WriteLine("Targeting SYSVOL at: " + sysvolPolDir);
 
             // if we're online, get a bunch of metadata about the GPOs via LDAP
+            JObject domainGpos = new JObject();
+
             if (GlobalVar.OnlineChecks)
             {
-                try
-                {
-                    domainGpos = LDAPstuff.GetDomainGpos();
-                }
-                catch (Exception e)
-                {
-                    Utility.DebugWrite("Failed to get all the GPO Data from DC.");
-                    Utility.DebugWrite(e.ToString());
-                }
+                domainGpos = GetDomainGpoData.DomainGpoData;
             }
 
             List<string> gpoPaths = new List<string>();
@@ -163,144 +185,12 @@ namespace Grouper2
             JObject grouper2Output = new JObject();
             // so for each uid directory (including ones with that dumb broken domain replication condition)
             // we're going to gather up all our goodies and put them into that dict we just created.
-            foreach (var gpoPath in gpoPaths)
+            foreach (string gpoPath in gpoPaths)
             {
-                try
+                JObject gpoFindings = ProcessGpo(gpoPath);
+                if (gpoFindings.HasValues)
                 {
-                    // create a dict to put the stuff we find for this GPO into.
-                    JObject gpoResult = new JObject();
-                    // Get the UID of the GPO from the file path.
-                    string[] splitPath = gpoPath.Split(Path.DirectorySeparatorChar);
-                    string gpoUid = splitPath[splitPath.Length - 1];
-
-                    // Make a JObject for GPO metadata
-                    JObject gpoProps = new JObject();
-                    // If we're online and talking to the domain, just use that data
-                    if (GlobalVar.OnlineChecks)
-                    {
-                        try
-                        {
-                            // select the GPO's details from the gpo data we got
-                            JToken domainGpo = domainGpos[gpoUid];
-                            gpoProps = (JObject) JToken.FromObject(domainGpo);
-                        }
-                        catch (ArgumentNullException e)
-                        {
-                            Utility.DebugWrite("Couldn't get GPO Properties from the domain for the following GPO: " + gpoUid);
-                            if (GlobalVar.DebugMode) {
-                                Utility.DebugWrite(e.ToString());
-                            }
-                            // if we weren't able to select the GPO's details, do what we can with what we have.
-                            gpoProps = new JObject()
-                            {
-                                {"gpoUID", gpoUid},
-                                {"gpoPath", gpoPath}
-                            };
-                        }
-                    }
-                    // otherwise do what we can with what we have
-                    else
-                    {
-                        gpoProps = new JObject()
-                        {
-                            {"gpoUID", gpoUid},
-                            {"gpoPath", gpoPath}
-                        };
-                    }
-
-
-                    // Add all this crap into a dict, if we found anything of interest.
-                    gpoResult.Add("GPOProps", gpoProps);
-                    // turn dict of data for this gpo into jobj
-                    JObject gpoResultJson = (JObject) JToken.FromObject(gpoResult);
-
-                    // if I were smarter I would have done this shit with the machine and user dirs inside the Process methods instead of calling each one twice out here.
-                    // @liamosaur you reckon you can see how to clean it up after the fact?
-                    // Get the paths for the machine policy and user policy dirs
-                    string machinePolPath = Path.Combine(gpoPath, "Machine");
-                    string userPolPath = Path.Combine(gpoPath, "User");
-
-                    // Process Inf and Xml Policy data for machine and user
-                    JArray machinePolInfResults = ProcessInf(machinePolPath);
-                    JArray userPolInfResults = ProcessInf(userPolPath);
-                    JArray machinePolGppResults = ProcessGpXml(machinePolPath);
-                    JArray userPolGppResults = ProcessGpXml(userPolPath);
-                    JArray machinePolScriptResults = ProcessScriptsIni(machinePolPath);
-                    JArray userPolScriptResults = ProcessScriptsIni(userPolPath);
-
-                    // add all our findings to a JArray in what seems a very inefficient manner but it's the only way i could see to avoid having a JArray of JArrays of Findings.
-                    JArray userFindings = new JArray();
-                    JArray machineFindings = new JArray();
-                    if (machinePolGppResults != null && machinePolGppResults.HasValues)
-                    {
-                        foreach (JObject finding in machinePolGppResults)
-                        {
-                            machineFindings.Add(finding);
-                        }
-                    }
-
-                    if (userPolGppResults != null && userPolGppResults.HasValues)
-                    {
-                        foreach (JObject finding in userPolGppResults)
-                        {
-                            userFindings.Add(finding);
-                        }
-                    }
-
-                    if (machinePolGppResults != null && machinePolInfResults.HasValues)
-                    {
-                        foreach (JObject finding in machinePolInfResults)
-                        {
-                            machineFindings.Add(finding);
-                        }
-                    }
-
-                    if (userPolInfResults != null && userPolInfResults.HasValues)
-                    {
-                        foreach (JObject finding in userPolInfResults)
-                        {
-                            userFindings.Add(finding);
-                        }
-                    }
-
-                    if (machinePolScriptResults != null && machinePolScriptResults.HasValues)
-                    {
-                        foreach (JObject finding in machinePolScriptResults)
-                        {
-                            machineFindings.Add(finding);
-                        }
-                    }
-
-                    if (userPolScriptResults != null && userPolScriptResults.HasValues)
-                    {
-                        foreach (JObject finding in userPolScriptResults)
-                        {
-                            userFindings.Add(finding);
-                        }
-                    }
-
-                    // if there are any Findings, add it to the final output.
-                    if (userFindings.HasValues)
-                    {
-                        JProperty userFindingsJProp = new JProperty("Findings in User Policy", userFindings);
-                        gpoResultJson.Add(userFindingsJProp);
-                    }
-
-                    if (machineFindings.HasValues)
-                    {
-                        JProperty machineFindingsJProp = new JProperty("Findings in Machine Policy", machineFindings);
-                        gpoResultJson.Add(machineFindingsJProp);
-                    }
-
-                    // put into final output
-                    if (userFindings.HasValues || machineFindings.HasValues)
-                    {
-                        grouper2Output.Add(gpoPath, gpoResultJson);
-                    }
-                }
-                catch (UnauthorizedAccessException e)
-                {
-                    Utility.DebugWrite(e.ToString());
+                    grouper2Output.Add(gpoPath, gpoFindings);
                 }
             }
 
@@ -320,6 +210,149 @@ namespace Grouper2
             }
         }
 
+        private static JObject ProcessGpo(string gpoPath)
+        {
+            try
+            {
+                // create a dict to put the stuff we find for this GPO into.
+                JObject gpoResult = new JObject();
+                // Get the UID of the GPO from the file path.
+                string[] splitPath = gpoPath.Split(Path.DirectorySeparatorChar);
+                string gpoUid = splitPath[splitPath.Length - 1];
+
+                // Make a JObject for GPO metadata
+                JObject gpoProps = new JObject();
+                // If we're online and talking to the domain, just use that data
+                if (GlobalVar.OnlineChecks)
+                {
+                    try
+                    {
+                        // select the GPO's details from the gpo data we got
+                        JToken domainGpo = GetDomainGpoData.DomainGpoData[gpoUid];
+                        gpoProps = (JObject)JToken.FromObject(domainGpo);
+                    }
+                    catch (ArgumentNullException e)
+                    {
+                        Utility.DebugWrite("Couldn't get GPO Properties from the domain for the following GPO: " + gpoUid);
+                        if (GlobalVar.DebugMode)
+                        {
+                            Utility.DebugWrite(e.ToString());
+                        }
+                        // if we weren't able to select the GPO's details, do what we can with what we have.
+                        gpoProps = new JObject()
+                            {
+                                {"gpoUID", gpoUid},
+                                {"gpoPath", gpoPath}
+                            };
+                    }
+                }
+                // otherwise do what we can with what we have
+                else
+                {
+                    gpoProps = new JObject()
+                        {
+                            {"gpoUID", gpoUid},
+                            {"gpoPath", gpoPath}
+                        };
+                }
+
+
+                // Add all this crap into a dict, if we found anything of interest.
+                gpoResult.Add("GPOProps", gpoProps);
+                // turn dict of data for this gpo into jobj
+                JObject gpoResultJson = (JObject)JToken.FromObject(gpoResult);
+
+                // if I were smarter I would have done this shit with the machine and user dirs inside the Process methods instead of calling each one twice out here.
+                // @liamosaur you reckon you can see how to clean it up after the fact?
+                // Get the paths for the machine policy and user policy dirs
+                string machinePolPath = Path.Combine(gpoPath, "Machine");
+                string userPolPath = Path.Combine(gpoPath, "User");
+
+                // Process Inf and Xml Policy data for machine and user
+                JArray machinePolInfResults = ProcessInf(machinePolPath);
+                JArray userPolInfResults = ProcessInf(userPolPath);
+                JArray machinePolGppResults = ProcessGpXml(machinePolPath);
+                JArray userPolGppResults = ProcessGpXml(userPolPath);
+                JArray machinePolScriptResults = ProcessScriptsIni(machinePolPath);
+                JArray userPolScriptResults = ProcessScriptsIni(userPolPath);
+
+                // add all our findings to a JArray in what seems a very inefficient manner but it's the only way i could see to avoid having a JArray of JArrays of Findings.
+                JArray userFindings = new JArray();
+                JArray machineFindings = new JArray();
+                if (machinePolGppResults != null && machinePolGppResults.HasValues)
+                {
+                    foreach (JObject finding in machinePolGppResults)
+                    {
+                        machineFindings.Add(finding);
+                    }
+                }
+
+                if (userPolGppResults != null && userPolGppResults.HasValues)
+                {
+                    foreach (JObject finding in userPolGppResults)
+                    {
+                        userFindings.Add(finding);
+                    }
+                }
+
+                if (machinePolGppResults != null && machinePolInfResults.HasValues)
+                {
+                    foreach (JObject finding in machinePolInfResults)
+                    {
+                        machineFindings.Add(finding);
+                    }
+                }
+
+                if (userPolInfResults != null && userPolInfResults.HasValues)
+                {
+                    foreach (JObject finding in userPolInfResults)
+                    {
+                        userFindings.Add(finding);
+                    }
+                }
+
+                if (machinePolScriptResults != null && machinePolScriptResults.HasValues)
+                {
+                    foreach (JObject finding in machinePolScriptResults)
+                    {
+                        machineFindings.Add(finding);
+                    }
+                }
+
+                if (userPolScriptResults != null && userPolScriptResults.HasValues)
+                {
+                    foreach (JObject finding in userPolScriptResults)
+                    {
+                        userFindings.Add(finding);
+                    }
+                }
+
+                // if there are any Findings, add it to the final output.
+                if (userFindings.HasValues)
+                {
+                    JProperty userFindingsJProp = new JProperty("Findings in User Policy", userFindings);
+                    gpoResultJson.Add(userFindingsJProp);
+                }
+
+                if (machineFindings.HasValues)
+                {
+                    JProperty machineFindingsJProp = new JProperty("Findings in Machine Policy", machineFindings);
+                    gpoResultJson.Add(machineFindingsJProp);
+                }
+
+                // put into final output
+                if (userFindings.HasValues || machineFindings.HasValues)
+                {
+                    return gpoResultJson;
+                }
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                Utility.DebugWrite(e.ToString());
+            }
+
+            return null;
+        }
 
         private static JArray ProcessInf(string Path)
         {

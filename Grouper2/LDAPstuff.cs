@@ -97,7 +97,7 @@ class LDAPstuff
 
             SearchResultCollection gpoSearchResults = gpoSearcher.FindAll();
 
-            // stolen from prashant - grabbing guids
+            // stolen from prashant - grabbing guids for extended rights
             Dictionary<string, string> guidDict = new Dictionary<string, string>();
             guidDict.Add("00000000-0000-0000-0000-000000000000", "All");
 
