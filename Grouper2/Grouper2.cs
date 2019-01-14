@@ -78,6 +78,7 @@ namespace Grouper2
         public static bool OnlineChecks;
         public static int IntLevelToShow;
         public static bool DebugMode;
+        public static List<string> CleanupList;
     }
 
     internal class Grouper2
@@ -282,10 +283,23 @@ namespace Grouper2
 
             DateTime grouper2EndTime = DateTime.Now;
 
+
+
             TimeSpan grouper2RunTime = grouper2EndTime.Subtract(grouper2StartTime);
             string grouper2RunTimeString = String.Format("{0}:{1}:{2}:{3}", grouper2RunTime.Hours, grouper2RunTime.Minutes, grouper2RunTime.Seconds, grouper2RunTime.Milliseconds);
 
             Console.WriteLine("Grouper2 took " + grouper2RunTimeString + " to run.");
+
+            if (GlobalVar.CleanupList != null)
+            {
+                Console.WriteLine("");
+                Console.WriteLine("Grouper tried to create these files. It probably failed but just in case it didn't, you might want to clean them up.");
+                foreach (string path in GlobalVar.CleanupList)
+                {
+                    Console.WriteLine(path);
+                }
+            }
+
             Console.WriteLine("Press any key to exit.");
             // wait for 'anykey'
             Console.ReadKey();

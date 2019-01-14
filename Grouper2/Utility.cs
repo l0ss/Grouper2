@@ -93,12 +93,12 @@ namespace Grouper2
                 return new JObject(new JProperty("I don't think there's a path here", inPath));
             }
 
-            if (fileName.Contains("http://"))
+            if (inPath.Contains("http://"))
             {
                 return new JObject(new JProperty("I think this is a URL not a file path", inPath));
             }
 
-            if (fileName.Contains('%'))
+            if (inPath.Contains('%'))
             {
                 return new JObject(new JProperty("I think this path contains an environment variable so I can't assess it properly", inPath));
             }
@@ -157,6 +157,7 @@ namespace Grouper2
                     {
                         dirDacls = Utility.GetFileDaclJObject(dirPath);
                         string dirWriteTestPath = Path.Combine(dirPath, "testFileFromGrouper2Assessment.txt");
+                        GlobalVar.CleanupList.Add(dirWriteTestPath);
                         //TODO this is fucking gross and messy but I can't think of a better way of doing it. ideally I want to delete these if i create them but putting File.Delete anywhere in this gives me the willies.
                         dirWritable = Utility.CanIWrite(dirWriteTestPath);
                     }
@@ -178,7 +179,7 @@ namespace Grouper2
                         {
                             Utility.DebugWrite(e.ToString());
                         }
-                        return new JObject(new JProperty("This doesn't seem to be a file path", dirPath));
+                        return new JObject(new JProperty("This doesn't seem to be a file path", inPath));
                     }
 
                     // get the first parent dir
@@ -213,6 +214,7 @@ namespace Grouper2
                             // set up a path for us to try and write to
                             string parentDirWriteTestPath =
                                 Path.Combine(parentDirTestPath, "testFileFromGrouper2Assessment.txt");
+                            GlobalVar.CleanupList.Add(parentDirWriteTestPath);
                             // this is fucking gross and messy but I can't think of a better way of doing it. ideally I want to delete these if i create them but putting File.Delete anywhere in this gives me the willies.
                             // try to write to it
                             parentDirWritable = Utility.CanIWrite(parentDirWriteTestPath);
