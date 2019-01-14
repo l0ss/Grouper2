@@ -14,8 +14,11 @@ It might also be useful for other people doing other stuff, but it is explicitly
 Where Grouper required you to:
 
 a) have GPMC/RSAT/whatever installed on a domain-joined computer
+
 b) generate an xml report with the Get-GPOReport PowerShell cmdlet
+
 c) feed the report to Grouper
+
 d) a bunch of gibberish falls out and hopefully you understand what it means enough to 
 
 Grouper2 does like Mr Ed suggests and goes straight to the source, i.e. SYSVOL. This means you don't have the horrible dependency on Get-GPOReport (hooray!) but it also means that it has to do a bunch of parsing of different file formats and so on (booo!).
