@@ -93,16 +93,26 @@ namespace Grouper2
                 return new JObject(new JProperty("I don't think there's a path here", inPath));
             }
 
-            if (inPath.Contains("http://"))
+            if (inPath.Contains("http://") || inPath.Contains("https://"))
             {
-                return new JObject(new JProperty("I think this is a URL not a file path", inPath));
+                return new JObject(new JProperty("I think this is an HTTP/S URL, not a file path", inPath));
+            }
+
+            if (inPath.Contains("://"))
+            {
+                return new JObject(new JProperty("I think this is some weird non-http URL.", inPath));
             }
 
             if (inPath.Contains('%'))
             {
-                return new JObject(new JProperty("I think this path contains an environment variable so I can't assess it properly", inPath));
+                return new JObject(new JProperty("I think this path contains an environment variable so I can't assess it properly. Maybe do it manually?", inPath));
             }
 
+            // if it doesn't seem to have any path separators it's probably a single file on sysvol.
+            if (!inPath.Contains('\\'))
+            {
+                return new JObject(new JProperty("I think this is a single file on sysvol.", inPath));
+            }
             // figure out if it's a file path or just a directory
             if (fileName == "")
             {
