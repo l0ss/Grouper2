@@ -73,12 +73,14 @@ namespace Grouper2
         }
     }
 
-    public class GlobalVar
+
+public class GlobalVar
     {
         public static bool OnlineChecks;
         public static int IntLevelToShow;
         public static bool DebugMode;
-        public static List<string> CleanupList;
+        
+        public static List<String> CleanupList = new List<string>();
     }
 
     internal class Grouper2
