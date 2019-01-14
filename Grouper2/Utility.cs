@@ -27,6 +27,10 @@ namespace Grouper2
                 return null;
             }
 
+            long fileSize = new System.IO.FileInfo(inPath).Length;
+
+            Utility.DebugWrite(fileSize.ToString());
+
             // TODO - check if file is too big to handle
 
             // get our list of interesting words
@@ -401,6 +405,8 @@ namespace Grouper2
         {
 
             JObject investigationResults = new JObject();
+
+            investigationResults.Add("Value", inString);
             // make a list to put any interesting words we find in it
             JArray interestingWordsFound = new JArray();
             // refer to our master list of interesting words
@@ -413,21 +419,32 @@ namespace Grouper2
                 }
             }
 
+            if (interestingWordsFound.Count > 0)
+            {
+                investigationResults.Add("String contained interesting key words", interestingWordsFound);
+            }
+
+            // TODO for each of these I need to separate out the interesting part of the string from the rest of it.
+
             if (inString.ToLower().Contains("\\\\"))
             {
-                Utility.DebugWrite("Think I found a UNC path: " + inString);
-                //do something here to investigate the path.
+                investigationResults.Add("Possible UNC path", inString);
+                //Utility.DebugWrite("Think I found a UNC path: " + inString);
+                //TODO do something here to investigate the path.
             }
 
             if (inString.ToLower().Contains(":\\"))
             {
-                Utility.DebugWrite("Maybe this is a path with a drive letter?");
+                investigationResults.Add("Possible file path", inString);
+                //Utility.DebugWrite("Maybe this is a path with a drive letter?");
             }
 
-            foreach (string word in interestingWordsFound)
+            if (inString.ToLower().Contains("http"))
             {
-                Utility.DebugWrite("I found the word " + word + " in the string: " + inString);
+                investigationResults.Add("Possible URL", inString);
             }
+
+            
             
             return investigationResults;
         }

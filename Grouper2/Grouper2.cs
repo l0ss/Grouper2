@@ -242,8 +242,10 @@ namespace Grouper2
                 gpoTasks.Add(t);
             }
             
-            
+            // 
             Task[] gpoTaskArray = gpoTasks.ToArray();
+
+            // create a little counter to provide status updates
             int totalTasksCount = gpoTaskArray.Length;
             int incompleteTaskCount = gpoTaskArray.Length;
             Console.WriteLine("");
@@ -252,7 +254,6 @@ namespace Grouper2
                 Task[] incompleteTasks =
                     Array.FindAll(gpoTaskArray, element => element.Status != TaskStatus.RanToCompletion);
                 incompleteTaskCount = incompleteTasks.Length;
-
 
                 int completeTaskCount = totalTasksCount - incompleteTaskCount;
                 int percentage = (int)Math.Round((double)(100 * completeTaskCount) / totalTasksCount);
@@ -264,7 +265,6 @@ namespace Grouper2
             // make double sure tasks all finished
             Task.WaitAll(gpoTasks.ToArray());
             cts.Dispose();
-            Utility.DebugWrite("Finished all tasks");
 
             try
             {
