@@ -225,9 +225,12 @@ namespace Grouper2
                 Task t = gpoFactory.StartNew(() =>
                 {
                     JObject gpoFindings = ProcessGpo(gpoPath);
-                    if (gpoFindings.HasValues)
+                    if (gpoFindings != null)
                     {
-                        grouper2Output.Add(gpoPath, gpoFindings);
+                        if (gpoFindings.HasValues)
+                        {
+                            grouper2Output.Add(gpoPath, gpoFindings);
+                        }
                     }
                 }, cts.Token);
                 gpoTasks.Add(t);
