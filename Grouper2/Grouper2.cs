@@ -219,6 +219,9 @@ namespace Grouper2
             TaskFactory gpoFactory = new TaskFactory(lcts);
             CancellationTokenSource cts = new CancellationTokenSource();
 
+            Console.WriteLine(gpoPaths.Count.ToString() + " GPOs to process.");
+            Console.WriteLine("Starting processing with " + maxThreads.ToString() + " threads.");
+
             // Create a task for each GPO
             foreach (string gpoPath in gpoPaths)
             {
@@ -229,16 +232,39 @@ namespace Grouper2
                     {
                         if (gpoFindings.HasValues)
                         {
-                            grouper2Output.Add(gpoPath, gpoFindings);
+                            lock (grouper2Output)
+                            {
+                                grouper2Output.Add(gpoPath, gpoFindings);
+                            }
                         }
                     }
                 }, cts.Token);
                 gpoTasks.Add(t);
             }
+            
+            
+            Task[] gpoTaskArray = gpoTasks.ToArray();
+            int totalTasksCount = gpoTaskArray.Length;
+            int incompleteTaskCount = gpoTaskArray.Length;
+            Console.WriteLine("");
+            while (incompleteTaskCount > 0)
+            {
+                Task[] incompleteTasks =
+                    Array.FindAll(gpoTaskArray, element => element.Status != TaskStatus.RanToCompletion);
+                incompleteTaskCount = incompleteTasks.Length;
 
+
+                int completeTaskCount = totalTasksCount - incompleteTaskCount;
+                int percentage = (int)Math.Round((double)(100 * completeTaskCount) / totalTasksCount);
+                string percentageString = percentage.ToString();
+
+                Console.Write("\r" + completeTaskCount.ToString() + "/" + totalTasksCount.ToString() + " "+ percentageString + "% complete.");
+            }
+
+            // make double sure tasks all finished
             Task.WaitAll(gpoTasks.ToArray());
             cts.Dispose();
-            Utility.DebugWrite("Finished Tasks");
+            Utility.DebugWrite("Finished all tasks");
 
             try
             {
