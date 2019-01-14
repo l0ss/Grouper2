@@ -27,12 +27,6 @@ namespace Grouper2
                 return null;
             }
 
-            long fileSize = new System.IO.FileInfo(inPath).Length;
-
-            Utility.DebugWrite(fileSize.ToString());
-
-            // TODO - check if file is too big to handle
-
             // get our list of interesting words
             JArray interestingWords = (JArray) JankyDb.Instance["interestingWords"];
             
@@ -70,6 +64,7 @@ namespace Grouper2
             bool dirExists = false;
             bool dirWritable = false;
             bool fileContentsInteresting = false;
+            bool fileTooBig = false;
             bool isFilePath = false;
             bool isDirPath = false;
             bool parentDirExists = false;
@@ -81,7 +76,7 @@ namespace Grouper2
             JObject parentDirDacls = new JObject();
             JObject fileDacls = new JObject();
             JObject dirDacls = new JObject();
-            JArray interestingStringsFound = new JArray();
+            JArray interestingWordsFromFile = new JArray();
 
             string fileName = "";
             string dirPath = "";
@@ -140,8 +135,17 @@ namespace Grouper2
                     // if we can read it, have a look if it has interesting strings in it.
                     if (fileReadable)
                     {
-                        // TODO write this method
-                        //interestingWordsFromFile = Utility.GetInterestingWordsFromFile(inPath);
+                        // make sure the file isn't massive so we don't waste ages grepping whole disk images over the network
+                        long fileSize = new System.IO.FileInfo(inPath).Length;
+
+                        if (fileSize < 1048576) // 1MB for now. Can tune if too slow.
+                        {
+                            interestingWordsFromFile = Utility.GetInterestingWordsFromFile(inPath);
+                            if (interestingWordsFromFile.Count > 0)
+                            {
+                                fileContentsInteresting = true;
+                            }
+                        }
                     }
                     // get the file permissions
                     fileDacls = Utility.GetFileDaclJObject(inPath);
@@ -248,7 +252,7 @@ namespace Grouper2
                     {
                         //TODO check for interesting strings in files
                         filePathAssessment.Add("File contains interesting strings", fileContentsInteresting);
-                        filePathAssessment.Add("Interesting strings found", interestingStringsFound );
+                        filePathAssessment.Add("Interesting strings found", interestingWordsFromFile );
                     }
                     filePathAssessment.Add("File is writable", fileWritable);
                     filePathAssessment.Add("File DACL", fileDacls);
