@@ -64,7 +64,7 @@ namespace Grouper2
                 foreach (JObject gppFile in gppCategory["File"])
                 {
                     JObject assessedFile = GetAssessedFile(gppFile);
-                    if (assessedFile.HasValues)
+                    if (assessedFile != null)
                     {
                         assessedFiles.Add(gppFile["@uid"].ToString(), assessedFile);
                     }
@@ -74,7 +74,7 @@ namespace Grouper2
             {
                 JObject gppFile = (JObject)JToken.FromObject(gppCategory["File"]);
                 JObject assessedFile = GetAssessedFile(gppFile);
-                if (assessedFile.HasValues)
+                if (assessedFile != null)
                 {
                     assessedFiles.Add(gppFile["@uid"].ToString(), assessedFile);
                 }
@@ -106,7 +106,13 @@ namespace Grouper2
                 
                 if (GlobalVar.OnlineChecks && (fromPath.Length > 0))
                 {
-                    assessedFile.Add("From Path", Utility.InvestigatePath(gppFileProps["@fromPath"].ToString()));
+                    JObject assessedPath = Utility.InvestigatePath(gppFileProps["@fromPath"].ToString());
+                    assessedFile.Add("From Path", assessedPath);
+                    if (assessedPath["InterestLevel"] != null)
+                    {
+                        int pathInterest = (int)assessedPath["InterestLevel"];
+                        interestLevel = interestLevel + pathInterest;
+                    }
                 }
                 else
                 {
@@ -117,7 +123,7 @@ namespace Grouper2
             // if it's too boring to be worth showing, return an empty jobj.
             if (interestLevel <= GlobalVar.IntLevelToShow)
             {
-                assessedFile = new JObject();
+                return null;
             }
             return assessedFile;
         }
