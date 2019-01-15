@@ -140,7 +140,7 @@ namespace Grouper2
                     foreach (JObject gppGroup in gppCategory["Group"])
                     {
                         JObject assessedGroup = GetAssessedGroup(gppGroup);
-                        if (assessedGroup.Count > 0)
+                        if (assessedGroup != null)
                         {
                             assessedGroups.Add(gppGroup["@uid"].ToString(), assessedGroup);
                         }
@@ -150,7 +150,7 @@ namespace Grouper2
                 {
                     JObject gppGroup = (JObject) JToken.FromObject(gppCategory["Group"]);
                     JObject assessedGroup = GetAssessedGroup(gppGroup);
-                    if (assessedGroup.Count > 0)
+                    if (assessedGroup != null)
                     {
                         assessedGroups.Add(gppGroup["@uid"].ToString(), assessedGroup);
                     }
@@ -166,7 +166,7 @@ namespace Grouper2
                     foreach (JObject gppUser in gppCategory["User"])
                     {
                         JObject assessedUser = GetAssessedUser(gppUser);
-                        if (assessedUser.Count > 0)
+                        if (assessedUser != null)
                         {
                             assessedUsers.Add(gppUser["@uid"].ToString(), assessedUser);
                         }
@@ -176,7 +176,7 @@ namespace Grouper2
                 {
                     JObject gppUser = (JObject) JToken.FromObject(gppCategory["User"]);
                     JObject assessedUser = GetAssessedUser(gppUser);
-                    if (assessedUser.Count > 0)
+                    if (assessedUser != null)
                     {
                         assessedUsers.Add(gppUser["@uid"].ToString(), assessedUser);
                     }
@@ -185,8 +185,8 @@ namespace Grouper2
 
             JObject assessedGppUsers = (JObject)JToken.FromObject(assessedUsers);
             
-            JProperty assessedUsersJson = new JProperty("GPPUserSettings", assessedGppUsers);
-            JProperty assessedGroupsJson = new JProperty("GPPGroupSettings", assessedGppGroups);
+            JProperty assessedUsersJson = new JProperty("GPP Users", assessedGppUsers);
+            JProperty assessedGroupsJson = new JProperty("GPP Groups", assessedGppGroups);
             // chuck the users and groups together in one JObject
             JObject assessedGppGroupsJson = new JObject();
             // only want to actually output these things if there's anything useful in them.
@@ -240,7 +240,7 @@ namespace Grouper2
             // if it's too boring to be worth showing, return an empty jobj.
             if (interestLevel < GlobalVar.IntLevelToShow)
             {
-                assessedUser = new JObject();
+                return null;
             }
             return assessedUser;
         }
@@ -300,7 +300,7 @@ namespace Grouper2
 
             if (interestLevel < GlobalVar.IntLevelToShow)
             {
-                assessedGroup = new JObject();
+                return null;
             }
             return assessedGroup;
         }

@@ -272,7 +272,7 @@ public class GlobalVar
                 int percentage = (int)Math.Round((double)(100 * completeTaskCount) / totalTasksCount);
                 string percentageString = percentage.ToString();
 
-                Console.Write("\r" + completeTaskCount.ToString() + "/" + totalTasksCount.ToString() + " "+ percentageString + "% complete.");
+                Console.Write("\r" + completeTaskCount.ToString() + "/" + totalTasksCount.ToString() + " GPOs processed. "+ percentageString + "% complete.");
             }
 
             // make double sure tasks all finished
