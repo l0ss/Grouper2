@@ -225,7 +225,7 @@ namespace Grouper2
                             parentDirWritable = Utility.CanIWrite(parentDirWriteTestPath);
                             if (parentDirWritable)
                             {
-                                writableParentDir = parentDirWriteTestPath;
+                                writableParentDir = parentDirTestPath;
                                 break;
                             }
                             else
