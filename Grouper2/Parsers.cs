@@ -182,7 +182,7 @@ namespace Grouper2
                         {
                             if (value == splitLine[0])
                             {
-                                break;
+                                continue;
                             }
                             else
                             {
@@ -204,9 +204,6 @@ namespace Grouper2
                     {
                         Utility.DebugWrite("Something has gone wrong parsing an Inf/Ini file.");
                     }
-                    
-
-                    
                     
                 }
                 //put the results into the dictionary we're gonna return

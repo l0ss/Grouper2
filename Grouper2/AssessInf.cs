@@ -336,9 +336,7 @@ internal static class AssessInf
         }
         return regKeysJson;
     }
-
-
-
+    
     public static JObject AssessServiceGenSetting(JToken svcGenSetting)
     {
         // this bit kind of works backwards on the placeholders. Fix as you fill these out.
