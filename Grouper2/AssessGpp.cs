@@ -488,22 +488,32 @@ namespace Grouper2
 
                 if (scheduledTask["Properties"]["Task"]["Actions"]["Exec"] != null)
                 {
-                    string commandString = Utility.GetSafeString(scheduledTask["Properties"]["Task"]["Actions"]["Exec"], "Command");
-                    string argumentsString = Utility.GetSafeString(scheduledTask["Properties"]["Task"]["Actions"]["Exec"], "Arguments");
-                    JObject command = Utility.InvestigatePath(commandString);
-                    JObject arguments = Utility.InvestigateString(argumentsString);
-                    if (arguments["InterestLevel"] != null)
-                    {
-                        int argumentInterest = (int) arguments["InterestLevel"];
-                        interestLevel = interestLevel + argumentInterest;
-                    }
+                    string commandString = Utility.GetSafeString(scheduledTask["Properties"]["Task"]["Actions"]["Exec"],
+                        "Command");
+                    string argumentsString =
+                        Utility.GetSafeString(scheduledTask["Properties"]["Task"]["Actions"]["Exec"], "Arguments");
 
-                    if (command["InterestLevel"] != null)
+                    JObject command = new JObject(new JProperty("Command", commandString));
+                    JObject arguments = new JObject(new JProperty("Arguments", argumentsString));
+
+                    if (GlobalVar.OnlineChecks)
                     {
-                        int commandInterest = (int) command["InterestLevel"];
-                        interestLevel = interestLevel + commandInterest;
+                        command = Utility.InvestigatePath(commandString);
+                        arguments = Utility.InvestigateString(argumentsString);
+                        if (arguments["InterestLevel"] != null)
+                        {
+                            int argumentInterest = (int) arguments["InterestLevel"];
+                            interestLevel = interestLevel + argumentInterest;
+                        }
+
+                        if (command["InterestLevel"] != null)
+                        {
+                            int commandInterest = (int) command["InterestLevel"];
+                            interestLevel = interestLevel + commandInterest;
+                        }
                     }
-                    assessedScheduledTask.Add(
+                    
+                assessedScheduledTask.Add(
                         new JProperty("Action - Execute Command", new JObject(
                             new JProperty("Command", command),
                             new JProperty("Arguments", arguments)
@@ -515,11 +525,17 @@ namespace Grouper2
                 if (scheduledTask["Properties"]["Task"]["Actions"]["SendEmail"] != null)
                 {
                     string attachmentString = Utility.GetSafeString(scheduledTask["Properties"]["Task"]["Actions"]["SendEmail"]["Attachments"], "File");
-                    JObject attachment = Utility.InvestigatePath(attachmentString);
-                    if (attachment["InterestLevel"] != null)
+
+                    JObject attachment = new JObject(new JProperty("Attachment", attachmentString));
+
+                    if (GlobalVar.OnlineChecks)
                     {
-                        int attachmentInterest = (int)attachment["InterestLevel"];
-                        interestLevel = interestLevel + attachmentInterest;
+                        attachment = Utility.InvestigatePath(attachmentString);
+                        if (attachment["InterestLevel"] != null)
+                        {
+                            int attachmentInterest = (int) attachment["InterestLevel"];
+                            interestLevel = interestLevel + attachmentInterest;
+                        }
                     }
 
                     assessedScheduledTask.Add(
@@ -541,19 +557,25 @@ namespace Grouper2
             {
                 string commandString = Utility.GetSafeString(scheduledTask["Properties"], "@appname");
                 string argumentsString = Utility.GetSafeString(scheduledTask["Properties"], "@args");
-                JObject command = Utility.InvestigatePath(commandString);
-                JObject arguments = Utility.InvestigateString(argumentsString);
+                JObject command = new JObject(new JProperty("Command", commandString));
+                JObject arguments = new JObject(new JProperty("Arguments", argumentsString));
 
-                if (arguments["InterestLevel"] != null)
+                if (GlobalVar.OnlineChecks)
                 {
-                    int argumentInterest = (int)arguments["InterestLevel"];
-                    interestLevel = interestLevel + argumentInterest;
-                }
+                    command = Utility.InvestigatePath(commandString);
+                    arguments = Utility.InvestigateString(argumentsString);
 
-                if (command["InterestLevel"] != null)
-                {
-                    int commandInterest = (int)command["InterestLevel"];
-                    interestLevel = interestLevel + commandInterest;
+                    if (arguments["InterestLevel"] != null)
+                    {
+                        int argumentInterest = (int) arguments["InterestLevel"];
+                        interestLevel = interestLevel + argumentInterest;
+                    }
+
+                    if (command["InterestLevel"] != null)
+                    {
+                        int commandInterest = (int) command["InterestLevel"];
+                        interestLevel = interestLevel + commandInterest;
+                    }
                 }
 
                 assessedScheduledTask.Add("Action", Utility.GetActionString(scheduledTask["Properties"]["@action"].ToString()));
@@ -572,19 +594,25 @@ namespace Grouper2
             {
                 string argumentsString = Utility.GetSafeString(scheduledTask["Properties"], "@args");
                 string commandString = Utility.GetSafeString(scheduledTask["Properties"], "@appName");
-                JObject command = Utility.InvestigatePath(commandString);
-                JObject arguments = Utility.InvestigateString(argumentsString);
+                JObject command = new JObject(new JProperty("Command", commandString));
+                JObject arguments = new JObject(new JProperty("Arguments", argumentsString));
 
-                if (arguments["InterestLevel"] != null)
+                if (GlobalVar.OnlineChecks)
                 {
-                    int argumentInterest = (int)arguments["InterestLevel"];
-                    interestLevel = interestLevel + argumentInterest;
-                }
+                    command = Utility.InvestigatePath(commandString);
+                    arguments = Utility.InvestigateString(argumentsString);
 
-                if (command["InterestLevel"] != null)
-                {
-                    int commandInterest = (int)command["InterestLevel"];
-                    interestLevel = interestLevel + commandInterest;
+                    if (arguments["InterestLevel"] != null)
+                    {
+                        int argumentInterest = (int) arguments["InterestLevel"];
+                        interestLevel = interestLevel + argumentInterest;
+                    }
+
+                    if (command["InterestLevel"] != null)
+                    {
+                        int commandInterest = (int) command["InterestLevel"];
+                        interestLevel = interestLevel + commandInterest;
+                    }
                 }
 
                 assessedScheduledTask.Add("Command", command);
