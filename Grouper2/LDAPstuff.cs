@@ -121,7 +121,10 @@ class LDAPstuff
                 }
                 catch (System.ArgumentException e)
                 {
-                    Utility.DebugWrite("Hit a duplicate GUID in extRightsResult");
+                    if (GlobalVar.DebugMode)
+                    {
+                        Utility.DebugWrite("Hit a duplicate GUID in extRightsResult");
+                    }
                 }
             }
 

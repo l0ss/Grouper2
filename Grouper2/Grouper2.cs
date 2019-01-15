@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.DirectoryServices.ActiveDirectory;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using CommandLineParser.Arguments;
 using CommandLineParser.Exceptions;
 using Grouper2.Properties;
@@ -89,6 +90,9 @@ public class GlobalVar
         {
             DateTime grouper2StartTime = DateTime.Now;
             Utility.PrintBanner();
+
+            Console.WriteLine("Running as user: " + Environment.UserDomainName + "\\" + Environment.UserName);
+            Console.WriteLine("All online checks will be performed in the context of this user.");
 
             CommandLineParser.CommandLineParser parser = new CommandLineParser.CommandLineParser();
             SwitchArgument debugArg = new SwitchArgument('d', "debug", "Enables debug mode. Will also show you the names of any categories of policies that Grouper saw but didn't have any means of processing. I eagerly await your pull request.", false);
@@ -300,15 +304,14 @@ public class GlobalVar
 
             if (GlobalVar.CleanupList != null)
             {
-                Console.WriteLine("");
-                Console.WriteLine("Grouper tried to create these files. It probably failed but just in case it didn't, you might want to clean them up.");
+                Console.WriteLine("\n\nGrouper tried to create these files. It probably failed, but just in case it didn't, you might want to check and clean them up.");
                 foreach (string path in GlobalVar.CleanupList)
                 {
                     Console.WriteLine(path);
                 }
             }
 
-            Console.WriteLine("Press any key to exit.");
+            Console.WriteLine("\n\nPress any key to exit.");
             // wait for 'anykey'
             Console.ReadKey();
         }
@@ -336,10 +339,11 @@ public class GlobalVar
                     }
                     catch (ArgumentNullException e)
                     {
-                        Utility.DebugWrite("Couldn't get GPO Properties from the domain for the following GPO: " +
-                                           gpoUid);
+                        
                         if (GlobalVar.DebugMode)
                         {
+                            Utility.DebugWrite("Couldn't get GPO Properties from the domain for the following GPO: " +
+                                               gpoUid);
                             Utility.DebugWrite(e.ToString());
                         }
 

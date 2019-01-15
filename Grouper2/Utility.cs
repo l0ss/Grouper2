@@ -244,8 +244,9 @@ namespace Grouper2
                 }
             }
             
-            // put all the values we just collected into a jobject for reporting.
+            // put all the values we just collected into a jobject for reporting and calculate how interesting it is.
             JObject filePathAssessment = new JObject();
+            int interestLevel = 0;
             filePathAssessment.Add("Path assessed", inPath);
             if (isFilePath)
             {
@@ -257,12 +258,14 @@ namespace Grouper2
                     filePathAssessment.Add("File is readable", fileReadable);
                     if (fileContentsInteresting)
                     {
-                        //TODO check for interesting strings in files
                         filePathAssessment.Add("File contains interesting strings", fileContentsInteresting);
                         filePathAssessment.Add("Interesting strings found", interestingWordsFromFile );
+                        interestLevel = interestLevel + 2;
                     }
                     filePathAssessment.Add("File is writable", fileWritable);
-                    filePathAssessment.Add("File DACL", fileDacls);
+                    if (fileWritable) interestLevel = interestLevel + 10;
+                    // TODO see if I can do anything more with these.
+                    filePathAssessment.Add("File DACLs", fileDacls);
                 }
                 else
                 {
@@ -271,6 +274,7 @@ namespace Grouper2
                     if (dirExists)
                     {
                         filePathAssessment.Add("Directory is writable", dirWritable);
+                        if (dirWritable) interestLevel = interestLevel + 10;
                         filePathAssessment.Add("Directory DACL", dirDacls);
                     }
                     else if (parentDirExists)
@@ -279,6 +283,7 @@ namespace Grouper2
                         if (parentDirWritable)
                         {
                             filePathAssessment.Add("Parent dir writable", parentDirWritable);
+                            interestLevel = interestLevel + 10;
                             filePathAssessment.Add("Writable parent dir", writableParentDir);
                         }
                         else
@@ -294,7 +299,8 @@ namespace Grouper2
                 if (dirExists)
                 {
                     filePathAssessment.Add("Directory is writable", dirWritable);
-                    filePathAssessment.Add("Directory DACL", dirDacls);
+                    if (parentDirWritable) interestLevel = interestLevel + 10;
+                    filePathAssessment.Add("Directory DACLs", dirDacls);
                 }
                 else if (parentDirExists)
                 {
@@ -302,6 +308,7 @@ namespace Grouper2
                     if (parentDirWritable)
                     {
                         filePathAssessment.Add("Parent dir writable", parentDirWritable);
+                        interestLevel = interestLevel + 10;
                         filePathAssessment.Add("Writable parent dir", writableParentDir);
                     }
                     else
@@ -310,6 +317,7 @@ namespace Grouper2
                     }
                 }
             }
+            filePathAssessment.Add("InterestLevel", interestLevel.ToString());
             return filePathAssessment;
         }
 

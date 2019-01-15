@@ -12,7 +12,7 @@
     <StartArguments>-o -s "..\..\TestPolicies" -d</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugLiveFromDC|AnyCPU'">
-    <StartArguments>-d</StartArguments>
+    <StartArguments>-i 6</StartArguments>
   </PropertyGroup>
   <PropertyGroup>
     <PublishUrlHistory>publish\</PublishUrlHistory>

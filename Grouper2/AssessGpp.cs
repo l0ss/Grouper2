@@ -482,12 +482,21 @@ namespace Grouper2
 
                 if (scheduledTask["Properties"]["Task"]["Actions"]["Exec"] != null)
                 {
-                    // TODO send this to investigate path method
                     string commandString = Utility.GetSafeString(scheduledTask["Properties"]["Task"]["Actions"]["Exec"], "Command");
                     string argumentsString = Utility.GetSafeString(scheduledTask["Properties"]["Task"]["Actions"]["Exec"], "Arguments");
                     JObject command = Utility.InvestigatePath(commandString);
                     JObject arguments = Utility.InvestigateString(argumentsString);
+                    if (arguments["InterestLevel"] != null)
+                    {
+                        int argumentInterest = (int) arguments["InterestLevel"];
+                        interestLevel = interestLevel + argumentInterest;
+                    }
 
+                    if (command["InterestLevel"] != null)
+                    {
+                        int commandInterest = (int) command["InterestLevel"];
+                        interestLevel = interestLevel + commandInterest;
+                    }
                     assessedScheduledTask.Add(
                         new JProperty("Action - Execute Command", new JObject(
                             new JProperty("Command", command),
@@ -500,7 +509,12 @@ namespace Grouper2
                 if (scheduledTask["Properties"]["Task"]["Actions"]["SendEmail"] != null)
                 {
                     string attachmentString = Utility.GetSafeString(scheduledTask["Properties"]["Task"]["Actions"]["SendEmail"]["Attachments"], "File");
-                    JObject attachment = Utility.InvestigateString(attachmentString);
+                    JObject attachment = Utility.InvestigatePath(attachmentString);
+                    if (attachment["InterestLevel"] != null)
+                    {
+                        int attachmentInterest = (int)attachment["InterestLevel"];
+                        interestLevel = interestLevel + attachmentInterest;
+                    }
 
                     assessedScheduledTask.Add(
                         new JProperty("Action - Send Email", new JObject(
@@ -509,7 +523,6 @@ namespace Grouper2
                             new JProperty("Subject", Utility.GetSafeString(scheduledTask["Properties"]["Task"]["Actions"]["SendEmail"], "Subject")),
                             new JProperty("Body", Utility.GetSafeString(scheduledTask["Properties"]["Task"]["Actions"]["SendEmail"], "Body")),
                             new JProperty("Header Fields", Utility.GetSafeString(scheduledTask["Properties"]["Task"]["Actions"]["SendEmail"], "HeaderFields")),
-                            // TODO send this to investigate path method.
                             new JProperty("Attachment", attachment),
                             new JProperty("Server", Utility.GetSafeString(scheduledTask["Properties"]["Task"]["Actions"]["SendEmail"], "Server"))
                             )
@@ -524,6 +537,18 @@ namespace Grouper2
                 string argumentsString = Utility.GetSafeString(scheduledTask["Properties"], "@args");
                 JObject command = Utility.InvestigatePath(commandString);
                 JObject arguments = Utility.InvestigateString(argumentsString);
+
+                if (arguments["InterestLevel"] != null)
+                {
+                    int argumentInterest = (int)arguments["InterestLevel"];
+                    interestLevel = interestLevel + argumentInterest;
+                }
+
+                if (command["InterestLevel"] != null)
+                {
+                    int commandInterest = (int)command["InterestLevel"];
+                    interestLevel = interestLevel + commandInterest;
+                }
 
                 assessedScheduledTask.Add("Action", Utility.GetActionString(scheduledTask["Properties"]["@action"].ToString()));
                 assessedScheduledTask.Add("Command", command);
@@ -544,16 +569,27 @@ namespace Grouper2
                 JObject command = Utility.InvestigatePath(commandString);
                 JObject arguments = Utility.InvestigateString(argumentsString);
 
+                if (arguments["InterestLevel"] != null)
+                {
+                    int argumentInterest = (int)arguments["InterestLevel"];
+                    interestLevel = interestLevel + argumentInterest;
+                }
+
+                if (command["InterestLevel"] != null)
+                {
+                    int commandInterest = (int)command["InterestLevel"];
+                    interestLevel = interestLevel + commandInterest;
+                }
+
                 assessedScheduledTask.Add("Command", command);
                 assessedScheduledTask.Add("Arguments", arguments);
                 assessedScheduledTask.Add("Start In", Utility.GetSafeString(scheduledTask["Properties"], "@startIn"));
                 assessedScheduledTask.Add("Comment", Utility.GetSafeString(scheduledTask["Properties"], "@comment"));
             }
-            //Utility.DebugWrite(assessedScheduledTask.ToString());
 
             if (interestLevel < GlobalVar.IntLevelToShow)
             {
-                assessedScheduledTask = new JObject();
+                return null;
             }
 
             return assessedScheduledTask;
@@ -595,7 +631,7 @@ namespace Grouper2
             }
            else
            {
-               Utility.DebugWrite("something fucked up");
+               Utility.DebugWrite("Something fucked up.");
                Utility.DebugWrite(gppCategory.ToString());
                return null;
            }
@@ -605,7 +641,7 @@ namespace Grouper2
        private JObject GetAssessedDrives(JObject gppCategory)
        {
            // dont forget cpasswords
-            int interestLevel = 2;
+           int interestLevel = 2;
            JProperty gppDriveProp = new JProperty("Drive", gppCategory["Drive"]);
            JObject assessedGppDrives = new JObject(gppDriveProp);
            if (interestLevel < GlobalVar.IntLevelToShow)
