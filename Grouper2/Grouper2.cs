@@ -91,7 +91,7 @@ public class GlobalVar
             Utility.PrintBanner();
 
             CommandLineParser.CommandLineParser parser = new CommandLineParser.CommandLineParser();
-            //SwitchArgument debugArg = new SwitchArgument('d', "debug", "Enables debug mode. Will also show you the names of any categories of policies that Grouper saw but didn't have any means of processing. I eagerly await your pull request.", false);
+            SwitchArgument debugArg = new SwitchArgument('d', "debug", "Enables debug mode. Will also show you the names of any categories of policies that Grouper saw but didn't have any means of processing. I eagerly await your pull request.", false);
             SwitchArgument offlineArg = new SwitchArgument('o', "offline",
                 "Disables checks that require LDAP comms with a DC or SMB comms with file shares found in policy settings. Requires that you define a value for --sysvol.",
                 false);
@@ -106,7 +106,7 @@ public class GlobalVar
             //parser.Arguments.Add(domainArg);
             //parser.Arguments.Add(usernameArg);
             //parser.Arguments.Add(passwordArg);
-            //parser.Arguments.Add(debugArg);
+            parser.Arguments.Add(debugArg);
             parser.Arguments.Add(intlevArg);
             parser.Arguments.Add(sysvolArg);
             parser.Arguments.Add(offlineArg);
@@ -145,6 +145,12 @@ public class GlobalVar
                 else
                 {
                     GlobalVar.IntLevelToShow = 1;
+                }
+
+                if (debugArg.Parsed)
+                {
+                    Console.WriteLine("Debug mode enabled. Hope you like yellow.");
+                    GlobalVar.DebugMode = true;
                 }
 
                 if (sysvolArg.Parsed)

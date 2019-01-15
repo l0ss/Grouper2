@@ -50,11 +50,6 @@ namespace Grouper2
         public static JObject InvestigatePath(string inPath)
         {
             // general purpose method for returning some information about why a path might be interesting.
-            // if it's a file, does it exist?
-            // if it exists, is it modifiable?
-            // if it exists, is it readable?
-            // if it's readable, does it contain anything interesting?
-            // if it doesn't exist, is the parent dir writable?
             
             // set up all our bools and empty JObjects so everything is boring until proven interesting.
             JArray interestingFileExts = (JArray) JankyDb.Instance["interestingExtensions"];
@@ -508,10 +503,28 @@ namespace Grouper2
 
                 JObject fileDaclJObject = new JObject();
                 fileDaclJObject.Add("Display Name", displayNameString);
-                fileDaclJObject.Add("Allow or Deny?", accessControlTypeString);
                 fileDaclJObject.Add("Inherited?", isInheritedString);
                 fileDaclJObject.Add("Rights", fileSystemRightsJArray);
-                fileDaclsJObject.Add(identityReferenceString, fileDaclJObject);
+                try
+                {
+                    fileDaclsJObject.Merge(fileDaclJObject, new JsonMergeSettings
+                    {
+                        // union array values together to avoid duplicates
+                        MergeArrayHandling = MergeArrayHandling.Union
+                    });
+                    //fileDaclsJObject.Add((identityReferenceString + " - " + accessControlTypeString), fileDaclJObject);
+                }
+                catch (System.ArgumentException e)
+                {
+                    if (GlobalVar.DebugMode)
+                    {
+                        Utility.DebugWrite(e.ToString());
+                        Utility.DebugWrite("\n" + "Trying to Add:");
+                        Utility.DebugWrite(fileDaclJObject.ToString());
+                        Utility.DebugWrite("\n" + "To:");
+                        Utility.DebugWrite(fileDaclsJObject.ToString());
+                    }
+                } 
             }
 
             return fileDaclsJObject;
@@ -624,7 +637,7 @@ namespace Grouper2
         {
             Console.BackgroundColor = ConsoleColor.Yellow;
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(textToWrite);
+            Console.WriteLine("\n" + textToWrite);
             Console.ResetColor();
         }
 
