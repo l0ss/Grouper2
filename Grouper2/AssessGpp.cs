@@ -632,7 +632,7 @@ namespace Grouper2
 
        private JObject GetAssessedRegistrySettings(JObject gppCategory)
        {
-           int interestLevel = 2;
+           int interestLevel = 0;
            if (gppCategory["Collection"] != null)
            {
                JProperty gppRegSettingsProp = new JProperty("RegSettingsColl", gppCategory["Collection"]);
@@ -675,7 +675,7 @@ namespace Grouper2
        private JObject GetAssessedDrives(JObject gppCategory)
        {
            // dont forget cpasswords
-           int interestLevel = 2;
+           int interestLevel = 0;
            JProperty gppDriveProp = new JProperty("Drive", gppCategory["Drive"]);
            JObject assessedGppDrives = new JObject(gppDriveProp);
            if (interestLevel < GlobalVar.IntLevelToShow)
@@ -688,7 +688,7 @@ namespace Grouper2
 
        private JObject GetAssessedEnvironmentVariables(JObject gppCategory)
        {
-           int interestLevel = 1;
+           int interestLevel = 0;
            JProperty gppEVProp = new JProperty("EnvironmentVariable", gppCategory["EnvironmentVariable"]);
            JObject assessedGppEVs = new JObject(gppEVProp);
            if (interestLevel < GlobalVar.IntLevelToShow)
@@ -702,7 +702,7 @@ namespace Grouper2
        {
            // dont forget cpasswords
 
-            int interestLevel = 3;
+            int interestLevel = 0;
            JProperty ntServiceProp = new JProperty("NTService", gppCategory["NTService"]);
            JObject assessedNtServices = new JObject(ntServiceProp);
            if (interestLevel < GlobalVar.IntLevelToShow)
@@ -714,7 +714,7 @@ namespace Grouper2
 
        private JObject GetAssessedNetworkOptions(JObject gppCategory)
        {
-           int interestLevel = 1;
+           int interestLevel = 0;
            JProperty gppNetworkOptionsProp = new JProperty("DUN", gppCategory["DUN"]);
            JObject assessedGppNetworkOptions = new JObject(gppNetworkOptionsProp);
            if (interestLevel < GlobalVar.IntLevelToShow)
@@ -727,7 +727,7 @@ namespace Grouper2
        private JObject GetAssessedPrinters(JObject gppCategory)
        {
            // dont forget cpasswords
-           int interestLevel = 1;
+           int interestLevel = 0;
            JProperty gppSharedPrintersProp = new JProperty("SharedPrinter", gppCategory["SharedPrinter"]);
            JObject assessedGppSharedPrinters = new JObject(gppSharedPrintersProp);
            if (interestLevel < GlobalVar.IntLevelToShow)
@@ -740,7 +740,7 @@ namespace Grouper2
        private JObject GetAssessedDataSources(JObject gppCategory)
        {
            // dont forget cpasswords
-           int interestLevel = 1;
+           int interestLevel = 0;
            JProperty gppDataSourcesProp = new JProperty("DataSource", gppCategory["DataSource"]);
            JObject assessedGppDataSources = new JObject(gppDataSourcesProp);
            if (interestLevel < GlobalVar.IntLevelToShow)
@@ -752,7 +752,7 @@ namespace Grouper2
 
         private JObject GetAssessedFolders(JObject gppCategory)
        {
-           int interestLevel = 1;
+           int interestLevel = 0;
            JProperty gppFoldersProp = new JProperty("Folder", gppCategory["Folder"]);
            JObject assessedGppFolders = new JObject(gppFoldersProp);
            if (interestLevel < GlobalVar.IntLevelToShow)
@@ -764,7 +764,7 @@ namespace Grouper2
 
        private JObject GetAssessedNetworkShareSettings(JObject gppCategory)
        {
-           int interestLevel = 1;
+           int interestLevel = 0;
            JProperty gppNetSharesProp = new JProperty("NetShare", gppCategory["NetShare"]);
            JObject assessedGppNetShares = new JObject(gppNetSharesProp);
            if (interestLevel < GlobalVar.IntLevelToShow)
@@ -777,7 +777,7 @@ namespace Grouper2
 
        private JObject GetAssessedIniFiles(JObject gppCategory)
        {
-           int interestLevel = 2;
+           int interestLevel = 0;
            JProperty gppIniFilesProp = new JProperty("Ini", gppCategory["Ini"]);
            JObject assessedGppIniFiles = new JObject(gppIniFilesProp);
            if (interestLevel < GlobalVar.IntLevelToShow)

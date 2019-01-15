@@ -304,7 +304,7 @@ internal static class AssessInf
     public static JObject AssessSysAccess(JToken sysAccess)
     {
         // this bit kind of works backwards on the placeholders. Fix as you fill these out.
-        int interestLevel = 10;
+        int interestLevel = 0;
         JObject sysAccessJson = new JObject();
         if (interestLevel >= GlobalVar.IntLevelToShow)
         {
@@ -316,7 +316,7 @@ internal static class AssessInf
     public static JObject AssessKerbPolicy(JToken kerbPolicy)
     {
         // this bit kind of works backwards on the placeholders. Fix as you fill these out.
-        int interestLevel = 1;
+        int interestLevel = 0;
         JObject kerbPolicyJson = new JObject();
         if (interestLevel >= GlobalVar.IntLevelToShow)
         {
@@ -328,7 +328,7 @@ internal static class AssessInf
     public static JObject AssessRegKeys(JToken regKeys)
     {
         // this bit kind of works backwards on the placeholders. Fix as you fill these out.
-        int interestLevel = 1;
+        int interestLevel = 0;
         JObject regKeysJson = new JObject();
         if (interestLevel >= GlobalVar.IntLevelToShow)
         {
@@ -342,7 +342,7 @@ internal static class AssessInf
     public static JObject AssessServiceGenSetting(JToken svcGenSetting)
     {
         // this bit kind of works backwards on the placeholders. Fix as you fill these out.
-        int interestLevel = 1;
+        int interestLevel = 0;
         JObject svcGenSettingJson = new JObject();
         if (interestLevel >= GlobalVar.IntLevelToShow)
         {
