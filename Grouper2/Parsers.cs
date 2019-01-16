@@ -107,7 +107,7 @@ namespace Grouper2
                     sectionSlices.Add(sectionHeading, sectionFinalLine);
                     fuck++;
                 }
-                catch (System.ArgumentOutOfRangeException e)
+                catch (System.ArgumentOutOfRangeException)
                 {
                     //Utility.DebugWrite(e.ToString());
                     int sectionHeading = headingLines[fuck];

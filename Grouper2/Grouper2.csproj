@@ -99,10 +99,30 @@
     <Reference Include="mscorlib" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssessGpp.cs" />
+    <Compile Include="GPPAssess\AssessGpp.cs" />
     <Compile Include="AssessHandlers.cs" />
-    <Compile Include="AssessInf.cs" />
-    <Compile Include="AssessScriptsIni.cs" />
+    <Compile Include="ScriptsIniAssess\AssessScriptsIni.cs" />
+    <Compile Include="GPPAssess\AssessDataSources.cs" />
+    <Compile Include="GPPAssess\AssessDrives.cs" />
+    <Compile Include="GPPAssess\AssessEnvVars.cs" />
+    <Compile Include="GPPAssess\AssessFiles.cs" />
+    <Compile Include="GPPAssess\AssessFolders.cs" />
+    <Compile Include="GPPAssess\AssessIniFiles.cs" />
+    <Compile Include="GPPAssess\AssessNetworkOptions.cs" />
+    <Compile Include="GPPAssess\AssessNetworkShares.cs" />
+    <Compile Include="GPPAssess\AssessNTServices.cs" />
+    <Compile Include="GPPAssess\AssessPrinters.cs" />
+    <Compile Include="GPPAssess\AssessRegSettings.cs" />
+    <Compile Include="GPPAssess\AssessSchedTasks.cs" />
+    <Compile Include="GPPAssess\AssessShortcuts.cs" />
+    <Compile Include="GPPAssess\AssessUsersAndGroups.cs" />
+    <Compile Include="InfAssess\AssessGroupMembership.cs" />
+    <Compile Include="InfAssess\AssessKerbPolicy.cs" />
+    <Compile Include="InfAssess\AssessPrivRights.cs" />
+    <Compile Include="InfAssess\AssessRegKeys.cs" />
+    <Compile Include="InfAssess\AssessRegValues.cs" />
+    <Compile Include="InfAssess\AssessServiceGenSetting.cs" />
+    <Compile Include="InfAssess\AssessSysAccess.cs" />
     <Compile Include="LDAPstuff.cs" />
     <Compile Include="Parsers.cs" />
     <Compile Include="Grouper2.cs" />
@@ -140,6 +160,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <MonoDevelop>

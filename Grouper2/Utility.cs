@@ -59,7 +59,6 @@ namespace Grouper2
             bool dirExists = false;
             bool dirWritable = false;
             bool fileContentsInteresting = false;
-            bool fileTooBig = false;
             bool isFilePath = false;
             bool isDirPath = false;
             bool parentDirExists = false;
@@ -329,9 +328,13 @@ namespace Grouper2
             {
                 fileExists = File.Exists(inPath);
             }
-            catch (System.ArgumentException e)
+            catch (System.ArgumentException)
             {
-                Utility.DebugWrite("Checked if file " + inPath + " exists but it doesn't seem to be a valid file path.");
+                if (GlobalVar.DebugMode)
+                {
+                    Utility.DebugWrite("Checked if file " + inPath +
+                                       " exists but it doesn't seem to be a valid file path.");
+                }
             }
             return fileExists;
         }
@@ -343,7 +346,7 @@ namespace Grouper2
             {
                 dirExists = Directory.Exists(inPath);
             }
-            catch (System.ArgumentException e)
+            catch (System.ArgumentException)
             {
                 Utility.DebugWrite("Checked if directory " + inPath + " exists but it doesn't seem to be a valid file path.");
             }
@@ -359,19 +362,18 @@ namespace Grouper2
                 canRead = stream.CanRead;
                 stream.Close();
             }
-            catch (System.UnauthorizedAccessException e)
+            catch (System.UnauthorizedAccessException)
             {
                 if (GlobalVar.DebugMode)
                 {
                     Utility.DebugWrite("Tested read perms for " + inPath + " and couldn't read.");
                 }
             }
-            catch (System.ArgumentException e)
+            catch (System.ArgumentException)
             {
                 if (GlobalVar.DebugMode)
                 {
-                    Utility.DebugWrite("Tested read perms for " + inPath +
-                                       " but it doesn't seem to be a valid file path.");
+                    Utility.DebugWrite("Tested read perms for " + inPath + " but it doesn't seem to be a valid file path.");
                 }
             }
             catch (Exception e)
@@ -393,14 +395,14 @@ namespace Grouper2
                 canWrite = stream.CanWrite;
                 stream.Close();
             }
-            catch (System.UnauthorizedAccessException e)
+            catch (System.UnauthorizedAccessException)
             {
                 if (GlobalVar.DebugMode)
                 {
                     Utility.DebugWrite("Tested write perms for " + inPath + " and couldn't write.");
                 }
             }
-            catch (System.ArgumentException e)
+            catch (System.ArgumentException)
             {
                 if (GlobalVar.DebugMode)
                 {
@@ -476,7 +478,7 @@ namespace Grouper2
             {
                 filePathSecObj = File.GetAccessControl(filePathString);
             }
-            catch (System.ArgumentException e)
+            catch (System.ArgumentException)
             {
                 Console.WriteLine("Tried to check file permissions on invalid path: " + filePathString.ToString());
                 return fileDaclsJObject;
@@ -510,7 +512,7 @@ namespace Grouper2
                 }
 
                 JObject fileDaclJObject = new JObject();
-                fileDaclJObject.Add("Display Name", displayNameString);
+                fileDaclJObject.Add(accessControlTypeString, displayNameString);
                 fileDaclJObject.Add("Inherited?", isInheritedString);
                 fileDaclJObject.Add("Rights", fileSystemRightsJArray);
                 try

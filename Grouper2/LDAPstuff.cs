@@ -119,7 +119,7 @@ class LDAPstuff
                 {
                     guidDict.Add(extRightGuidString, extRightNameString);
                 }
-                catch (System.ArgumentException e)
+                catch (System.ArgumentException)
                 {
                     if (GlobalVar.DebugMode)
                     {
