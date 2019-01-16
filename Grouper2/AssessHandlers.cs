@@ -58,7 +58,7 @@ namespace Grouper2
             if (sysAccess != null)
             {
                 JObject assessedSysAccess = AssessInf.AssessSysAccess(sysAccess);
-                if (assessedSysAccess.Count > 0)
+                if (assessedSysAccess != null)
                 {
                     assessedGpTmpl.Add("System Access", assessedSysAccess);
                 }
@@ -71,7 +71,7 @@ namespace Grouper2
             if (kerbPolicy != null)
             {
                 JObject assessedKerbPol = AssessInf.AssessKerbPolicy(kerbPolicy);
-                if (assessedKerbPol.Count > 0)
+                if (assessedKerbPol != null)
                 {
                     assessedGpTmpl.Add("Kerberos Policy", assessedKerbPol);
                 }
