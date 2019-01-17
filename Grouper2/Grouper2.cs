@@ -65,10 +65,7 @@ namespace Grouper2
                         Utility.DebugWrite(e.ToString());
                         _domainGpoData = new JObject();
                     }
-
-                    //do stuff
                 }
-
                 return _domainGpoData;
             }
         }

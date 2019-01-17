@@ -101,6 +101,7 @@
   <ItemGroup>
     <Compile Include="GPPAssess\AssessGpp.cs" />
     <Compile Include="AssessHandlers.cs" />
+    <Compile Include="ParseSDDL.cs" />
     <Compile Include="ScriptsIniAssess\AssessScriptsIni.cs" />
     <Compile Include="GPPAssess\AssessDataSources.cs" />
     <Compile Include="GPPAssess\AssessDrives.cs" />
@@ -132,6 +133,14 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="SddlParser\Ace.cs" />
+    <Compile Include="SddlParser\Acl.cs" />
+    <Compile Include="SddlParser\Format.cs" />
+    <Compile Include="SddlParser\Match.cs" />
+    <Compile Include="SddlParser\Sddl.cs" />
+    <Compile Include="SddlParser\SecurableObjectType.cs" />
+    <Compile Include="SddlParser\Sid.cs" />
+    <Compile Include="SddlParser\StringBuilderExtensions.cs" />
     <Compile Include="Utility.cs" />
   </ItemGroup>
   <ItemGroup>

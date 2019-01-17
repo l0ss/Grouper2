@@ -14,7 +14,6 @@ internal static partial class AssessInf
         MaxClockSkew = 5
         TicketValidateClient = 1
         */
-        Utility.DebugWrite(kerbPolicy.ToString());
 
         JObject assessedKerbPolicy = new JObject();
 

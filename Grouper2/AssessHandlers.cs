@@ -84,7 +84,7 @@ namespace Grouper2
             if (regKeys != null)
             {
                 JObject assessedRegKeys = AssessInf.AssessRegKeys(regKeys);
-                if (assessedRegKeys.Count > 0)
+                if (assessedRegKeys != null)
                 {
                     assessedGpTmpl.Add("Registry Keys", assessedRegKeys);
                 }
