@@ -97,8 +97,12 @@ namespace Sddl.Parser
                 {
                     JObject parsedAce = new JObject();
 
-
-                    JArray aceFlagsJArray = JArray.FromObject(ace.AceFlags);
+                    JArray aceFlagsJArray = new JArray();
+                    if (ace.AceFlags != null)
+                    {
+                        aceFlagsJArray = JArray.FromObject(ace.AceFlags);
+                    }
+                    
                     string aceSidAlias = ace.AceSid.Alias;
                     string aceSidRaw = ace.AceSid.Raw;
                     string aceType = "";
