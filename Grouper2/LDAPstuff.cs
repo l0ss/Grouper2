@@ -7,6 +7,9 @@ using System.Security.Principal;
 using System.Text;
 using Grouper2;
 using System.Runtime.InteropServices;
+using System.Security.AccessControl;
+using System.Threading;
+using Sddl.Parser;
 
 class LDAPstuff
 {
@@ -143,11 +146,18 @@ class LDAPstuff
                 gpoData.Add("UID", gpoUid);
                 string gpoDn = gpoDe.Properties["distinguishedName"].Value.ToString();
                 gpoData.Add("Distinguished Name", gpoDn);
-
+                string gpoCreated = gpoDe.Properties["whenCreated"].Value.ToString();
+                gpoData.Add("Created", gpoCreated);
                 // get the acl
                 ActiveDirectorySecurity gpoAcl = gpoDe.ObjectSecurity;
-                // make a JObject to put the acl in
-                JObject gpoAclJObject = new JObject();
+                // Get the owner in a really dumb way
+                string gpoSddl = gpoAcl.GetSecurityDescriptorSddlForm(AccessControlSections.Owner);
+                JObject parsedOwner = ParseSDDL.ParseSddlString(gpoSddl, SecurableObjectType.DirectoryServiceObject);
+                string gpoOwner = parsedOwner["Owner"].ToString();
+                gpoData.Add("Owner", gpoOwner);
+                // make a JObject to put the stuff in
+                JObject gpoAclJObject = new JObject();;
+
                 //iterate over the aces in the acl
                 foreach (ActiveDirectoryAccessRule gpoAce in gpoAcl.GetAccessRules(true, true,
                     typeof(System.Security.Principal.SecurityIdentifier)))
@@ -231,6 +241,7 @@ class LDAPstuff
         catch (Exception exception)
         {
             Utility.DebugWrite(exception.ToString());
+            Console.ReadKey();
             Environment.Exit(1);
         }
 
