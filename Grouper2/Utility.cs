@@ -442,7 +442,7 @@ namespace Grouper2
 
             if (interestingWordsFound.Count > 0)
             {
-                investigationResults.Add("String contained interesting key words", interestingWordsFound);
+                investigationResults.Add("Interesting words found", interestingWordsFound);
             }
 
             // TODO for each of these I need to separate out the interesting part of the string from the rest of it.

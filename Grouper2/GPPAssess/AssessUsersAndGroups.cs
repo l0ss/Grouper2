@@ -112,7 +112,8 @@ namespace Grouper2
                 string decryptedCpassword = "";
                 decryptedCpassword = Utility.DecryptCpassword(cpassword);
                 // if we find one, that's super interesting.
-                assessedUser.Add("Cpassword", decryptedCpassword);
+                assessedUser.Add("Cpassword", cpassword);
+                assessedUser.Add("Decrypted Password", decryptedCpassword);
                 interestLevel = 10;
             }
 
