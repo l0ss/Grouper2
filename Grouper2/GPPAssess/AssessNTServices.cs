@@ -7,7 +7,7 @@ namespace Grouper2
         private JObject GetAssessedNTServices(JObject gppCategory)
         {
             // dont forget cpasswords
-
+            //Utility.DebugWrite(gppCategory["NTService"].ToString());
             int interestLevel = 0;
             JProperty ntServiceProp = new JProperty("NTService", gppCategory["NTService"]);
             JObject assessedNtServices = new JObject(ntServiceProp);

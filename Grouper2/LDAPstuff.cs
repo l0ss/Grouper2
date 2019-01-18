@@ -148,6 +148,32 @@ class LDAPstuff
                 gpoData.Add("Distinguished Name", gpoDn);
                 string gpoCreated = gpoDe.Properties["whenCreated"].Value.ToString();
                 gpoData.Add("Created", gpoCreated);
+
+                // 3= all disabled
+                // 2= computer configuration settings disabled
+                // 1= user policy disabled
+                // 0 = all enabled
+                string gpoFlags = gpoDe.Properties["flags"].Value.ToString();
+                string gpoEnabledStatus = "";
+                switch (gpoFlags)
+                {
+                    case "0":
+                        gpoEnabledStatus = "Enabled";
+                        break;
+                    case "1":
+                        gpoEnabledStatus = "User Policy Disabled";
+                        break;
+                    case "2":
+                        gpoEnabledStatus = "Computer Policy Disabled";
+                        break;
+                    case "3":
+                        gpoEnabledStatus = "Disabled";
+                        break;
+                    default:
+                        gpoEnabledStatus = "Couldn't process GPO Enabled Status. Weird.";
+                        break;
+                }
+                gpoData.Add("GPO Status", gpoEnabledStatus);
                 // get the acl
                 ActiveDirectorySecurity gpoAcl = gpoDe.ObjectSecurity;
                 // Get the owner in a really dumb way
