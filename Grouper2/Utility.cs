@@ -187,13 +187,13 @@ namespace Grouper2
                     }
 
                     // get the first parent dir
-                    string parentDirTestPath = "";
+                    string dirPathParent = "";
 
                     try
                     {
-                        if (Directory.GetParent(dirPath) != null)
+                        if (Utility.GetParentDirPath(dirPath) != null)
                         {
-                            parentDirTestPath = Directory.GetParent(dirPath).FullName;
+                            dirPathParent = Utility.GetParentDirPath(dirPath);
                         }
                     }
                     catch (ArgumentException e)
@@ -206,25 +206,25 @@ namespace Grouper2
                     }
 
                     // iterate until the path root 
-                    while (parentDirTestPath.Length > 1)
+                    while (dirPathParent != null)
                     {
                         // check if the parent dir exists
-                        parentDirExists = Utility.DoesDirExist(parentDirTestPath);
+                        parentDirExists = Utility.DoesDirExist(dirPathParent);
                         // if it does
                         if (parentDirExists)
                         {
                             // get the dir dacls
-                            parentDirDacls = Utility.GetFileDaclJObject(parentDirTestPath);
+                            parentDirDacls = Utility.GetFileDaclJObject(dirPathParent);
                             // set up a path for us to try and write to
                             string parentDirWriteTestPath =
-                                Path.Combine(parentDirTestPath, "testFileFromGrouper2Assessment.txt");
+                                Path.Combine(dirPathParent, "testFileFromGrouper2Assessment.txt");
                             GlobalVar.CleanupList.Add(parentDirWriteTestPath);
                             // this is fucking gross and messy but I can't think of a better way of doing it. ideally I want to delete these if i create them but putting File.Delete anywhere in this gives me the willies.
                             // try to write to it
                             parentDirWritable = Utility.CanIWrite(parentDirWriteTestPath);
                             if (parentDirWritable)
                             {
-                                writableParentDir = parentDirTestPath;
+                                writableParentDir = dirPathParent;
                                 break;
                             }
                             else
@@ -232,13 +232,15 @@ namespace Grouper2
                                 break;
                             }
                         }
-
-                        //prepare for next iteration by aiming at the parent dir
-                        if (Directory.GetParent(dirPath) != null)
+                        else
                         {
-                            parentDirTestPath = Directory.GetParent(dirPath).FullName;
+                            //prepare for next iteration by aiming at the parent dir
+                            if (Utility.GetParentDirPath(dirPathParent) != null)
+                            {
+                                dirPathParent = Utility.GetParentDirPath(dirPathParent);
+                            }
+                            else break;
                         }
-                        else break;
                     }
                 }
             }
@@ -320,6 +322,34 @@ namespace Grouper2
             return filePathAssessment;
         }
 
+        public static string GetParentDirPath(string dirPath)
+        {
+            //Utility.DebugWrite("input " + dirPath);
+            
+            int count = dirPath.Length - dirPath.Replace("\\", "").Length;
+
+            int lastDirSepIndex = IndexOfNth(dirPath, "\\", count);
+            
+            string parentPath = dirPath.Remove(lastDirSepIndex);
+
+            //Utility.DebugWrite("output " + parentPath);
+
+            return parentPath;
+        }
+
+        public static int IndexOfNth(string str, string value, int nth = 1)
+        // from https://stackoverflow.com/questions/22669044/how-to-get-the-index-of-second-comma-in-a-string
+        {
+            if (nth <= 0)
+                throw new ArgumentException("Can not find the zeroth index of substring in string. Must start with 1");
+            int offset = str.IndexOf(value);
+            for (int i = 1; i < nth; i++)
+            {
+                if (offset == -1) return -1;
+                offset = str.IndexOf(value, offset + 1);
+            }
+            return offset;
+        }
 
         public static bool DoesFileExist(string inPath)
         {
@@ -715,7 +745,7 @@ namespace Grouper2
                     actionString = "Create";
                     break;
                 case "R":
-                    actionString = "Remove";
+                    actionString = "Replace";
                     break;
                 default:
                     Utility.DebugWrite("oh no this is new");

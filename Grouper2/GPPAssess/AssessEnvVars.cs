@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using System.Security.Cryptography;
 
 namespace Grouper2
 {
@@ -20,33 +21,29 @@ namespace Grouper2
             {
                 foreach (JToken gppEv in gppCategory["EnvironmentVariable"])
                 {
-                    JObject assessedGppEv = AssessGppEv(gppEv);
-                    string uid = assessedGppEv["UID"].ToString();
-                    assessedGppEvs.Add(uid, assessedGppEv);
+                    JProperty assessedGppEv = AssessGppEv(gppEv);
+                    assessedGppEvs.Add(assessedGppEv);
                 }
             }
             else
             {
-                JObject assessedGppEv = AssessGppEv(gppCategory["EnvironmentVariable"]);
-                string uid = assessedGppEv["UID"].ToString();
-                assessedGppEv["UID"].Remove();
-                assessedGppEvs.Add(uid, assessedGppEv);
+                JProperty assessedGppEv = AssessGppEv(gppCategory["EnvironmentVariable"]);
+                assessedGppEvs.Add(assessedGppEv["uid"].ToString(), assessedGppEv);
             }
 
             return assessedGppEvs;
         }
 
-        static JObject AssessGppEv(JToken gppEv)
+        static JProperty AssessGppEv(JToken gppEv)
         {
-            JObject AssessedGppEv = new JObject();
-            
-            AssessedGppEv.Add("Name", Utility.GetSafeString(gppEv, "@name"));
-            AssessedGppEv.Add("Status", Utility.GetSafeString(gppEv, "@status"));
-            AssessedGppEv.Add("Changed", Utility.GetSafeString(gppEv, "@changed"));
-            AssessedGppEv.Add("Action", Utility.GetActionString(gppEv["Properties"]["@action"].ToString()));
-            AssessedGppEv.Add("UID", Utility.GetSafeString(gppEv, "@uid"));
-            
-            return AssessedGppEv;
+            JObject assessedGppEv = new JObject();
+            assessedGppEv.Add("Name", Utility.GetSafeString(gppEv, "@name"));
+            assessedGppEv.Add("Status", Utility.GetSafeString(gppEv, "@status"));
+            assessedGppEv.Add("Changed", Utility.GetSafeString(gppEv, "@changed"));
+            assessedGppEv.Add("Action", Utility.GetActionString(gppEv["Properties"]["@action"].ToString()));
+            return new JProperty(Utility.GetSafeString(gppEv, "@uid"), assessedGppEv);
         }
     }
+
+    
 }
