@@ -324,16 +324,12 @@ namespace Grouper2
 
         public static string GetParentDirPath(string dirPath)
         {
-            //Utility.DebugWrite("input " + dirPath);
-            
             int count = dirPath.Length - dirPath.Replace("\\", "").Length;
 
             int lastDirSepIndex = IndexOfNth(dirPath, "\\", count);
             
             string parentPath = dirPath.Remove(lastDirSepIndex);
-
-            //Utility.DebugWrite("output " + parentPath);
-
+            
             return parentPath;
         }
 

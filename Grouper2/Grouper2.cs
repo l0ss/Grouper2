@@ -279,7 +279,7 @@ public class GlobalVar
             try
             {
                 // Final output is finally happening finally here:
-                Console.WriteLine("RESULT!");
+                Console.WriteLine("\nRESULT!");
                 Console.WriteLine("");
                 Console.WriteLine(grouper2Output);
                 Console.WriteLine("");
