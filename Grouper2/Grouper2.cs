@@ -88,8 +88,8 @@ public class GlobalVar
             DateTime grouper2StartTime = DateTime.Now;
             Utility.PrintBanner();
 
-            Console.WriteLine("Running as user: " + Environment.UserDomainName + "\\" + Environment.UserName);
-            Console.WriteLine("All online checks will be performed in the context of this user.");
+            Console.Error.WriteLine("Running as user: " + Environment.UserDomainName + "\\" + Environment.UserName);
+            Console.Error.WriteLine("All online checks will be performed in the context of this user.");
 
             CommandLineParser.CommandLineParser parser = new CommandLineParser.CommandLineParser();
             SwitchArgument debugArg = new SwitchArgument('d', "debug", "Enables debug mode. Will also show you the names of any categories of policies that Grouper saw but didn't have any means of processing. I eagerly await your pull request.", false);
@@ -131,7 +131,7 @@ public class GlobalVar
                 if (offlineArg.Parsed && offlineArg.Value && !sysvolArg.Parsed)
                 {
                     // handle someone trying to run in offline mode without giving a value for sysvol
-                    Console.WriteLine(
+                    Console.Error.WriteLine(
                         "Offline mode requires you to provide a value for -s, the path where Grouper2 can find the domain SYSVOL share, or a copy of it at least.");
                     Environment.Exit(1);
                 }
@@ -139,7 +139,7 @@ public class GlobalVar
                 if (intlevArg.Parsed)
                 {
                     // handle interest level parsing
-                    Console.WriteLine("Roger. Everything with an Interest Level lower than " +
+                    Console.Error.WriteLine("Roger. Everything with an Interest Level lower than " +
                                       intlevArg.Value.ToString() + " is getting thrown on the floor.");
                     GlobalVar.IntLevelToShow = intlevArg.Value;
                 }
@@ -150,19 +150,22 @@ public class GlobalVar
 
                 if (debugArg.Parsed)
                 {
-                    Console.WriteLine("Debug mode enabled. Hope you like yellow.");
+                    Console.Error.WriteLine("Debug mode enabled. Hope you like yellow.");
                     GlobalVar.DebugMode = true;
-                }
-
-                if (sysvolArg.Parsed)
-                {
-                    sysvolPolDir = sysvolArg.Value;
                 }
 
                 if (threadsArg.Parsed)
                 {
+                    Console.Error.WriteLine("Maximum threads set to: " + threadsArg.Value);
                     maxThreads = threadsArg.Value;
                 }
+
+                if (sysvolArg.Parsed)
+                {
+                    Console.Error.WriteLine("Hitting sysvol at path: " + sysvolArg.Value);
+                    sysvolPolDir = sysvolArg.Value;
+                }
+                
             }
             catch (CommandLineException e)
             {
@@ -221,7 +224,6 @@ public class GlobalVar
             // we're going to gather up all our goodies and put them into that dict we just created.
 
             // Create a TaskScheduler
-            // TODO add arg for number of threads.
             LimitedConcurrencyLevelTaskScheduler lcts = new LimitedConcurrencyLevelTaskScheduler(maxThreads);
             List<Task> gpoTasks = new List<Task>();
 
@@ -229,8 +231,8 @@ public class GlobalVar
             TaskFactory gpoFactory = new TaskFactory(lcts);
             CancellationTokenSource cts = new CancellationTokenSource();
 
-            Console.WriteLine(gpoPaths.Count.ToString() + " GPOs to process.");
-            Console.WriteLine("Starting processing with " + maxThreads.ToString() + " threads.");
+            Console.Error.WriteLine(gpoPaths.Count.ToString() + " GPOs to process.");
+            Console.Error.WriteLine("Starting processing with " + maxThreads.ToString() + " threads.");
 
             // Create a task for each GPO
             foreach (string gpoPath in gpoPaths)
