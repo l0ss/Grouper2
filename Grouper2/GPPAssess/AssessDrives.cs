@@ -6,9 +6,7 @@ namespace Grouper2
     public partial class AssessGpp
     {
         private JObject GetAssessedDrives(JObject gppCategory)
-        {
-            int interestLevel = 1;
-            
+        {   
             JObject assessedGppDrives = new JObject();
 
             if (gppCategory["Drive"] is JArray)

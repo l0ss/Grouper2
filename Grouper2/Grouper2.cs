@@ -252,9 +252,9 @@ public class GlobalVar
                 gpoTasks.Add(t);
             }
             
-            // 
+            // put 'em all in a happy little array
             Task[] gpoTaskArray = gpoTasks.ToArray();
-
+           
             // create a little counter to provide status updates
             int totalTasksCount = gpoTaskArray.Length;
             int incompleteTaskCount = gpoTaskArray.Length;
@@ -266,11 +266,13 @@ public class GlobalVar
                 incompleteTaskCount = incompleteTasks.Length;
 
                 int completeTaskCount = totalTasksCount - incompleteTaskCount;
-                int percentage = (int)Math.Round((double)(100 * completeTaskCount) / totalTasksCount);
+                int percentage = (int) Math.Round((double) (100 * completeTaskCount) / totalTasksCount);
                 string percentageString = percentage.ToString();
 
-                Console.Write("\r" + completeTaskCount.ToString() + "/" + totalTasksCount.ToString() + " GPOs processed. "+ percentageString + "% complete.");
+                Console.Error.Write("\r" + completeTaskCount.ToString() + "/" + totalTasksCount.ToString() +
+                              " GPOs processed. " + percentageString + "% complete.");
             }
+            
 
             // make double sure tasks all finished
             Task.WaitAll(gpoTasks.ToArray());
