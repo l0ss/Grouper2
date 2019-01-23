@@ -36,7 +36,6 @@ namespace Grouper2
         
         static JProperty AssessGppIni(JToken gppIni)
         {
-            Utility.DebugWrite(gppIni.ToString());
             int interestLevel = 1;
             string gppIniUid = Utility.GetSafeString(gppIni, "@uid");
             string gppIniName = Utility.GetSafeString(gppIni, "@name");

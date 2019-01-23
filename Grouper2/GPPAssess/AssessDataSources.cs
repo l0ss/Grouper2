@@ -6,66 +6,74 @@ namespace Grouper2
     {
         private JObject GetAssessedDataSources(JObject gppCategory)
         {
-            /*{
-                "@clsid": "{5C209626-D820-4d69-8D50-1FACD6214488}",
-                "@name": "thing",
-                "@image": "0",
-                "@changed": "2019-01-15 12:50:18",
-                "@uid": "{79D5F174-338C-48D7-A4E6-B46A26D72394}",
-                "@userContext": "1",
-                "@removePolicy": "0",
-                "Properties": {
-                    "@action": "C",
-                    "@userDSN": "1",
-                    "@dsn": "thing",
-                    "@driver": "SQL Server",
-                    "@description": "hlkjhlkj",
-                    "@username": "hgkjhgkjh\\tkuhgk",
-                    "@cpassword": "/yIv9hPoIkBuYXZZ7onYlg",
-                    "Attributes": {
-                        "Attribute": [
-                        {
-                            "@name": "qwer",
-                            "@value": "asdf"
-                        },
-                        {
-                            "@name": "qwer1",
-                            "@value": "asdf1"
-                        }
-                        ]
-                    }
-                }
-            },
+            JObject assessedGppDataSources = new JObject();
+            if (gppCategory["DataSource"] is JArray)
             {
-                "@clsid": "{5C209626-D820-4d69-8D50-1FACD6214488}",
-                "@userContext": "1",
-                "@name": "yuio",
-                "@image": "0",
-                "@changed": "2019-01-15 12:50:50",
-                "@uid": "{C0EB588B-8163-4F92-9697-6A0E76B6E93C}",
-                "Properties": {
-                    "@action": "C",
-                    "@userDSN": "0",
-                    "@dsn": "yuio",
-                    "@driver": "HJKL",
-                    "@description": "DGDHJ",
-                    "@username": "VCXV",
-                    "@cpassword": "/yIv9hPoIkBuYXZZ7onYlg"
+                foreach (JToken gppDataSource in gppCategory["DataSource"])
+                {
+                    JProperty assessedGppDataSource = AssessGppDataSource(gppDataSource);
+                    assessedGppDataSources.Add(assessedGppDataSource);
                 }
-            }*/
-
-            //Utility.DebugWrite("\nDataSource");
-            //Utility.DebugWrite(gppCategory["DataSource"].ToString());
-            // dont forget cpasswords
-            int interestLevel = 0;
-            JProperty gppDataSourcesProp = new JProperty("DataSource", gppCategory["DataSource"]);
-            JObject assessedGppDataSources = new JObject(gppDataSourcesProp);
-            if (interestLevel < GlobalVar.IntLevelToShow)
+            }
+            else
             {
-                assessedGppDataSources = new JObject();
+                JProperty assessedGppDataSource = AssessGppDataSource(gppCategory["DataSource"]);
+                assessedGppDataSources.Add(assessedGppDataSource);
             }
 
-            return assessedGppDataSources;
+            if (assessedGppDataSources.HasValues)
+            {
+                return assessedGppDataSources;
+            }
+            else
+            {
+                return null;
+            }
+            
+        }
+        
+        static JProperty AssessGppDataSource(JToken gppDataSource)
+        {
+            //Utility.DebugWrite(gppDataSource.ToString());
+            int interestLevel = 1;
+            string gppDataSourceUid = Utility.GetSafeString(gppDataSource, "@uid");
+            string gppDataSourceName = Utility.GetSafeString(gppDataSource, "@name");
+            string gppDataSourceChanged = Utility.GetSafeString(gppDataSource, "@changed");
+            
+            JToken gppDataSourceProps = gppDataSource["Properties"];
+            string gppDataSourceAction = Utility.GetActionString(gppDataSourceProps["@action"].ToString());
+            string gppDataSourceUserName = Utility.GetSafeString(gppDataSourceProps, "@username");
+            string gppDataSourcecPassword = Utility.GetSafeString(gppDataSourceProps, "@cpassword");
+            string gppDataSourcePassword = "";
+            if (gppDataSourcecPassword.Length > 0)
+            {
+                gppDataSourcePassword = Utility.DecryptCpassword(gppDataSourcecPassword);
+                interestLevel = 10;
+            }
+
+            string gppDataSourceDsn = Utility.GetSafeString(gppDataSourceProps, "@dsn");
+            string gppDataSourceDriver = Utility.GetSafeString(gppDataSourceProps, "@driver");
+            string gppDataSourceDescription = Utility.GetSafeString(gppDataSourceProps, "@description");
+            JToken gppDataSourceAttributes = gppDataSourceProps["Attributes"];
+
+            if (interestLevel >= GlobalVar.IntLevelToShow)
+            {
+                JObject assessedGppDataSource = new JObject();
+                assessedGppDataSource.Add("Name", gppDataSourceName);
+                assessedGppDataSource.Add("Changed", gppDataSourceChanged);
+                assessedGppDataSource.Add("Action", gppDataSourceAction);
+                assessedGppDataSource.Add("Username", gppDataSourceUserName);
+                assessedGppDataSource.Add("cPassword", gppDataSourcecPassword);
+                assessedGppDataSource.Add("Decrypted Password", gppDataSourcePassword);
+                assessedGppDataSource.Add("DSN", gppDataSourceDsn);
+                assessedGppDataSource.Add("Driver", gppDataSourceDriver);
+                assessedGppDataSource.Add("Description", gppDataSourceDescription);
+                assessedGppDataSource.Add("Attributes", gppDataSourceAttributes);
+               
+                return new JProperty(gppDataSourceUid, assessedGppDataSource);
+            }
+
+            return null;
         }
     }
 }

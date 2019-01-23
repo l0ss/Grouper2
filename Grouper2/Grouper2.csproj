@@ -113,7 +113,6 @@
     <Compile Include="GPPAssess\AssessDrives.cs" />
     <Compile Include="GPPAssess\AssessEnvVars.cs" />
     <Compile Include="GPPAssess\AssessFiles.cs" />
-    <Compile Include="GPPAssess\AssessFolders.cs" />
     <Compile Include="GPPAssess\AssessIniFiles.cs" />
     <Compile Include="GPPAssess\AssessNetworkOptions.cs" />
     <Compile Include="GPPAssess\AssessNetworkShares.cs" />

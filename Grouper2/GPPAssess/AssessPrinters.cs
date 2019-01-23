@@ -7,6 +7,8 @@ namespace Grouper2
         private JObject GetAssessedPrinters(JObject gppCategory)
         {/*
             {
+            THIS IS VERY WEIRD I CANT MAKE THIS HAVE A CPASSWORD VALUE EVEN ON 2008
+
                 "@clsid": "{9A5E9697-9095-436d-A0EE-4D128FDFBCE5}",
                 "@name": "printer",
                 "@status": "printer",
