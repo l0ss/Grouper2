@@ -77,6 +77,7 @@ public class GlobalVar
         public static bool OnlineChecks;
         public static int IntLevelToShow;
         public static bool DebugMode;
+        public static bool NoMess;
         
         public static List<String> CleanupList = new List<string>();
     }
@@ -100,7 +101,7 @@ public class GlobalVar
             ValueArgument<int> threadsArg = new ValueArgument<int>('t',"threads", "Max number of threads. Defaults to 10.");
             SwitchArgument helpArg = new SwitchArgument('h', "help", "Displays this help.", false);
             SwitchArgument prettyArg = new SwitchArgument('p', "pretty", "Switches output from the raw Json to a prettier format.", false);
-
+            SwitchArgument noMessArg = new SwitchArgument('m', "nomess", "Avoids file writes at all costs. May find less stuff.", false);
             parser.Arguments.Add(debugArg);
             parser.Arguments.Add(intlevArg);
             parser.Arguments.Add(sysvolArg);
@@ -108,12 +109,13 @@ public class GlobalVar
             parser.Arguments.Add(threadsArg);
             parser.Arguments.Add(helpArg);
             parser.Arguments.Add(prettyArg);
-
+            parser.Arguments.Add(noMessArg);
             // set a few defaults
             string sysvolPolDir = "";
             GlobalVar.OnlineChecks = true;
             int maxThreads = 10;
             bool prettyOutput = false;
+            GlobalVar.NoMess = false;
 
             try
             {
@@ -180,7 +182,13 @@ public class GlobalVar
                     Console.Error.WriteLine("Switching output to pretty mode. Nice.");
                     prettyOutput = true;
                 }
-                
+
+                if (noMessArg.Parsed)
+                {
+                    Console.Error.WriteLine("No Mess mode enabled. Good for OPSEC, maybe bad for finding all the vulns? All \"Directory Is Writable\" checks will return false.");
+
+                    GlobalVar.NoMess = true;
+                }
             }
             catch (CommandLineException e)
             {

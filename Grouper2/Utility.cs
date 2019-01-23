@@ -417,9 +417,16 @@ namespace Grouper2
             bool canWrite = false;
             try
             {
-                FileStream stream = File.OpenWrite(inPath);
-                canWrite = stream.CanWrite;
-                stream.Close();
+                if (GlobalVar.NoMess)
+                {
+                    return false;
+                }
+                else
+                {
+                    FileStream stream = File.OpenWrite(inPath);
+                    canWrite = stream.CanWrite;
+                    stream.Close();
+                }
             }
             catch (System.UnauthorizedAccessException)
             {
