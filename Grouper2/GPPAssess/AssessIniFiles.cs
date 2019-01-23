@@ -6,35 +6,80 @@ namespace Grouper2
     {
         private JObject GetAssessedIniFiles(JObject gppCategory)
         {
-            /*
-             {
-               "@clsid": "{EEFACE84-D3D8-4680-8D4B-BF103E759448}",
-               "@name": "propertywhooo",
-               "@status": "propertywhooo",
-               "@image": "2",
-               "@changed": "2018-11-13 06:29:07",
-               "@uid": "{1168179B-89D4-464B-B092-7136D0970979}",
-               "Properties": {
-               "@path": "C:\\temp\\temp.ini",
-               "@section": "sectionwhee",
-               "@value": "valuewhaaaa",
-               "@property": "propertywhooo",
-               "@action": "U"
-               }
-               }
-             */
 
-            //Utility.DebugWrite("\nIni");
-            //Utility.DebugWrite(gppCategory["Ini"].ToString());
-            int interestLevel = 0;
-            JProperty gppIniFilesProp = new JProperty("Ini", gppCategory["Ini"]);
-            JObject assessedGppIniFiles = new JObject(gppIniFilesProp);
-            if (interestLevel < GlobalVar.IntLevelToShow)
+            JObject assessedGppInis = new JObject();
+
+            if (gppCategory["Ini"] is JArray)
             {
-                assessedGppIniFiles = new JObject();
+                foreach (JToken gppIni in gppCategory["Ini"])
+                {
+                    JProperty assessedGppIni = AssessGppIni(gppIni);
+                    assessedGppInis.Add(assessedGppIni);
+                }
+            }
+            else
+            {
+                JProperty assessedGppIni = AssessGppIni(gppCategory["Ini"]);
+                assessedGppInis.Add(assessedGppIni);
             }
 
-            return assessedGppIniFiles;
+            if (assessedGppInis.HasValues)
+            {
+                return assessedGppInis;
+            }
+            else
+            {
+                return null;
+            }
+            
+        }
+        
+        static JProperty AssessGppIni(JToken gppIni)
+        {
+            Utility.DebugWrite(gppIni.ToString());
+            int interestLevel = 1;
+            string gppIniUid = Utility.GetSafeString(gppIni, "@uid");
+            string gppIniName = Utility.GetSafeString(gppIni, "@name");
+            string gppIniChanged = Utility.GetSafeString(gppIni, "@changed");
+            string gppIniStatus = Utility.GetSafeString(gppIni, "@status");
+            
+            JToken gppIniProps = gppIni["Properties"];
+            string gppIniAction = Utility.GetActionString(gppIniProps["@action"].ToString());
+            JToken gppIniPath = Utility.InvestigatePath(Utility.GetSafeString(gppIniProps, "@path"));
+            JToken gppIniSection = Utility.InvestigateString(Utility.GetSafeString(gppIniProps, "@section"));
+            JToken gppIniValue = Utility.InvestigateString(Utility.GetSafeString(gppIniProps, "@value"));
+            JToken gppIniProperty = Utility.InvestigateString(Utility.GetSafeString(gppIniProps, "@property"));
+            
+            // check each of our potentially interesting values to see if it raises our overall interest level
+            JToken[] valuesWithInterest = {gppIniPath, gppIniSection, gppIniValue, gppIniProperty};
+            foreach (JToken val in valuesWithInterest)
+            {
+                if (val["InterestLevel"] != null)
+                {
+                    int valInterestLevel = int.Parse(val["InterestLevel"].ToString());
+                    if (valInterestLevel > interestLevel)
+                    {
+                        interestLevel = valInterestLevel;
+                    }
+                }
+            }
+
+            if (interestLevel >= GlobalVar.IntLevelToShow)
+            {
+                JObject assessedGppIni = new JObject();
+                assessedGppIni.Add("Name", gppIniName);
+                assessedGppIni.Add("Changed", gppIniChanged);
+                assessedGppIni.Add("Path", gppIniPath);
+                assessedGppIni.Add("Action", gppIniAction);
+                assessedGppIni.Add("Status", gppIniStatus);
+                assessedGppIni.Add("Section", gppIniSection);
+                assessedGppIni.Add("Value", gppIniValue);
+                assessedGppIni.Add("Property", gppIniProperty);
+               
+                return new JProperty(gppIniUid, assessedGppIni);
+            }
+
+            return null;
         }
     }
 }
