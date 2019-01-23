@@ -81,18 +81,23 @@
     <ApplicationIcon>aroo_gjh_icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Alba.CsConsoleFormat, Version=1.0.0.89, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Alba.CsConsoleFormat.1.0.0\lib\net40\Alba.CsConsoleFormat.dll</HintPath>
+    </Reference>
     <Reference Include="CommandLineArgumentsParser, Version=3.0.19.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\CommandLineArgumentsParser.3.0.19\lib\net40\CommandLineArgumentsParser.dll</HintPath>
     </Reference>
     <Reference Include="Costura, Version=3.3.0.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
       <HintPath>..\packages\Costura.Fody.3.3.0\lib\net40\Costura.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -101,6 +106,7 @@
   <ItemGroup>
     <Compile Include="GPPAssess\AssessGpp.cs" />
     <Compile Include="AssessHandlers.cs" />
+    <Compile Include="Output.cs" />
     <Compile Include="ParseSDDL.cs" />
     <Compile Include="ScriptsIniAssess\AssessScriptsIni.cs" />
     <Compile Include="GPPAssess\AssessDataSources.cs" />

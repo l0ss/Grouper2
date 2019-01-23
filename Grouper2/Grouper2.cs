@@ -87,10 +87,7 @@ public class GlobalVar
         {
             DateTime grouper2StartTime = DateTime.Now;
             Utility.PrintBanner();
-
-            Console.Error.WriteLine("Running as user: " + Environment.UserDomainName + "\\" + Environment.UserName);
-            Console.Error.WriteLine("All online checks will be performed in the context of this user.");
-
+            
             CommandLineParser.CommandLineParser parser = new CommandLineParser.CommandLineParser();
             SwitchArgument debugArg = new SwitchArgument('d', "debug", "Enables debug mode. Will also show you the names of any categories of policies that Grouper saw but didn't have any means of processing. I eagerly await your pull request.", false);
             SwitchArgument offlineArg = new SwitchArgument('o', "offline",
@@ -101,26 +98,38 @@ public class GlobalVar
             ValueArgument<int> intlevArg = new ValueArgument<int>('i', "interestlevel",
                 "The minimum interest level to display. i.e. findings with an interest level lower than x will not be seen in output. Defaults to 1, i.e. show everything except some extremely dull defaults. If you want to see those too, do -i 0.");
             ValueArgument<int> threadsArg = new ValueArgument<int>('t',"threads", "Max number of threads. Defaults to 10.");
-            //ValueArgument<string> domainArg = new ValueArgument<string>('d', "domain", "The domain to connect to. If not specified, connects to current user context domain.");
-            //ValueArgument<string> usernameArg = new ValueArgument<string>('u', "username", "Username to authenticate as. SMB permissions checks will be run from this user's perspective.");
-            //ValueArgument<string> passwordArg = new ValueArgument<string>('p', "password", "Password to use for authentication.");
-            //parser.Arguments.Add(domainArg);
-            //parser.Arguments.Add(usernameArg);
-            //parser.Arguments.Add(passwordArg);
+            SwitchArgument helpArg = new SwitchArgument('h', "help", "Displays this help.", false);
+            SwitchArgument prettyArg = new SwitchArgument('p', "pretty", "Switches output from the raw Json to a prettier format.", false);
+
             parser.Arguments.Add(debugArg);
             parser.Arguments.Add(intlevArg);
             parser.Arguments.Add(sysvolArg);
             parser.Arguments.Add(offlineArg);
             parser.Arguments.Add(threadsArg);
+            parser.Arguments.Add(helpArg);
+            parser.Arguments.Add(prettyArg);
 
-            // set a couple of defaults
+            // set a few defaults
             string sysvolPolDir = "";
             GlobalVar.OnlineChecks = true;
             int maxThreads = 10;
+            bool prettyOutput = false;
 
             try
             {
                 parser.ParseCommandLine(args);
+                if (helpArg.Parsed)
+                {
+                    foreach (Argument arg in parser.Arguments)
+                    {
+                        Console.Error.Write("-");
+                        Console.Error.Write(arg.ShortName);
+                        Console.Error.Write(" " + arg.LongName);
+                        Console.Error.WriteLine(" - " + arg.Description);
+                    }
+
+                    Environment.Exit(0);
+                }
                 if (offlineArg.Parsed && offlineArg.Value && sysvolArg.Parsed)
                 {
                     // args config for valid offline run.
@@ -165,13 +174,21 @@ public class GlobalVar
                     Console.Error.WriteLine("Hitting sysvol at path: " + sysvolArg.Value);
                     sysvolPolDir = sysvolArg.Value;
                 }
+
+                if (prettyArg.Parsed)
+                {
+                    Console.Error.WriteLine("Switching output to pretty mode. Nice.");
+                    prettyOutput = true;
+                }
                 
             }
             catch (CommandLineException e)
             {
                 Console.WriteLine(e.Message);
             }
-
+            
+            Console.Error.WriteLine("Running as user: " + Environment.UserDomainName + "\\" + Environment.UserName);
+            Console.Error.WriteLine("All online checks will be performed in the context of this user.");
 
             // Ask the DC for GPO details
             if (GlobalVar.OnlineChecks)
@@ -283,21 +300,27 @@ public class GlobalVar
             try
             {
                 // Final output is finally happening finally here:
-                Console.WriteLine("\nRESULT!");
-                Console.WriteLine("");
-                Console.WriteLine(grouper2Output);
-                Console.WriteLine("");
 
+                if (prettyOutput)
+                {
+                    foreach (KeyValuePair<string, JToken> gpo in grouper2Output)
+                    {
+                        Console.Error.WriteLine("\n");
+                        Output.GetAssessedGPOOutput(gpo);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine(grouper2Output);
+                }
             }
             catch (Exception e)
             {
                 Utility.DebugWrite(e.ToString());
             }
 
+            // get the time it took to do the thing and give to user
             DateTime grouper2EndTime = DateTime.Now;
-
-
-
             TimeSpan grouper2RunTime = grouper2EndTime.Subtract(grouper2StartTime);
             string grouper2RunTimeString = String.Format("{0}:{1}:{2}:{3}", grouper2RunTime.Hours, grouper2RunTime.Minutes, grouper2RunTime.Seconds, grouper2RunTime.Milliseconds);
 
@@ -305,7 +328,7 @@ public class GlobalVar
 
             if (GlobalVar.CleanupList != null)
             {
-                Console.WriteLine("\n\nGrouper tried to create these files. It probably failed, but just in case it didn't, you might want to check and clean them up.");
+                Console.WriteLine("\n\nGrouper tried to create these files. It probably failed, but just in case it didn't, you might want to check and clean them up.\n");
                 foreach (string path in GlobalVar.CleanupList)
                 {
                     Console.WriteLine(path);
@@ -337,6 +360,7 @@ public class GlobalVar
                         // select the GPO's details from the gpo data we got
                         JToken domainGpo = GetDomainGpoData.DomainGpoData[gpoUid];
                         gpoProps = (JObject) JToken.FromObject(domainGpo);
+                        gpoProps.Add("gpoPath", gpoPath);
                     }
                     catch (ArgumentNullException e)
                     {
@@ -351,7 +375,7 @@ public class GlobalVar
                         // if we weren't able to select the GPO's details, do what we can with what we have.
                         gpoProps = new JObject()
                         {
-                            {"gpoUID", gpoUid},
+                            {"UID", gpoUid},
                             {"gpoPath", gpoPath}
                         };
                     }
@@ -361,7 +385,7 @@ public class GlobalVar
                 {
                     gpoProps = new JObject()
                     {
-                        {"gpoUID", gpoUid},
+                        {"UID", gpoUid},
                         {"gpoPath", gpoPath}
                     };
                 }
@@ -437,22 +461,24 @@ public class GlobalVar
                     }
                 }
 
+                JObject allFindings = new JObject();
+
                 // if there are any Findings, add it to the final output.
                 if (userFindings.HasValues)
                 {
-                    JProperty userFindingsJProp = new JProperty("Findings in User Policy", userFindings);
-                    gpoResultJson.Add(userFindingsJProp);
+                    JProperty userFindingsJProp = new JProperty("User Policy", userFindings);
+                    allFindings.Add(userFindingsJProp);
                 }
 
                 if (machineFindings.HasValues)
                 {
-                    JProperty machineFindingsJProp = new JProperty("Findings in Machine Policy", machineFindings);
-                    gpoResultJson.Add(machineFindingsJProp);
+                    JProperty machineFindingsJProp = new JProperty("Machine Policy", machineFindings);
+                    allFindings.Add(machineFindingsJProp);
                 }
 
-                // put into final output
-                if (userFindings.HasValues || machineFindings.HasValues)
+                if (allFindings.HasValues)
                 {
+                    gpoResultJson.Add("Findings", allFindings);
                     return gpoResultJson;
                 }
             }
