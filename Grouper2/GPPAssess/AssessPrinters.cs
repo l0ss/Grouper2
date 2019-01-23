@@ -5,42 +5,103 @@ namespace Grouper2
     public partial class AssessGpp
     {
         private JObject GetAssessedPrinters(JObject gppCategory)
-        {/*
-            {
-            THIS IS VERY WEIRD I CANT MAKE THIS HAVE A CPASSWORD VALUE EVEN ON 2008
+        {
+            Utility.DebugWrite(gppCategory.ToString());
+            
+            JToken portPrinters = gppCategory["PortPrinter"];
+            
+            JToken sharedPrinters = gppCategory["SharedPrinters"];
 
-                "@clsid": "{9A5E9697-9095-436d-A0EE-4D128FDFBCE5}",
-                "@name": "printer",
-                "@status": "printer",
-                "@image": "2",
-                "@changed": "2019-01-15 12:55:10",
-                "@uid": "{9DB15FAD-0D44-4D79-9349-E7E68C78A051}",
-                "Properties": {
-                    "@action": "U",
-                    "@comment": "",
-                    "@path": "\\\\thing.thing\\printer",
-                    "@location": "",
-                    "@default": "0",
-                    "@skipLocal": "0",
-                    "@deleteAll": "0",
-                    "@persistent": "0",
-                    "@deleteMaps": "0",
-                    "@port": ""
+            JToken[] gppPrinterTypes = new JToken[] { portPrinters, sharedPrinters};
+
+            JObject assessedGppPrinters = new JObject();
+
+            foreach (JToken printerType in gppPrinterTypes)
+            {
+                if (printerType is JArray)
+                {
+                    foreach (JToken gppPrinter in printerType)
+                    {
+                        JProperty assessedGppPrinter = AssessGppPrinter(gppPrinter);
+                        assessedGppPrinters.Add(assessedGppPrinter);
+                    }
                 }
-            }*/
-
-            //Utility.DebugWrite("\nSharedPrinter");
-            //Utility.DebugWrite(gppCategory["SharedPrinter"].ToString());
-            // dont forget cpasswords
-            int interestLevel = 0;
-            JProperty gppSharedPrintersProp = new JProperty("SharedPrinter", gppCategory["SharedPrinter"]);
-            JObject assessedGppSharedPrinters = new JObject(gppSharedPrintersProp);
-            if (interestLevel < GlobalVar.IntLevelToShow)
+                else if (printerType != null)
+                {
+                    JProperty assessedGppPrinter = AssessGppPrinter(printerType);
+                    assessedGppPrinters.Add(assessedGppPrinter);
+                }
+            }
+            
+            if (assessedGppPrinters.HasValues)
             {
-                assessedGppSharedPrinters = new JObject();
+                return assessedGppPrinters;
+            }
+            else
+            {
+                return null;
             }
 
-            return assessedGppSharedPrinters;
+        }
+
+        static JProperty AssessGppPrinter(JToken gppPrinter)
+        {
+            int interestLevel = 1;
+            string gppPrinterUid = Utility.GetSafeString(gppPrinter, "@uid");
+            string gppPrinterName = Utility.GetSafeString(gppPrinter, "@name");
+            string gppPrinterChanged = Utility.GetSafeString(gppPrinter, "@changed");
+            JToken gppPrinterProps = gppPrinter["Properties"];
+            string gppPrinterAction = Utility.GetActionString(gppPrinterProps["@action"].ToString());
+            string gppPrinterUsername = Utility.GetSafeString(gppPrinterProps, "@username");
+            string gppPrintercPassword = Utility.GetSafeString(gppPrinterProps, "@cpassword");
+            string gppPrinterPassword = "";
+            if (gppPrintercPassword.Length > 0)
+            {
+                gppPrinterPassword = Utility.DecryptCpassword(gppPrintercPassword);
+                interestLevel = 10;
+            }
+            string gppPrinterAddress = Utility.GetSafeString(gppPrinterProps, "@ipAddress");
+            string gppPrinterLocalName = Utility.GetSafeString(gppPrinterProps, "@localName");
+            string gppPrinterSnmpCommString = Utility.GetSafeString(gppPrinterProps, "@snmpCommunity");
+            if (gppPrinterSnmpCommString.Length > 1) interestLevel = 7;
+            JToken gppPrinterPath = Utility.InvestigatePath(Utility.GetSafeString(gppPrinterProps, "@path"));
+            JToken gppPrinterComment = Utility.InvestigateString(Utility.GetSafeString(gppPrinterProps, "@comment"));
+            JToken gppPrinterLocation = Utility.InvestigateString(Utility.GetSafeString(gppPrinterProps, "@location"));
+
+            // check each of our potentially interesting values to see if it raises our overall interest level
+            JToken[] valuesWithInterest = { gppPrinterPath, gppPrinterComment, gppPrinterLocation,};
+            foreach (JToken val in valuesWithInterest)
+            {
+                if (val["InterestLevel"] != null)
+                {
+                    int valInterestLevel = int.Parse(val["InterestLevel"].ToString());
+                    if (valInterestLevel > interestLevel)
+                    {
+                        interestLevel = valInterestLevel;
+                    }
+                }
+            }
+
+            if (interestLevel >= GlobalVar.IntLevelToShow)
+            {
+                JObject assessedGppPrinter = new JObject();
+                assessedGppPrinter.Add("Name", gppPrinterName);
+                assessedGppPrinter.Add("Changed", gppPrinterChanged);
+                assessedGppPrinter.Add("Action", gppPrinterAction);
+                assessedGppPrinter.Add("Username", gppPrinterUsername);
+                assessedGppPrinter.Add("cPassword", gppPrintercPassword);
+                assessedGppPrinter.Add("Decrypted Password", gppPrinterPassword);
+                assessedGppPrinter.Add("Local Name", gppPrinterLocalName);
+                assessedGppPrinter.Add("Address", gppPrinterAddress);
+                assessedGppPrinter.Add("Path", gppPrinterPath);
+                assessedGppPrinter.Add("SNMP Community String", gppPrinterSnmpCommString);
+                assessedGppPrinter.Add("Comment", gppPrinterComment);
+                assessedGppPrinter.Add("Location", gppPrinterLocation);
+
+                return new JProperty(gppPrinterUid, assessedGppPrinter);
+            }
+
+            return null;
         }
     }
 }
