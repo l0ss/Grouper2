@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.DirectoryServices.ActiveDirectory;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
 using CommandLineParser.Arguments;
 using CommandLineParser.Exceptions;
 using Grouper2.Properties;
@@ -330,7 +329,8 @@ public class GlobalVar
             // get the time it took to do the thing and give to user
             DateTime grouper2EndTime = DateTime.Now;
             TimeSpan grouper2RunTime = grouper2EndTime.Subtract(grouper2StartTime);
-            string grouper2RunTimeString = String.Format("{0}:{1}:{2}:{3}", grouper2RunTime.Hours, grouper2RunTime.Minutes, grouper2RunTime.Seconds, grouper2RunTime.Milliseconds);
+            string grouper2RunTimeString =
+                $"{grouper2RunTime.Hours}:{grouper2RunTime.Minutes}:{grouper2RunTime.Seconds}:{grouper2RunTime.Milliseconds}";
 
             Console.WriteLine("Grouper2 took " + grouper2RunTimeString + " to run.");
 

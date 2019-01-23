@@ -46,9 +46,9 @@ namespace Grouper2
                     Children =
                     {
                         new Cell("UID"), new Cell(gpoProps["UID"].ToString()),
-                        new Cell("Path"), new Cell(gpoProps["gpoPath"].ToString()),
-                        new Cell("Created"), new Cell(gpoProps["Created"].ToString()),
-                        new Cell("Status"), new Cell(Utility.GetSafeString(gpoProps, "GPO Status"))
+                        new Cell("Path"), new Cell(gpoProps["gpoPath"].ToString())
+                        //new Cell("Created"), new Cell(gpoProps["Created"].ToString()),
+                        //new Cell("Status"), new Cell(Utility.GetSafeString(gpoProps, "GPO Status"))
                     }
                 }
                 );
