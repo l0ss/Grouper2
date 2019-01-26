@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Runtime.Remoting.Messaging;
+using Newtonsoft.Json.Linq;
 
 namespace Grouper2
 {
@@ -6,48 +7,50 @@ namespace Grouper2
     {
         private JObject GetAssessedRegistrySettings(JObject gppCategory)
         {
-            int interestLevel = 0;
+            // I both hate and fear this part of the thing. I want it to go away.
+
+            JObject assessedGppRegSettingsOut = new JObject();
+
             if (gppCategory["Collection"] != null)
             {
-                JProperty gppRegSettingsProp = new JProperty("RegSettingsColl", gppCategory["Collection"]);
-                JObject assessedGppRegSettings = new JObject(gppRegSettingsProp);
-                if (interestLevel < GlobalVar.IntLevelToShow)
+                JObject assessedGppRegCollections = GetAssessedRegistryCollection(gppCategory["Collection"]);
+                if (assessedGppRegCollections != null)
                 {
-                    assessedGppRegSettings = new JObject();
+                    assessedGppRegSettingsOut.Add(assessedGppRegCollections);
                 }
-
-                return assessedGppRegSettings;
             }
 
             if (gppCategory["Registry"] != null)
             {
-                JProperty gppRegSettingsProp = new JProperty("RegSettingsReg", gppCategory["Registry"]);
-                JObject assessedGppRegSettings = new JObject(gppRegSettingsProp);
-                if (interestLevel < GlobalVar.IntLevelToShow)
+                JObject assessedGppRegSettings = GetAssessedRegistrySetting(gppCategory["Registry"]);
+                if (assessedGppRegSettings != null)
                 {
-                    assessedGppRegSettings = new JObject();
+                    assessedGppRegSettings.Add(assessedGppRegSettings);
                 }
-
-                return assessedGppRegSettings;
             }
 
-            if (gppCategory["RegistrySettings"] != null)
+            if (assessedGppRegSettingsOut.HasValues)
             {
-                JProperty gppRegSettingsProp = new JProperty("RegSettingsRegSet", gppCategory["RegistrySettings"]);
-                JObject assessedGppRegSettings = new JObject(gppRegSettingsProp);
-                if (interestLevel < GlobalVar.IntLevelToShow)
-                {
-                    assessedGppRegSettings = new JObject();
-                }
-
-                return assessedGppRegSettings;
+                return assessedGppRegSettingsOut;
             }
             else
             {
-                Utility.DebugWrite("Something fucked up.");
-                Utility.DebugWrite(gppCategory.ToString());
                 return null;
             }
+        }
+
+        private JObject GetAssessedRegistryCollection(JToken gppRegCollection)
+        {
+            //Utility.DebugWrite("Collection");
+            //Utility.DebugWrite(gppRegCollection.ToString());
+            return null;
+        }
+
+        private JObject GetAssessedRegistrySetting(JToken gppRegSetting)
+        {
+            //Utility.DebugWrite("Setting");
+            //Utility.DebugWrite(gppRegSetting.ToString());
+            return null;
         }
     }
 }

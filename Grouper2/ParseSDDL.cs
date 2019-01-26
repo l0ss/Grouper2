@@ -9,9 +9,10 @@ namespace Grouper2
     {
         public static JObject ParseSddlString(string rawSddl, SecurableObjectType type)
         {
-            var sddl = new Sddl.Parser.Sddl(rawSddl, type);
-
-            return sddl.ToJObject();
+            //var sddl = new Sddl.Parser.Sddl(rawSddl, type);
+            // commented out pending fix
+            //return sddl.ToJObject();
+            return new JObject();
         }
     }
 }
