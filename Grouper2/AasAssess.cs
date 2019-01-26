@@ -6,11 +6,30 @@ namespace Grouper2
     {
         public static JObject AssessAasFile(JObject parsedAasFile)
         {
-            // for now it just passes these through
-            // TODO
-            JObject assessedAasFile = parsedAasFile;
+            int interestLevel = 3;
 
-            return assessedAasFile;
+            if (parsedAasFile["MSI Path"] != null)
+            {
+                string msiPath = parsedAasFile["MSI Path"].ToString();
+                JObject assessedMsiPath = Utility.InvestigatePath(msiPath);
+                if (assessedMsiPath.HasValues)
+                {
+                    parsedAasFile["MSI Path"] = assessedMsiPath;
+                    if ((int) assessedMsiPath["InterestLevel"] > interestLevel)
+                    {
+                        interestLevel = (int) assessedMsiPath["InterestLevel"];
+                    }
+                }
+            }
+
+            if (interestLevel >= GlobalVar.IntLevelToShow)
+            {
+                return parsedAasFile;
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

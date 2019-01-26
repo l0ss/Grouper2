@@ -3,6 +3,8 @@ using System.Text.RegularExpressions;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mime;
+using System.Text;
 using Newtonsoft.Json.Linq;
 using System.Xml;
 using Newtonsoft.Json;
@@ -232,18 +234,104 @@ namespace Grouper2
 
         public static JObject ParseAASFile(string aasFile)
         {
-            JObject parsedAasFile = new JObject();
-
+            byte[] aasBytes = File.ReadAllBytes(aasFile);
             string aasString = File.ReadAllText(aasFile);
 
-            Utility.DebugWrite(aasString);
+            //Utility.DebugWrite(aasString);
 
             // guid regex
             // [{]?[0-9a-fA-F]{8}[-]?([0-9a-fA-F]{4}[-]?){3}[0-9a-fA-F]{12}[}]
 
 
+            // regex to find guids in the file
+            string guidRegExPattern = @"[{]?[0-9a-fA-F]{8}[-]?([0-9a-fA-F]{4}[-]?){3}[0-9a-fA-F]{12}[}]";
+            Regex guidRegex = new Regex(guidRegExPattern);
+            // find them
+            MatchCollection aasGuids = guidRegex.Matches(aasString);
+            // first one is the product Code, second and third are revision number, 4th is upgrade code.
+            string productCode = aasGuids[0].Value;
+            string revisionNumber = aasGuids[2].ToString();
+            string upgradeCode = aasGuids[3].ToString();
+
+            // product Name appears at offset 100, figure out how long it is by looking for null byte.
+            int prodNameLength = 0;
+            foreach (byte b in aasBytes.Skip(100))
+            {
+                if (b == 0x00)
+                {
+                    break;
+                }
+                else prodNameLength++;
+            }
+
+            byte[] prodNameBytes = new byte[prodNameLength - 1];
+            // then actually get the thing.
+            Array.Copy(aasBytes, 100, prodNameBytes, 0, (prodNameLength - 1));
+
+            string productName = System.Text.Encoding.UTF8.GetString(prodNameBytes, 0, prodNameBytes.Length);
+
+            // file name starts 2 bytes after product name
+            int fileNameOffset = 100 + prodNameLength + 1;
+            // repeat process for that.
+            int fileNameLength = 0;
+            foreach (byte b in aasBytes.Skip(fileNameOffset))
+            {
+                if (b == 0x00)
+                {
+                    break;
+                }
+                else fileNameLength++;
+            }
+
+            byte[] fileNameBytes = new byte[fileNameLength];
+            // then actually get the thing.
+            Array.Copy(aasBytes, fileNameOffset, fileNameBytes, 0, fileNameLength);
+
+            string fileName = System.Text.Encoding.UTF8.GetString(fileNameBytes, 0, fileNameBytes.Length);
+
+            byte[] upgradeCodeBytes = Encoding.UTF8.GetBytes(upgradeCode);
+
+            int upgradeCodeOffset = new int();
+
+            if ((upgradeCodeBytes != null) && (aasBytes.Length >= upgradeCodeBytes.Length))
+            {
+                for (int l = 0; l < aasBytes.Length - upgradeCodeBytes.Length + 1; l++)
+                {
+                    if (!upgradeCodeBytes.Where((data, index) => !aasBytes[l + index].Equals(data)).Any())
+                    {
+                        upgradeCodeOffset = l;
+                    }
+                }
+            }
+
+            int filePathOffset = (upgradeCodeOffset + 66);
+            int filePathLength = 0;
+            foreach (byte b in aasBytes.Skip(filePathOffset))
+            {
+                if (b == 0x00)
+                {
+                    break;
+                }
+                else filePathLength++;
+            }
+
+            byte[] filePathBytes = new byte[filePathLength - 2];
+            Array.Copy(aasBytes, filePathOffset, filePathBytes, 0, filePathLength - 2);
+            string filePath = System.Text.Encoding.UTF8.GetString(filePathBytes, 0, filePathBytes.Length);
+
+            string msiPath = Path.Combine(filePath, fileName);
+
+            JObject parsedAasFile = new JObject(
+                new JProperty("Package Name", productName),
+                new JProperty("MSI Path", msiPath),
+                new JProperty("AAS Path", aasFile),
+                new JProperty("ProductCode", productCode),
+                new JProperty("Revision Number", revisionNumber),
+                new JProperty("Upgrade Code", upgradeCode)
+                );
 
             return parsedAasFile;
         }
     }
 }
+ 
