@@ -417,55 +417,48 @@ public class GlobalVar
                 JArray userPolGppResults = ProcessGpXml(userPolPath);
                 JArray machinePolScriptResults = ProcessScriptsIni(machinePolPath);
                 JArray userPolScriptResults = ProcessScriptsIni(userPolPath);
+                JArray machinePolAasResults = ProcessAas(machinePolPath);
+                JArray userPolAasResults = ProcessAas(userPolPath);
 
                 // add all our findings to a JArray in what seems a very inefficient manner but it's the only way i could see to avoid having a JArray of JArrays of Findings.
                 JArray userFindings = new JArray();
                 JArray machineFindings = new JArray();
-                if (machinePolGppResults != null && machinePolGppResults.HasValues)
+
+                JArray[] allMachineGpoResults =
                 {
-                    foreach (JObject finding in machinePolGppResults)
+                    machinePolInfResults,
+                    machinePolGppResults,
+                    machinePolScriptResults,
+                    machinePolAasResults
+                };
+
+                JArray[] allUserGpoResults =
+                {
+                    userPolInfResults,
+                    userPolGppResults,
+                    userPolScriptResults,
+                    userPolAasResults
+                };
+
+                foreach (JArray machineGpoResult in allMachineGpoResults)
+                {
+                    if (machineGpoResult != null && machineGpoResult.HasValues)
                     {
-                        machineFindings.Add(finding);
+                        foreach (JObject finding in machineGpoResult)
+                        {
+                            machineFindings.Add(finding);
+                        }
                     }
                 }
 
-                if (userPolGppResults != null && userPolGppResults.HasValues)
+                foreach (JArray userGpoResult in allUserGpoResults)
                 {
-                    foreach (JObject finding in userPolGppResults)
+                    if (userGpoResult != null && userGpoResult.HasValues)
                     {
-                        userFindings.Add(finding);
-                    }
-                }
-
-                if (machinePolGppResults != null && machinePolInfResults.HasValues)
-                {
-                    foreach (JObject finding in machinePolInfResults)
-                    {
-                        machineFindings.Add(finding);
-                    }
-                }
-
-                if (userPolInfResults != null && userPolInfResults.HasValues)
-                {
-                    foreach (JObject finding in userPolInfResults)
-                    {
-                        userFindings.Add(finding);
-                    }
-                }
-
-                if (machinePolScriptResults != null && machinePolScriptResults.HasValues)
-                {
-                    foreach (JObject finding in machinePolScriptResults)
-                    {
-                        machineFindings.Add(finding);
-                    }
-                }
-
-                if (userPolScriptResults != null && userPolScriptResults.HasValues)
-                {
-                    foreach (JObject finding in userPolScriptResults)
-                    {
-                        userFindings.Add(finding);
+                        foreach (JObject finding in userGpoResult)
+                        {
+                            userFindings.Add(finding);
+                        }
                     }
                 }
 
@@ -497,6 +490,7 @@ public class GlobalVar
 
             return null;
         }
+
 
         private static JArray ProcessInf(string Path)
         {
@@ -577,6 +571,46 @@ public class GlobalVar
             }
 
             return processedScriptsIniFiles;
+        }
+
+        private static JArray ProcessAas(string Path)
+        {
+            List<string> aasFiles = new List<string>();
+
+            try
+            {
+                aasFiles = Directory.GetFiles(Path, "*.aas", SearchOption.AllDirectories).ToList();
+            }
+            catch (System.IO.DirectoryNotFoundException e)
+            {
+                if (GlobalVar.DebugMode)
+                {
+                    Utility.DebugWrite(e.ToString());
+                }
+
+                return null;
+            }
+            catch (System.UnauthorizedAccessException e)
+            {
+                if (GlobalVar.DebugMode)
+                {
+                    Utility.DebugWrite(e.ToString());
+                }
+
+                return null;
+            }
+            JArray processedAases = new JArray();
+            foreach (string aasFile in aasFiles)
+            {
+                JObject parsedAasFile = Parsers.ParseAASFile(aasFile);
+                JObject assessedAasFile = AasAssess.AssessAasFile(parsedAasFile);
+                if (assessedAasFile.HasValues)
+                {
+                    processedAases.Add(assessedAasFile);
+                }
+            }
+
+            return processedAases;
         }
 
         private static JArray ProcessGpXml(string Path)
