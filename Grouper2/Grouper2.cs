@@ -175,7 +175,7 @@ public class GlobalVar
 
                 if (sysvolArg.Parsed)
                 {
-                    Console.Error.WriteLine("Hitting sysvol at path: " + sysvolArg.Value);
+                    Console.Error.WriteLine("You specified that I should assume SYSVOL is here: " + sysvolArg.Value);
                     sysvolDir = sysvolArg.Value;
                 }
 
@@ -227,7 +227,6 @@ public class GlobalVar
                 }
 
                 Console.WriteLine("Current AD Domain is: " + currentDomainString);
-
                 
                 Console.WriteLine("");
 
@@ -243,11 +242,9 @@ public class GlobalVar
             }
             else
             {
-                Console.WriteLine("\nSomething went wrong with parsing the path to sysvol and I gave up.");
+                Console.Error.WriteLine("\nSomething went wrong with parsing the path to sysvol and I gave up.");
                 Environment.Exit(1);
             }
-
-            Console.WriteLine("Targeting SYSVOL at: " + sysvolDir);
 
             // get all the dirs with Policies and scripts in an array.
             string[] sysvolDirs =
@@ -255,17 +252,19 @@ public class GlobalVar
 
             Console.WriteLine(
                 "I found all these directories in SYSVOL...\r\n");
+            Console.WriteLine("#########################################");
             foreach (string line in sysvolDirs)
             {
                 Console.WriteLine(line);
             }
+            Console.WriteLine("#########################################");
 
             List<string> sysvolPolDirs = new List<string>();
             List<string> sysvolScriptDirs = new List<string>();
 
             if (noNTFRS)
             {
-                Console.Error.WriteLine("... but I'm not going to look in any of them except .\\Policies and .\\Scripts because you told me not to.");
+                Console.WriteLine("... but I'm not going to look in any of them except .\\Policies and .\\Scripts because you told me not to.");
                 sysvolPolDirs.Add(sysvolDir + "Policies\\");
                 sysvolScriptDirs.Add(sysvolDir + "Scripts\\");
             }
@@ -340,7 +339,14 @@ public class GlobalVar
                         {
                             lock (grouper2Output)
                             {
-                                grouper2Output.Add(gpoPath, gpoFindings);
+                                if (!(gpoPath.Contains("NTFRS")))
+                                {
+                                    grouper2Output.Add(("Current Policy - " + gpoPath), gpoFindings);
+                                }
+                                else
+                                {
+                                    grouper2Output.Add(gpoPath, gpoFindings);
+                                }
                             }
                         }
                     }

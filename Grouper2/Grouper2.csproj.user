@@ -26,6 +26,6 @@
     <VerifyUploadedFiles>false</VerifyUploadedFiles>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugFromTestPath|AnyCPU'">
-    <StartArguments>-o -s C:\users\mike.testing2016\desktop\testgpos\sysvol2\ -i 0</StartArguments>
+    <StartArguments>-o -s C:\users\mike.testing2016\desktop\testgpos\sysvol\ -i 10</StartArguments>
   </PropertyGroup>
 </Project>

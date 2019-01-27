@@ -109,10 +109,13 @@ internal static partial class AssessInf
             }
             else
             {
-                assessedSvcGenSettings.Add(serviceName, new JObject(
-                    new JProperty("SDDL", sddl),
-                    new JProperty("Startup Type", startupString)
+                if (interestLevel >= GlobalVar.IntLevelToShow)
+                {
+                    assessedSvcGenSettings.Add(serviceName, new JObject(
+                        new JProperty("SDDL", sddl),
+                        new JProperty("Startup Type", startupString)
                     ));
+                }
             }
         }
 

@@ -35,7 +35,10 @@ namespace Grouper2
                     }
                     else
                     {
-                        Utility.DebugWrite(assessName);
+                        if (GlobalVar.DebugMode)
+                        {
+                            Utility.DebugWrite("GetAssessed" + assessName + "didn't return anything.");
+                        }
                         return null;
                     }
                 }

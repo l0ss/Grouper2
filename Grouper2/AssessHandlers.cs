@@ -110,7 +110,7 @@ namespace Grouper2
             if (svcGenSetting != null)
             {
                 JObject assessedSvcGenSetting = AssessInf.AssessServiceGenSetting(svcGenSetting);
-                if (assessedSvcGenSetting.Count > 0)
+                if (assessedSvcGenSetting != null && assessedSvcGenSetting.HasValues)
                 {
                     assessedGpTmpl.Add("Service General Setting", assessedSvcGenSetting);
                 }
