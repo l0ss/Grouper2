@@ -13,7 +13,10 @@ namespace Grouper2
                 foreach (JToken gppNTService in gppCategory["NTService"])
                 {
                     JProperty assessedGppNTService = AssessGppNTService(gppNTService);
-                    assessedGppNTServices.Add(assessedGppNTService);
+                    if (assessedGppNTService != null)
+                    {
+                        assessedGppNTServices.Add(assessedGppNTService);
+                    }
                 }
             }
             else

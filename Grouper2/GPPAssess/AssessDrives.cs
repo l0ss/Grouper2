@@ -14,7 +14,10 @@ namespace Grouper2
                 foreach (JToken gppDrive in gppCategory["Drive"])
                 {
                     JProperty assessedGppDrive = AssessGppDrive(gppDrive);
-                    assessedGppDrives.Add(assessedGppDrive);
+                    if (assessedGppDrive != null)
+                    {
+                        assessedGppDrives.Add(assessedGppDrive);
+                    }
                 }
             }
             else

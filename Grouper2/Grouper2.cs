@@ -101,6 +101,7 @@ public class GlobalVar
             SwitchArgument helpArg = new SwitchArgument('h', "help", "Displays this help.", false);
             SwitchArgument prettyArg = new SwitchArgument('p', "pretty", "Switches output from the raw Json to a prettier format.", false);
             SwitchArgument noMessArg = new SwitchArgument('m', "nomess", "Avoids file writes at all costs. May find less stuff.", false);
+            SwitchArgument currentPolOnly = new SwitchArgument('c', "currentonly", "Only checks current policies, ignoring stuff in those Policies_NTFRS_* directories that result from replication failures.", false);
             parser.Arguments.Add(debugArg);
             parser.Arguments.Add(intlevArg);
             parser.Arguments.Add(sysvolArg);
@@ -109,12 +110,14 @@ public class GlobalVar
             parser.Arguments.Add(helpArg);
             parser.Arguments.Add(prettyArg);
             parser.Arguments.Add(noMessArg);
+            parser.Arguments.Add(currentPolOnly);
             // set a few defaults
-            string sysvolPolDir = "";
+            string sysvolDir = "";
             GlobalVar.OnlineChecks = true;
             int maxThreads = 10;
             bool prettyOutput = false;
             GlobalVar.NoMess = false;
+            bool noNTFRS = false;
 
             try
             {
@@ -135,7 +138,7 @@ public class GlobalVar
                 {
                     // args config for valid offline run.
                     GlobalVar.OnlineChecks = false;
-                    sysvolPolDir = sysvolArg.Value;
+                    sysvolDir = sysvolArg.Value;
                 }
 
                 if (offlineArg.Parsed && offlineArg.Value && !sysvolArg.Parsed)
@@ -173,7 +176,7 @@ public class GlobalVar
                 if (sysvolArg.Parsed)
                 {
                     Console.Error.WriteLine("Hitting sysvol at path: " + sysvolArg.Value);
-                    sysvolPolDir = sysvolArg.Value;
+                    sysvolDir = sysvolArg.Value;
                 }
 
                 if (prettyArg.Parsed)
@@ -187,6 +190,12 @@ public class GlobalVar
                     Console.Error.WriteLine("No Mess mode enabled. Good for OPSEC, maybe bad for finding all the vulns? All \"Directory Is Writable\" checks will return false.");
 
                     GlobalVar.NoMess = true;
+                }
+
+                if (currentPolOnly.Parsed)
+                {
+                    Console.Error.WriteLine("Only looking at current policies and scripts, not checking any of those weird old NTFRS dirs.");
+                    noNTFRS = true;
                 }
             }
             catch (CommandLineException e)
@@ -208,7 +217,7 @@ public class GlobalVar
                 }
                 catch (ActiveDirectoryOperationException e)
                 {
-                    Console.WriteLine("Couldn't talk to the domain properly. If you're trying to run offline you should use the -o switch. Failing that, try rerunning with -d to get more information about the error.");
+                    Console.WriteLine("\nCouldn't talk to the domain properly. If you're trying to run offline you should use the -o switch. Failing that, try rerunning with -d to get more information about the error.");
                     if (GlobalVar.DebugMode)
                     {
                         Utility.DebugWrite(e.ToString());
@@ -219,26 +228,63 @@ public class GlobalVar
 
                 Console.WriteLine("Current AD Domain is: " + currentDomainString);
 
-                string[] sysvolPolDirs =
-                    Directory.GetDirectories(@"\\" + currentDomainString + @"\sysvol\" + currentDomainString);
-
                 
-                Console.WriteLine(
-                    "SYSVOL dir has this stuff in it. If you see NTFRS in any of the folder names there is probably some value in manually targeting each of those dirs for closer looks.\r\n");
-                foreach (string line in sysvolPolDirs)
-                {
-                    Console.WriteLine(line);
-                }
-
                 Console.WriteLine("");
 
-                if (sysvolPolDir == "")
+                if (sysvolDir == "")
                 {
-                    sysvolPolDir = @"\\" + currentDomainString + @"\sysvol\" + currentDomainString + @"\Policies\";
+                    sysvolDir = @"\\" + currentDomainString + @"\sysvol\" + currentDomainString + @"\";
+                    Console.WriteLine("Targeting SYSVOL at: " + sysvolDir);
                 }
             }
+            else if ((GlobalVar.OnlineChecks == false) && sysvolDir.Length > 1)
+            {
+                Console.WriteLine("Targeting SYSVOL at: " + sysvolDir);
+            }
+            else
+            {
+                Console.WriteLine("\nSomething went wrong with parsing the path to sysvol and I gave up.");
+                Environment.Exit(1);
+            }
 
-            Console.WriteLine("Targeting SYSVOL at: " + sysvolPolDir);
+            Console.WriteLine("Targeting SYSVOL at: " + sysvolDir);
+
+            // get all the dirs with Policies and scripts in an array.
+            string[] sysvolDirs =
+                Directory.GetDirectories(sysvolDir);
+
+            Console.WriteLine(
+                "I found all these directories in SYSVOL...\r\n");
+            foreach (string line in sysvolDirs)
+            {
+                Console.WriteLine(line);
+            }
+
+            List<string> sysvolPolDirs = new List<string>();
+            List<string> sysvolScriptDirs = new List<string>();
+
+            if (noNTFRS)
+            {
+                Console.Error.WriteLine("... but I'm not going to look in any of them except .\\Policies and .\\Scripts because you told me not to.");
+                sysvolPolDirs.Add(sysvolDir + "Policies\\");
+                sysvolScriptDirs.Add(sysvolDir + "Scripts\\");
+            }
+            else
+            {
+                Console.Error.WriteLine("... and I'm going to find all the goodies I can in all of them.");
+                foreach (string dir in sysvolDirs)
+                {
+                    if (dir.Contains("Scripts"))
+                    {
+                        sysvolScriptDirs.Add(dir);
+                    }
+
+                    if (dir.Contains("Policies"))
+                    {
+                        sysvolPolDirs.Add(dir);
+                    }
+                }
+            }
 
             // if we're online, get a bunch of metadata about the GPOs via LDAP
             JObject domainGpos = new JObject();
@@ -249,14 +295,21 @@ public class GlobalVar
             }
 
             List<string> gpoPaths = new List<string>();
-            try
+            foreach (string policyPath in sysvolPolDirs)
             {
-                gpoPaths = Directory.GetDirectories(sysvolPolDir).ToList();
-            }
-            catch
-            {
-                Console.WriteLine("Sysvol path is broken. You should fix it.");
-                Environment.Exit(1);
+                try
+                {
+                    gpoPaths = Directory.GetDirectories(policyPath).ToList();
+                }
+                catch (Exception e)
+                {
+                    Console.Error.WriteLine("I had a problem with " + policyPath +
+                                            ". I guess you could try to fix it?");
+                    if (GlobalVar.DebugMode)
+                    {
+                        Utility.DebugWrite(e.ToString());
+                    }
+                }
             }
 
             // create a JObject to put all our output goodies in.
@@ -621,7 +674,7 @@ public class GlobalVar
             {
                 JObject parsedAasFile = Parsers.ParseAASFile(aasFile);
                 JObject assessedAasFile = AasAssess.AssessAasFile(parsedAasFile);
-                if (assessedAasFile.HasValues)
+                if (assessedAasFile != null && assessedAasFile.HasValues)
                 {
                     processedAases.Add(assessedAasFile);
                 }

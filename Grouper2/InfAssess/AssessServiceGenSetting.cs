@@ -35,71 +35,84 @@ internal static partial class AssessInf
             }
 
             // go parse the SDDL
-            JObject parsedSddl = ParseSDDL.ParseSddlString(sddl, SecurableObjectType.WindowsService);
-
-            // then assess the results based on interestLevel
-            JObject assessedSddl = new JObject();
-
-            string[] defaultSids = new string[]
+            if (GlobalVar.OnlineChecks)
             {
-                "CREATOR_OWNER",
-                "World Authority",
-                "LOCAL_SYSTEM",
-                "BUILTIN_ADMINISTRATORS",
-                "Flags"
-            };
+                JObject parsedSddl = ParseSDDL.ParseSddlString(sddl, SecurableObjectType.WindowsService);
 
-            if (parsedSddl["Owner"] != null)
-            {
-                assessedSddl.Add("Owner", parsedSddl["Owner"].ToString());
-                interestLevel = 6;
-            }
 
-            if (parsedSddl["Group"] != null)
-            {
-                assessedSddl.Add("Group", parsedSddl["Group"].ToString());
-                interestLevel = 6;
-            }
+                // then assess the results based on interestLevel
+                JObject assessedSddl = new JObject();
 
-            if (parsedSddl["DACL"] != null)
-            {
-                JObject assessedDacl = new JObject();
-                foreach (KeyValuePair<string, JToken> ace in JObject.FromObject(parsedSddl["DACL"]))
+                string[] defaultSids = new string[]
                 {
-                    // unless we are at interest level zero (show all defaults)
-                    bool boringSidMatch = false;
-                    foreach (string boringSid in defaultSids)
-                    {
-                        if (ace.Key.Contains(boringSid)) boringSidMatch = true;
-                    }
-
-                    if ((boringSidMatch) && (GlobalVar.IntLevelToShow > 0))
-                    {
-                        continue;
-                    }
-
-                    else
-                    {
-                        assessedDacl.Add(ace.Key, ace.Value);
-                    }
-                }
-
-                if (assessedDacl.HasValues)
-                {
-                    interestLevel = 6;
-                    assessedSddl.Add("DACL", assessedDacl);
+                    "CREATOR_OWNER",
+                    "World Authority",
+                    "LOCAL_SYSTEM",
+                    "BUILTIN_ADMINISTRATORS",
+                    "Flags"
                 };
-            }
 
-            if (interestLevel >= GlobalVar.IntLevelToShow)
-            {
-                if (assessedSddl.HasValues)
+                if (parsedSddl["Owner"] != null)
                 {
-                    assessedSvcGenSettings.Add(serviceName, new JObject(
-                        new JProperty("Permissions", assessedSddl),
-                        new JProperty("Startup Type", startupString)
-                    ));
+                    assessedSddl.Add("Owner", parsedSddl["Owner"].ToString());
+                    interestLevel = 6;
                 }
+
+                if (parsedSddl["Group"] != null)
+                {
+                    assessedSddl.Add("Group", parsedSddl["Group"].ToString());
+                    interestLevel = 6;
+                }
+
+                if (parsedSddl["DACL"] != null)
+                {
+                    JObject assessedDacl = new JObject();
+                    foreach (KeyValuePair<string, JToken> ace in JObject.FromObject(parsedSddl["DACL"]))
+                    {
+                        // unless we are at interest level zero (show all defaults)
+                        bool boringSidMatch = false;
+                        foreach (string boringSid in defaultSids)
+                        {
+                            if (ace.Key.Contains(boringSid)) boringSidMatch = true;
+                        }
+
+                        if ((boringSidMatch) && (GlobalVar.IntLevelToShow > 0))
+                        {
+                            continue;
+                        }
+
+                        else
+                        {
+                            assessedDacl.Add(ace.Key, ace.Value);
+                        }
+                    }
+
+                    if (assessedDacl.HasValues)
+                    {
+                        interestLevel = 6;
+                        assessedSddl.Add("DACL", assessedDacl);
+                    }
+
+                    ;
+                }
+
+                if (interestLevel >= GlobalVar.IntLevelToShow)
+                {
+                    if (assessedSddl.HasValues)
+                    {
+                        assessedSvcGenSettings.Add(serviceName, new JObject(
+                            new JProperty("Permissions", assessedSddl),
+                            new JProperty("Startup Type", startupString)
+                        ));
+                    }
+                }
+            }
+            else
+            {
+                assessedSvcGenSettings.Add(serviceName, new JObject(
+                    new JProperty("SDDL", sddl),
+                    new JProperty("Startup Type", startupString)
+                    ));
             }
         }
 

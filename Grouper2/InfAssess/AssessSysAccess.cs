@@ -55,7 +55,7 @@ internal static partial class AssessInf
         {
             if (sysAccess["ResetLockoutCount"].ToString() != "30")
             {
-                assessedSysAccess.Add("Invalid attempt counter resets after", sysAccess["ResetLockoutDuration"].ToString() + " minutes");
+                assessedSysAccess.Add("Invalid attempt counter resets after", sysAccess["ResetLockoutCount"].ToString() + " minutes");
             }
         }
         if ((GlobalVar.IntLevelToShow <= 3) && (sysAccess["LockoutDuration"] != null))

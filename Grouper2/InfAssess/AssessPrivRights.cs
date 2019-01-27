@@ -37,12 +37,26 @@ internal static partial class AssessInf
                         foreach (JToken trusteeJToken in privRight.Value)
                         {
                             string trustee = trusteeJToken.ToString();
-                            trustees.Add(GetTrustee(trustee));
+                            if (GlobalVar.OnlineChecks)
+                            {
+                                trustees.Add(GetTrustee(trustee));
+                            }
+                            else
+                            {
+                                trustees.Add(new JProperty(trustee, "Unable to resolve SID"));
+                            }
                         }
                     }
                     else
                     {
-                        trustees.Add(GetTrustee(privRight.Value.ToString()));
+                        if (GlobalVar.OnlineChecks)
+                        {
+                            trustees.Add(GetTrustee(privRight.Value.ToString()));
+                        }
+                        else
+                        {
+                            trustees.Add("Trustee", privRight.Value.ToString());
+                        }
                     }
 
                     // add the results to our jobj of trustees if they are interesting enough.
