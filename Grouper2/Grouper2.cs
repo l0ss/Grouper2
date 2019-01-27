@@ -201,11 +201,28 @@ public class GlobalVar
             if (GlobalVar.OnlineChecks)
             {
                 Console.WriteLine("Trying to figure out what AD domain we're working with.");
-                string currentDomainString = Domain.GetCurrentDomain().ToString();
+                string currentDomainString = "";
+                try
+                {
+                    currentDomainString = Domain.GetCurrentDomain().ToString();
+                }
+                catch (ActiveDirectoryOperationException e)
+                {
+                    Console.WriteLine("Couldn't talk to the domain properly. If you're trying to run offline you should use the -o switch. Failing that, try rerunning with -d to get more information about the error.");
+                    if (GlobalVar.DebugMode)
+                    {
+                        Utility.DebugWrite(e.ToString());
+                    }
+
+                    Environment.Exit(1);
+                }
+
                 Console.WriteLine("Current AD Domain is: " + currentDomainString);
 
                 string[] sysvolPolDirs =
                     Directory.GetDirectories(@"\\" + currentDomainString + @"\sysvol\" + currentDomainString);
+
+                
                 Console.WriteLine(
                     "SYSVOL dir has this stuff in it. If you see NTFRS in any of the folder names there is probably some value in manually targeting each of those dirs for closer looks.\r\n");
                 foreach (string line in sysvolPolDirs)
