@@ -101,7 +101,8 @@ public class GlobalVar
             SwitchArgument helpArg = new SwitchArgument('h', "help", "Displays this help.", false);
             SwitchArgument prettyArg = new SwitchArgument('p', "pretty", "Switches output from the raw Json to a prettier format.", false);
             SwitchArgument noMessArg = new SwitchArgument('m', "nomess", "Avoids file writes at all costs. May find less stuff.", false);
-            SwitchArgument currentPolOnly = new SwitchArgument('c', "currentonly", "Only checks current policies, ignoring stuff in those Policies_NTFRS_* directories that result from replication failures.", false);
+            SwitchArgument currentPolOnlyArg = new SwitchArgument('c', "currentonly", "Only checks current policies, ignoring stuff in those Policies_NTFRS_* directories that result from replication failures.", false);
+            SwitchArgument noGrepScriptsArg = new SwitchArgument('n', "nogrepscripts", "Don't grep through the files in the \"Scripts\" subdirectory", false);
             parser.Arguments.Add(debugArg);
             parser.Arguments.Add(intlevArg);
             parser.Arguments.Add(sysvolArg);
@@ -110,7 +111,8 @@ public class GlobalVar
             parser.Arguments.Add(helpArg);
             parser.Arguments.Add(prettyArg);
             parser.Arguments.Add(noMessArg);
-            parser.Arguments.Add(currentPolOnly);
+            parser.Arguments.Add(currentPolOnlyArg);
+            parser.Arguments.Add(noGrepScriptsArg);
             // set a few defaults
             string sysvolDir = "";
             GlobalVar.OnlineChecks = true;
@@ -118,6 +120,7 @@ public class GlobalVar
             bool prettyOutput = false;
             GlobalVar.NoMess = false;
             bool noNTFRS = false;
+            bool noGrepScripts = false;
 
             try
             {
@@ -192,10 +195,16 @@ public class GlobalVar
                     GlobalVar.NoMess = true;
                 }
 
-                if (currentPolOnly.Parsed)
+                if (currentPolOnlyArg.Parsed)
                 {
                     Console.Error.WriteLine("Only looking at current policies and scripts, not checking any of those weird old NTFRS dirs.");
                     noNTFRS = true;
+                }
+
+                if (noGrepScriptsArg.Parsed)
+                {
+                    Console.Error.WriteLine("Not gonna look through scripts in SYSVOL for goodies.");
+                    noGrepScripts = true;
                 }
             }
             catch (CommandLineException e)
@@ -273,12 +282,12 @@ public class GlobalVar
                 Console.Error.WriteLine("... and I'm going to find all the goodies I can in all of them.");
                 foreach (string dir in sysvolDirs)
                 {
-                    if (dir.Contains("Scripts"))
+                    if (dir.ToLower().Contains("scripts"))
                     {
                         sysvolScriptDirs.Add(dir);
                     }
 
-                    if (dir.Contains("Policies"))
+                    if (dir.ToLower().Contains("policies"))
                     {
                         sysvolPolDirs.Add(dir);
                     }
@@ -293,6 +302,7 @@ public class GlobalVar
                 domainGpos = GetDomainGpoData.DomainGpoData;
             }
 
+            // get all the policy dirs
             List<string> gpoPaths = new List<string>();
             foreach (string policyPath in sysvolPolDirs)
             {
@@ -319,14 +329,14 @@ public class GlobalVar
             // Create a TaskScheduler
             LimitedConcurrencyLevelTaskScheduler lcts = new LimitedConcurrencyLevelTaskScheduler(maxThreads);
             List<Task> gpoTasks = new List<Task>();
-
+            
             // create a TaskFactory
             TaskFactory gpoFactory = new TaskFactory(lcts);
-            CancellationTokenSource cts = new CancellationTokenSource();
-
+            CancellationTokenSource gpocts = new CancellationTokenSource();
+            
             Console.Error.WriteLine(gpoPaths.Count.ToString() + " GPOs to process.");
-            Console.Error.WriteLine("Starting processing with " + maxThreads.ToString() + " threads.");
-
+            Console.Error.WriteLine("Starting processing GPOs with " + maxThreads.ToString() + " threads.");
+            
             // Create a task for each GPO
             foreach (string gpoPath in gpoPaths)
             {
@@ -350,15 +360,15 @@ public class GlobalVar
                             }
                         }
                     }
-                }, cts.Token);
+                }, gpocts.Token);
                 gpoTasks.Add(t);
             }
             
             // put 'em all in a happy little array
             Task[] gpoTaskArray = gpoTasks.ToArray();
-           
+            
             // create a little counter to provide status updates
-            int totalTasksCount = gpoTaskArray.Length;
+            int totalGPOTasksCount = gpoTaskArray.Length;
             int incompleteTaskCount = gpoTaskArray.Length;
             Console.WriteLine("");
             while (incompleteTaskCount > 0)
@@ -366,19 +376,30 @@ public class GlobalVar
                 Task[] incompleteTasks =
                     Array.FindAll(gpoTaskArray, element => element.Status != TaskStatus.RanToCompletion);
                 incompleteTaskCount = incompleteTasks.Length;
-
-                int completeTaskCount = totalTasksCount - incompleteTaskCount;
-                int percentage = (int) Math.Round((double) (100 * completeTaskCount) / totalTasksCount);
+            
+                int completeTaskCount = totalGPOTasksCount - incompleteTaskCount;
+                int percentage = (int) Math.Round((double) (100 * completeTaskCount) / totalGPOTasksCount);
                 string percentageString = percentage.ToString();
-
-                Console.Error.Write("\r" + completeTaskCount.ToString() + "/" + totalTasksCount.ToString() +
+            
+                Console.Error.Write("\r" + completeTaskCount.ToString() + "/" + totalGPOTasksCount.ToString() +
                               " GPOs processed. " + percentageString + "% complete.");
             }
+
+            // while that's happening, we'll use Main[] to do the script grepping.
             
+            if (!(noGrepScripts))
+            {
+                Console.Error.Write("\r Processing SYSVOL script dirs.");
+                JObject processedScriptDirs = ProcessScripts(sysvolScriptDirs);
+                if ((processedScriptDirs != null) && (processedScriptDirs.HasValues))
+                {
+                    grouper2Output.Add("Scripts", processedScriptDirs);
+                }
+            }
 
             // make double sure tasks all finished
             Task.WaitAll(gpoTasks.ToArray());
-            cts.Dispose();
+            gpocts.Dispose();
 
             try
             {
@@ -412,7 +433,7 @@ public class GlobalVar
 
             if (GlobalVar.CleanupList != null)
             {
-                Console.WriteLine("\n\nGrouper tried to create these files. It probably failed, but just in case it didn't, you might want to check and clean them up.\n");
+                Console.WriteLine("\n\nGrouper2 tried to create these files. It probably failed, but just in case it didn't, you might want to check and clean them up.\n");
                 foreach (string path in GlobalVar.CleanupList)
                 {
                     Console.WriteLine(path);
@@ -422,6 +443,57 @@ public class GlobalVar
             Console.WriteLine("\n\nPress any key to exit.");
             // wait for 'anykey'
             Console.ReadKey();
+        }
+
+        private static JObject ProcessScripts(List<string> scriptDirs)
+        {
+            // output object
+            JObject processedScripts = new JObject();
+
+            foreach (string scriptDir in scriptDirs)
+            {
+                try
+                {
+                    // get all the files in this dir
+                    string[] scriptDirFiles = Directory.GetFiles(scriptDir, "*", SearchOption.AllDirectories);
+                    // add them all to the master list of files
+                    foreach (string scriptDirFile in scriptDirFiles)
+                    {
+                        // get the file info so we can check size
+                        FileInfo scriptFileInfo = new FileInfo(scriptDirFile);
+                        // if it's not too big
+                        if (scriptFileInfo.Length < 200000)
+                        {
+                            // feed the whole thing through Utility.InvestigateFileContents
+                            JObject investigatedScript = Utility.InvestigateFileContents(scriptDirFile);
+                            // if we got anything good, add the result to processedScripts
+                            if (investigatedScript != null)
+                            {
+                                if (((int)investigatedScript["InterestLevel"]) >= GlobalVar.IntLevelToShow)
+                                {
+                                    processedScripts.Add(
+                                        new JProperty(scriptDirFile, investigatedScript)
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Utility.DebugWrite(e.ToString());
+                }
+            }
+            
+
+            if (processedScripts.HasValues)
+            {
+                return processedScripts;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         private static JObject ProcessGpo(string gpoPath)
@@ -566,7 +638,6 @@ public class GlobalVar
 
             return null;
         }
-
 
         private static JArray ProcessInf(string Path)
         {

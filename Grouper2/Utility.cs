@@ -30,8 +30,8 @@ namespace Grouper2
             // get our list of interesting words
             JArray interestingWords = (JArray) JankyDb.Instance["interestingWords"];
             
-            // get contents of the file
-            string fileContents = File.ReadAllText(inPath);
+            // get contents of the file and smash case
+            string fileContents = File.ReadAllText(inPath).ToLower();
 
             // set up output object
             JArray interestingWordsFound = new JArray();
@@ -453,11 +453,31 @@ namespace Grouper2
             return canWrite;
         }
 
+        public static JObject InvestigateFileContents(string inString)
+        {
+            string fileString = File.ReadAllText(inString).ToLower();
+            
+            // feed the whole thing through Utility.InvestigateString
+            JObject investigatedFileContents = Utility.InvestigateString(fileString);
+            
+            if (investigatedFileContents["InterestLevel"] != null)
+            {
+                if (((int)investigatedFileContents["InterestLevel"]) >= GlobalVar.IntLevelToShow)
+                {
+                    investigatedFileContents.Remove("Value");
+                    investigatedFileContents.AddFirst(new JProperty("File Path", inString));
+                    return investigatedFileContents;
+                }
+            }
+
+            return null;
+        }
+
         public static JObject InvestigateString(string inString)
         // general purpose method for returning some information about why a string might be interesting.
-        // TODO finish this
+        // TODO expand/finish this
         {
-
+            int interestLevel = 0;
             JObject investigationResults = new JObject();
 
             investigationResults.Add("Value", inString);
@@ -470,37 +490,50 @@ namespace Grouper2
                 if (inString.ToLower().Contains(interestingWord))
                 {
                     interestingWordsFound.Add(interestingWord);
+                    interestLevel = 4;
+                }
+            }
+            
+            // TODO for each of these I need to separate out the interesting part of the string from the rest of it.
+
+            if (inString.ToLower().Contains("\\\\"))
+            {
+                interestingWordsFound.Add("Possible UNC path found");
+                //Utility.DebugWrite("Think I found a UNC path: " + inString);
+                //TODO do something here to investigate the path.
+                if (interestLevel <= 2)
+                {
+                    interestLevel = 2;
+                }
+            }
+
+            if (inString.ToLower().Contains(":\\"))
+            {
+                interestingWordsFound.Add("Possible mapped drive path found");
+                //Utility.DebugWrite("Maybe this is a path with a drive letter?");
+                if (interestLevel <= 2)
+                {
+                    interestLevel = 2;
+                }
+            }
+
+            if (inString.ToLower().Contains("http"))
+            {
+                interestingWordsFound.Add("Possible URL found");
+                if (interestLevel <= 2)
+                {
+                    interestLevel = 2;
                 }
             }
 
             if (interestingWordsFound.Count > 0)
             {
-                investigationResults.Add("Interesting words found", interestingWordsFound);
+                investigationResults.Add("Interesting Words", interestingWordsFound);
             }
 
-            // TODO for each of these I need to separate out the interesting part of the string from the rest of it.
-
-            if (inString.ToLower().Contains("\\\\"))
-            {
-                investigationResults.Add("Possible UNC path", inString);
-                //Utility.DebugWrite("Think I found a UNC path: " + inString);
-                //TODO do something here to investigate the path.
-            }
-
-            if (inString.ToLower().Contains(":\\"))
-            {
-                investigationResults.Add("Possible file path", inString);
-                //Utility.DebugWrite("Maybe this is a path with a drive letter?");
-            }
-
-            if (inString.ToLower().Contains("http"))
-            {
-                investigationResults.Add("Possible URL", inString);
-            }
-
-            
-            
+            investigationResults.Add("InterestLevel", interestLevel);
             return investigationResults;
+            
         }
 
         public static JObject GetFileDaclJObject(string filePathString)
