@@ -144,22 +144,87 @@ namespace Grouper2
                         {
                             findingsDocument.Children.Add(GetDrivesDocument(driveFinding));
                         }
+                        continue;
+                    }
+                    if (cat.Key == "Privilege Rights")
+                    {
+                        continue;
+                    }
+                    if (cat.Key == "Group Membership")
+                    {
+                        continue;
+                    }
+                    if (cat.Key == "Groups")
+                    {
+                        continue;
+                    }
+                    if (cat.Key == "DataSources")
+                    {
+                        continue;
+                    }
+                    if (cat.Key == "Printers")
+                    {
+                        continue;
+                    }
+                    if (cat.Key == "Files")
+                    {
+                        continue;
+                    }
+                    if (cat.Key == "ScheduledTasks")
+                    {
+                        continue;
+                    }
+                    if (cat.Key == "Assigned Applications")
+                    {
+                        continue;
+                    }
+                    if (cat.Key == "Service General Setting")
+                    {
+                        continue;
+                    }
+                    if (cat.Key == "NTServices")
+                    {
+                        continue;
+                    }
+                    if (cat.Key == "Shortcuts")
+                    {
+                        continue;
+                    }
+                    if (cat.Key == "System Access")
+                    {
+                        continue;
+                    }
+                    if (cat.Key == "Kerberos Policy")
+                    {
+                        continue;
+                    }
+                    if (cat.Key == "Registry Values")
+                    {
+                        continue;
+                    }
+                    if (cat.Key == "RegistrySettings")
+                    {
+                        continue;
+                    }
+                    if (cat.Key == "Registry Keys")
+                    {
+                        continue;
+                    }
+                    if (cat.Key == "EnvironmentVariables")
+                    {
+                        continue;
+                    }
+                    if (cat.Key == "IniFiles")
+                    {
+                        continue;
                     }
                     if (cat.Key == "Scripts")
                     {
-                        /*
-                         findingsDocument.Children.Add(
-                             new Span("Scripts")
-                         );
-                        foreach (JToken scriptFinding in cat.Value)
-                        {
-                            findingsDocument.Children.Add(GetScriptsDocument(scriptFinding));
-                        }
-                        */
+                        continue;
                     }
                     else
                     {
-                        findingsDocument.Children.Add(cat.Key + " wasn't properly prettified for output.\n");
+                        findingsDocument.Children.Add(new Span(cat.Key + " wasn't properly prettified for output.\n") {Color= ConsoleColor.Red});
                     }
                 }
             }
