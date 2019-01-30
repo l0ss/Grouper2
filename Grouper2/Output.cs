@@ -36,11 +36,14 @@ namespace Grouper2
             LineThickness headerThickness = new LineThickness(LineWidth.Double, LineWidth.Single);
             Document outputDocument = new Document();
 
+            
             outputDocument.Children.Add(
                 // nice Title
-                new Span(gpoTitle) {Color = ConsoleColor.Yellow}, "\n",
+                new Span(gpoTitle) {Color = ConsoleColor.Green}, "\n",
+                new Span("--------------------------------------") { Color = ConsoleColor.Green}, "\n", "\n",
                 // nice Section header
-                new Span {Color = ConsoleColor.White}, "GPO Properties"
+                new Span("GPO Properties") {Color = ConsoleColor.Yellow}, "\n",
+                new Span("##############") { Color = ConsoleColor.Yellow }
             );
             
             if (GlobalVar.OnlineChecks)
@@ -86,14 +89,20 @@ namespace Grouper2
             Document userPolFindingsDoc = new Document();
             Document machinePolFindingsDoc = new Document();
 
+            // send the json off to get turned into nice output
             if (uPolFindings != null)
             {
-                Utility.DebugWrite(uPolFindings.ToString());
+                userPolFindingsDoc = GetFindingsDocument(uPolFindings, "user");
             }
 
+            // and again
+            if (mPolFindings != null)
+            {
+                machinePolFindingsDoc = GetFindingsDocument(mPolFindings, "machine");
+            }
+            
             // add our findings docs to our final doc
             outputDocument.Children.Add(
-                new Span("Findings"),
                 userPolFindingsDoc,
                 machinePolFindingsDoc
                 );
@@ -101,5 +110,84 @@ namespace Grouper2
             ConsoleRenderer.RenderDocument(outputDocument);
         }
 
+        private static Document GetFindingsDocument(JToken polFindings, string polType)
+        {
+            Document findingsDocument = new Document();
+
+            if (polType == "user")
+            {
+                findingsDocument.Children.Add(
+                    new Span("\nFindings in User Policy") { Color = ConsoleColor.Yellow }, "\n",
+                    new Span("#######################") { Color = ConsoleColor.Yellow }, "\n"
+                    );
+            }
+
+            if (polType == "machine")
+            {
+                findingsDocument.Children.Add(
+                    new Span("\nFindings in Machine Policy") { Color = ConsoleColor.Yellow }, "\n",
+                    new Span("##########################") { Color = ConsoleColor.Yellow }, "\n"
+                    );
+            }
+
+            foreach (JObject polFindingCat in polFindings)
+            {
+                foreach (KeyValuePair<string, JToken> cat in polFindingCat)
+                {
+                    if (cat.Key == "Drives")
+                    {
+                        findingsDocument.Children.Add(
+                            new Span("GPP Drive Mappings") { Color = ConsoleColor.Magenta }, "\n",
+                            new Span("~~~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
+                        );
+                        foreach (JToken driveFinding in cat.Value)
+                        {
+                            findingsDocument.Children.Add(GetDrivesDocument(driveFinding));
+                        }
+                    }
+                    if (cat.Key == "Scripts")
+                    {
+                        /*
+                         findingsDocument.Children.Add(
+                             new Span("Scripts")
+                         );
+                        foreach (JToken scriptFinding in cat.Value)
+                        {
+                            findingsDocument.Children.Add(GetScriptsDocument(scriptFinding));
+                        }
+                        */
+                    }
+                    else
+                    {
+                        findingsDocument.Children.Add(cat.Key + " wasn't properly prettified for output.\n");
+                    }
+                }
+            }
+            findingsDocument.Children.Add(new Span("\n\n"));
+
+            return findingsDocument;
+        }
+
+        private static Document GetDrivesDocument(JToken drivesJToken)
+        {
+            Document outDoc = new Document();
+            
+            foreach (JToken driveJToken in drivesJToken)
+            {
+                outDoc.Children.Add(new Span(driveJToken["Name"].ToString()));
+            }
+            return outDoc;
+        }
+
+        private static Document GetScriptsDocument(JToken scriptsJToken)
+        {
+            Document outDoc = new Document();
+            
+            foreach (JToken scriptJToken in scriptsJToken)
+            {
+                //outDoc.Children.Add(new Span(scriptJToken["Name"].ToString()));
+            }
+            return outDoc;
+        }
     }
 }
