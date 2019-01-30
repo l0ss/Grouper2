@@ -103,9 +103,9 @@ namespace Grouper2
                 return new JObject(new JProperty("I think this is an HTTP/S URL, not a file path", inPath));
             }
 
-            if (inPath.Contains("://"))
+            if (inPath.Contains("://") && !(inPath.Contains("http://")))
             {
-                return new JObject(new JProperty("I think this is some weird non-http URL.", inPath));
+                return new JObject(new JProperty("I think this is some non-http URI like ftp or something.", inPath));
             }
 
             if (inPath.Contains('%'))
@@ -114,7 +114,7 @@ namespace Grouper2
             }
 
             // if it doesn't seem to have any path separators it's probably a single file on sysvol.
-            if (!inPath.Contains('\\'))
+            if (!inPath.Contains('\\') && !inPath.Contains('/'))
             {
                 return new JObject(new JProperty("I think this is a single file on sysvol.", inPath));
             }
@@ -172,7 +172,6 @@ namespace Grouper2
                     {
                         dirDacls = Utility.GetFileDaclJObject(dirPath);
                         string dirWriteTestPath = Path.Combine(dirPath, "testFileFromGrouper2Assessment.txt");
-                        GlobalVar.CleanupList.Add(dirWriteTestPath);
                         //TODO this is fucking gross and messy but I can't think of a better way of doing it. ideally I want to delete these if i create them but putting File.Delete anywhere in this gives me the willies.
                         dirWritable = Utility.CanIWrite(dirWriteTestPath);
                     }
@@ -229,7 +228,6 @@ namespace Grouper2
                             // set up a path for us to try and write to
                             string parentDirWriteTestPath =
                                 Path.Combine(dirPathParent, "testFileFromGrouper2Assessment.txt");
-                            GlobalVar.CleanupList.Add(parentDirWriteTestPath);
                             // this is fucking gross and messy but I can't think of a better way of doing it. ideally I want to delete these if i create them but putting File.Delete anywhere in this gives me the willies.
                             // try to write to it
                             parentDirWritable = Utility.CanIWrite(parentDirWriteTestPath);
@@ -428,12 +426,13 @@ namespace Grouper2
             bool canWrite = false;
             try
             {
-                if (GlobalVar.NoMess)
+                if (GlobalVar.NoMess || !GlobalVar.OnlineChecks)
                 {
                     return false;
                 }
                 else
                 {
+                    GlobalVar.CleanupList.Add(inPath);
                     FileStream stream = File.OpenWrite(inPath);
                     canWrite = stream.CanWrite;
                     stream.Close();

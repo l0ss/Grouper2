@@ -12,10 +12,6 @@ namespace Grouper2
     {
         static public void GetAssessedGPOOutput (KeyValuePair<string, JToken> inputKvp)
         {
-            
-            StringBuilder sb = new StringBuilder();
-            //sb.Append("GPO ah ah ah");
-
             // munge it to a JObject
             JToken gpo = inputKvp.Value;
 
@@ -51,7 +47,7 @@ namespace Grouper2
                         //new Cell("Status"), new Cell(Utility.GetSafeString(gpoProps, "GPO Status"))
                     }
                 }
-                );
+            );
 
 
 
