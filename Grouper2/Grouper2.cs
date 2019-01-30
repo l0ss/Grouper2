@@ -14,6 +14,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.DirectoryServices.ActiveDirectory;
 using System.IO;
 using System.Linq;
@@ -491,8 +492,9 @@ public class GlobalVar
 
             if (GlobalVar.CleanupList != null)
             {
+                List<string> cleanupList = Utility.DedupeList(GlobalVar.CleanupList);
                 Console.WriteLine("\n\nGrouper2 tried to create these files. It probably failed, but just in case it didn't, you might want to check and clean them up.\n");
-                foreach (string path in GlobalVar.CleanupList)
+                foreach (string path in cleanupList)
                 {
                     Console.WriteLine(path);
                 }

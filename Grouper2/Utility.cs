@@ -13,6 +13,17 @@ namespace Grouper2
 {
     class Utility
     {
+        public static List<string> DedupeList(List<string> listStrings)
+        {
+            List<string> result = new List<string>();
+            for (int i = 0; i < listStrings.Count; i++)
+            {
+                if (!result.Contains(listStrings[i]))
+                    result.Add(listStrings[i]);
+            }
+            return result;
+        }
+
         public static bool IsEmptyOrWhiteSpace(string inString)
         {
            return inString.All(char.IsWhiteSpace);
