@@ -164,14 +164,14 @@ public class GlobalVar
                 {
                     // handle someone trying to run in offline mode without giving a value for sysvol
                     Console.Error.WriteLine(
-                        "Offline mode requires you to provide a value for -s, the path where Grouper2 can find the domain SYSVOL share, or a copy of it at least.");
+                        "\nOffline mode requires you to provide a value for -s, the path where Grouper2 can find the domain SYSVOL share, or a copy of it at least.");
                     Environment.Exit(1);
                 }
 
                 if (intlevArg.Parsed)
                 {
                     // handle interest level parsing
-                    Console.Error.WriteLine("Roger. Everything with an Interest Level lower than " +
+                    Console.Error.WriteLine("\nRoger. Everything with an Interest Level lower than " +
                                       intlevArg.Value.ToString() + " is getting thrown on the floor.");
                     GlobalVar.IntLevelToShow = intlevArg.Value;
                 }
@@ -182,47 +182,47 @@ public class GlobalVar
 
                 if (debugArg.Parsed)
                 {
-                    Console.Error.WriteLine("Verbose debug mode enabled. Hope you like yellow.");
+                    Console.Error.WriteLine("\nVerbose debug mode enabled. Hope you like yellow.");
                     GlobalVar.DebugMode = true;
                 }
 
                 if (threadsArg.Parsed)
                 {
-                    Console.Error.WriteLine("Maximum threads set to: " + threadsArg.Value);
+                    Console.Error.WriteLine("\nMaximum threads set to: " + threadsArg.Value);
                     maxThreads = threadsArg.Value;
                 }
 
                 if (sysvolArg.Parsed)
                 {
-                    Console.Error.WriteLine("You specified that I should assume SYSVOL is here: " + sysvolArg.Value);
+                    Console.Error.WriteLine("\nYou specified that I should assume SYSVOL is here: " + sysvolArg.Value);
                     sysvolDir = sysvolArg.Value;
                 }
 
                 if (prettyArg.Parsed)
                 {
-                    Console.Error.WriteLine("Switching output to pretty mode. Nice.");
+                    Console.Error.WriteLine("\nSwitching output to pretty mode. Nice.");
                     prettyOutput = true;
                 }
 
                 if (noMessArg.Parsed)
                 {
-                    Console.Error.WriteLine("No Mess mode enabled. Good for OPSEC, maybe bad for finding all the vulns? All \"Directory Is Writable\" checks will return false.");
+                    Console.Error.WriteLine("\nNo Mess mode enabled. Good for OPSEC, maybe bad for finding all the vulns? All \"Directory Is Writable\" checks will return false.");
 
                     GlobalVar.NoMess = true;
                 }
 
                 if (currentPolOnlyArg.Parsed)
                 {
-                    Console.Error.WriteLine("Only looking at current policies and scripts, not checking any of those weird old NTFRS dirs.");
+                    Console.Error.WriteLine("\nOnly looking at current policies and scripts, not checking any of those weird old NTFRS dirs.");
                     noNtfrs = true;
                 }
 
                 if (domainArg.Parsed)
                 {
-                    Console.Error.Write("You told me to talk to domain " + domainArg.Value + " so I'm gonna do that.");
+                    Console.Error.Write("\nYou told me to talk to domain " + domainArg.Value + " so I'm gonna do that.");
                     if (!(usernameArg.Parsed) || !(passwordArg.Parsed))
                     {
-                        Console.Error.Write("If you specify a domain you need to specify a username and password too using -u and -p.");
+                        Console.Error.Write("\nIf you specify a domain you need to specify a username and password too using -u and -p.");
                     };
                     userDefinedDomain = domainArg.Value;
                     string[] splitDomain = userDefinedDomain.Split('.');
@@ -247,7 +247,7 @@ public class GlobalVar
 
                 if (noGrepScriptsArg.Parsed)
                 {
-                    Console.Error.WriteLine("Not gonna look through scripts in SYSVOL for goodies.");
+                    Console.Error.WriteLine("\nNot gonna look through scripts in SYSVOL for goodies.");
                     noGrepScripts = true;
                 }
             }
@@ -258,13 +258,13 @@ public class GlobalVar
 
             if (GlobalVar.UserDefinedDomain != null)
             {
-                Console.Error.WriteLine("Running as user: " + GlobalVar.UserDefinedDomain + "\\" + GlobalVar.UserDefinedUsername);
+                Console.Error.WriteLine("\nRunning as user: " + GlobalVar.UserDefinedDomain + "\\" + GlobalVar.UserDefinedUsername);
             }
             else
             {
-                Console.Error.WriteLine("Running as user: " + Environment.UserDomainName + "\\" + Environment.UserName);
+                Console.Error.WriteLine("\nRunning as user: " + Environment.UserDomainName + "\\" + Environment.UserName);
             }
-            Console.Error.WriteLine("All online checks will be performed in the context of this user.");
+            Console.Error.WriteLine("\nAll online checks will be performed in the context of this user.");
 
             // Ask the DC for GPO details
             string currentDomainString = "";
@@ -276,7 +276,7 @@ public class GlobalVar
                 }
                 else
                 {
-                    Console.WriteLine("Trying to figure out what AD domain we're working with.");
+                    Console.WriteLine("\nTrying to figure out what AD domain we're working with.");
                     try
                     {
                         currentDomainString = Domain.GetCurrentDomain().ToString();
@@ -293,7 +293,7 @@ public class GlobalVar
                     }
                 }
 
-                Console.WriteLine("Current AD Domain is: " + currentDomainString);
+                Console.WriteLine("\nCurrent AD Domain is: " + currentDomainString);
                 
                 // if we're online, get a bunch of metadata about the GPOs via LDAP
                 JObject domainGpos = new JObject();
@@ -313,7 +313,7 @@ public class GlobalVar
             }
             else if ((GlobalVar.OnlineChecks == false) && sysvolDir.Length > 1)
             {
-                Console.WriteLine("Targeting SYSVOL at: " + sysvolDir);
+                Console.WriteLine("\nTargeting SYSVOL at: " + sysvolDir);
             }
             else
             {
@@ -326,7 +326,7 @@ public class GlobalVar
                 Directory.GetDirectories(sysvolDir);
 
             Console.WriteLine(
-                "I found all these directories in SYSVOL...\r\n");
+                "\nI found all these directories in SYSVOL...");
             Console.WriteLine("#########################################");
             foreach (string line in sysvolDirs)
             {
@@ -393,8 +393,8 @@ public class GlobalVar
             TaskFactory gpoFactory = new TaskFactory(lcts);
             CancellationTokenSource gpocts = new CancellationTokenSource();
             
-            Console.Error.WriteLine(gpoPaths.Count.ToString() + " GPOs to process.");
-            Console.Error.WriteLine("Starting processing GPOs with " + maxThreads.ToString() + " threads.");
+            Console.Error.WriteLine("\n" + gpoPaths.Count.ToString() + " GPOs to process.");
+            Console.Error.WriteLine("\nStarting processing GPOs with " + maxThreads.ToString() + " threads.");
             
             // Create a task for each GPO
             foreach (string gpoPath in gpoPaths)
@@ -439,16 +439,21 @@ public class GlobalVar
                 int completeTaskCount = totalGPOTasksCount - incompleteTaskCount;
                 int percentage = (int) Math.Round((double) (100 * completeTaskCount) / totalGPOTasksCount);
                 string percentageString = percentage.ToString();
+                Console.Error.Write("");
             
                 Console.Error.Write("\r" + completeTaskCount.ToString() + "/" + totalGPOTasksCount.ToString() +
                               " GPOs processed. " + percentageString + "% complete.");
             }
 
-            // while that's happening, we'll use Main[] to do the script grepping.
-            
+
+            // make double sure tasks all finished
+            Task.WaitAll(gpoTasks.ToArray());
+            gpocts.Dispose();
+
+            // do the script grepping
             if (!(noGrepScripts))
             {
-                Console.Error.Write("\r Processing SYSVOL script dirs.");
+                Console.Error.Write("Processing SYSVOL script dirs.");
                 JObject processedScriptDirs = ProcessScripts(sysvolScriptDirs);
                 if ((processedScriptDirs != null) && (processedScriptDirs.HasValues))
                 {
@@ -456,9 +461,6 @@ public class GlobalVar
                 }
             }
 
-            // make double sure tasks all finished
-            Task.WaitAll(gpoTasks.ToArray());
-            gpocts.Dispose();
 
             try
             {
