@@ -38,39 +38,7 @@ namespace Grouper2
                 return null;
             }
         }
-        /*
-
-            Looks like the structure kind of goes like:
-
-            You can have multiple collections in a collection JArray
-
-            Collections have some top level properties like:
-            @name
-            @changed
-            @uid
-            @desc
-            @bypassErrors
-            Registry
-                Contains a Settings JArray
-
-            Settings objects are just a JArray of individual regkeys which have:
-            @name
-            @status
-            @changed
-            @uid
-            Properties
-                @action
-                @displayDecimal
-                @default
-                @hive
-                @key
-                @name
-                @type
-                @value
-
-
-        */
-
+        
 
         private JObject GetAssessedRegistryCollections(JToken gppRegCollections)
         // another one of these methods to handle if the thing is a JArray or a single object.
@@ -101,7 +69,24 @@ namespace Grouper2
 
         private JToken GetAssessedRegistryCollection(JToken gppRegCollection)
         {
-            // this method handles the 'collection' object, which contains a bunch of individual regkeys
+            // this method handles the 'collection' object, which contains a bunch of individual regkeys and these properties 
+
+            /*
+             
+            Looks like the structure kind of goes like:
+
+            You can have multiple collections in a collection JArray
+
+            Collections have some top level properties like:
+            @name
+            @changed
+            @uid
+            @desc
+            @bypassErrors
+            Registry
+                Contains a Settings JArray
+
+             */
             JObject assessedRegistryCollection = new JObject
             {
                 // add collection-specific properties
@@ -160,16 +145,47 @@ namespace Grouper2
 
         private JObject GetAssessedRegistrySetting(JToken gppRegSetting)
         {
-            JObject assessedRegistrySetting = JObject.FromObject(gppRegSetting);
+            JObject assessedRegistrySetting = new JObject();
+
+            assessedRegistrySetting.Add("Display Name", Utility.GetSafeString(gppRegSetting, "@name"));
+            assessedRegistrySetting.Add("Status", Utility.GetSafeString(gppRegSetting, "@status"));
+            assessedRegistrySetting.Add("Changed", Utility.GetSafeString(gppRegSetting, "@changed"));
+            assessedRegistrySetting.Add("Action", Utility.GetActionString(gppRegSetting["Properties"]["@action"].ToString()));
+            assessedRegistrySetting.Add("Default", Utility.GetSafeString(gppRegSetting["Properties"], "@default"));
+            assessedRegistrySetting.Add("Hive", Utility.GetSafeString(gppRegSetting["Properties"], "@hive"));
+            assessedRegistrySetting.Add("Key", Utility.GetSafeString(gppRegSetting["Properties"], "@key"));
+            assessedRegistrySetting.Add("Name", Utility.GetSafeString(gppRegSetting["Properties"], "@name"));
+            assessedRegistrySetting.Add("Type", Utility.GetSafeString(gppRegSetting["Properties"], "@type"));
+            assessedRegistrySetting.Add("Value", Utility.GetSafeString(gppRegSetting["Properties"], "@value"));
+
             // this is the method that ACTUALLY looks at reg keys. blugh.
             if ((gppRegSetting != null) && gppRegSetting.HasValues)
             {
-                return assessedRegistrySetting;
+                return new JObject(assessedRegistrySetting);
             }
             else
             {
                 return null;
             }
         }
+        /*
+
+            Settings objects are just a JArray of individual regkeys which have:
+            @name
+            @status
+            @changed
+            @uid
+            Properties
+                @action
+                @displayDecimal
+                @default
+                @hive
+                @key
+                @name
+                @type
+                @value
+
+
+        */
     }
 }
