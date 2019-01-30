@@ -85,12 +85,28 @@ class LDAPstuff
     {
         try
         {
-            DirectoryEntry rootDse = new DirectoryEntry("LDAP://rootDSE");
-            DirectoryEntry root = new DirectoryEntry("GC://" + rootDse.Properties["defaultNamingContext"].Value);
-            string schemaContextString = rootDse.Properties["schemaNamingContext"].Value.ToString();
-            DirectoryEntry rootExtRightsContext =
-                new DirectoryEntry("LDAP://" + schemaContextString.Replace("Schema", "Extended-Rights"));
-
+            DirectoryEntry rootDse = new DirectoryEntry();
+            DirectoryEntry root = new DirectoryEntry();
+            DirectoryEntry rootExtRightsContext = new DirectoryEntry();
+            if (GlobalVar.UserDefinedDomainDn != null)
+            {
+                rootDse = new DirectoryEntry(("LDAP://" + GlobalVar.UserDefinedDomain + "/rootDSE"), GlobalVar.UserDefinedUsername, GlobalVar.UserDefinedPassword);
+                root = new DirectoryEntry(("GC://" + rootDse.Properties["defaultNamingContext"].Value),
+                    GlobalVar.UserDefinedUsername, GlobalVar.UserDefinedPassword);
+                string schemaContextString = rootDse.Properties["schemaNamingContext"].Value.ToString();
+                rootExtRightsContext =
+                    new DirectoryEntry("LDAP://" + schemaContextString.Replace("Schema", "Extended-Rights"),
+                        GlobalVar.UserDefinedUsername, GlobalVar.UserDefinedPassword);
+            }
+            else
+            {
+                rootDse = new DirectoryEntry("LDAP://rootDSE");
+                root = new DirectoryEntry("GC://" + rootDse.Properties["defaultNamingContext"].Value);
+                string schemaContextString = rootDse.Properties["schemaNamingContext"].Value.ToString();
+                rootExtRightsContext =
+                    new DirectoryEntry("LDAP://" + schemaContextString.Replace("Schema", "Extended-Rights"));
+            }
+            
             // make a searcher to find GPOs
             DirectorySearcher gpoSearcher = new DirectorySearcher(root)
             {

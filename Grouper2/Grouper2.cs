@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.DirectoryServices.ActiveDirectory;
 using System.IO;
 using System.Linq;
+using System.Text;
 using CommandLineParser.Arguments;
 using CommandLineParser.Exceptions;
 using Grouper2.Properties;
@@ -77,7 +78,10 @@ public class GlobalVar
         public static int IntLevelToShow;
         public static bool DebugMode;
         public static bool NoMess;
-        
+        public static string UserDefinedDomain;
+        public static string UserDefinedDomainDn;
+        public static string UserDefinedUsername;
+        public static string UserDefinedPassword;
         public static List<String> CleanupList = new List<string>();
     }
 
@@ -89,7 +93,7 @@ public class GlobalVar
             Utility.PrintBanner();
             
             CommandLineParser.CommandLineParser parser = new CommandLineParser.CommandLineParser();
-            SwitchArgument debugArg = new SwitchArgument('d', "debug", "Enables debug mode. Will also show you the names of any categories of policies that Grouper saw but didn't have any means of processing. I eagerly await your pull request.", false);
+            SwitchArgument debugArg = new SwitchArgument('v', "verbose", "Enables verbose debug mode. Will also show you the names of any categories of policies that Grouper saw but didn't have any means of processing. I eagerly await your pull request.", false);
             SwitchArgument offlineArg = new SwitchArgument('o', "offline",
                 "Disables checks that require LDAP comms with a DC or SMB comms with file shares found in policy settings. Requires that you define a value for --sysvol.",
                 false);
@@ -98,11 +102,19 @@ public class GlobalVar
             ValueArgument<int> intlevArg = new ValueArgument<int>('i', "interestlevel",
                 "The minimum interest level to display. i.e. findings with an interest level lower than x will not be seen in output. Defaults to 1, i.e. show everything except some extremely dull defaults. If you want to see those too, do -i 0.");
             ValueArgument<int> threadsArg = new ValueArgument<int>('t',"threads", "Max number of threads. Defaults to 10.");
+            ValueArgument<string> domainArg =
+                new ValueArgument<string>('d', "domain", "Domain to query for Group Policy Goodies.");
+            ValueArgument<string> passwordArg = new ValueArgument<string>('p', "password", "Password to use for LDAP operations.");
+            ValueArgument<string> usernameArg =
+                new ValueArgument<string>('u', "username", "Username to use for LDAP operations.");
             SwitchArgument helpArg = new SwitchArgument('h', "help", "Displays this help.", false);
-            SwitchArgument prettyArg = new SwitchArgument('p', "pretty", "Switches output from the raw Json to a prettier format.", false);
+            SwitchArgument prettyArg = new SwitchArgument('g', "pretty", "Switches output from the raw Json to a prettier format.", false);
             SwitchArgument noMessArg = new SwitchArgument('m', "nomess", "Avoids file writes at all costs. May find less stuff.", false);
             SwitchArgument currentPolOnlyArg = new SwitchArgument('c', "currentonly", "Only checks current policies, ignoring stuff in those Policies_NTFRS_* directories that result from replication failures.", false);
             SwitchArgument noGrepScriptsArg = new SwitchArgument('n', "nogrepscripts", "Don't grep through the files in the \"Scripts\" subdirectory", false);
+        
+            parser.Arguments.Add(usernameArg);
+            parser.Arguments.Add(passwordArg);
             parser.Arguments.Add(debugArg);
             parser.Arguments.Add(intlevArg);
             parser.Arguments.Add(sysvolArg);
@@ -113,14 +125,17 @@ public class GlobalVar
             parser.Arguments.Add(noMessArg);
             parser.Arguments.Add(currentPolOnlyArg);
             parser.Arguments.Add(noGrepScriptsArg);
+            parser.Arguments.Add(domainArg);
+
             // set a few defaults
             string sysvolDir = "";
             GlobalVar.OnlineChecks = true;
             int maxThreads = 10;
             bool prettyOutput = false;
             GlobalVar.NoMess = false;
-            bool noNTFRS = false;
+            bool noNtfrs = false;
             bool noGrepScripts = false;
+            string userDefinedDomain = "";
 
             try
             {
@@ -166,7 +181,7 @@ public class GlobalVar
 
                 if (debugArg.Parsed)
                 {
-                    Console.Error.WriteLine("Debug mode enabled. Hope you like yellow.");
+                    Console.Error.WriteLine("Verbose debug mode enabled. Hope you like yellow.");
                     GlobalVar.DebugMode = true;
                 }
 
@@ -198,7 +213,35 @@ public class GlobalVar
                 if (currentPolOnlyArg.Parsed)
                 {
                     Console.Error.WriteLine("Only looking at current policies and scripts, not checking any of those weird old NTFRS dirs.");
-                    noNTFRS = true;
+                    noNtfrs = true;
+                }
+
+                if (domainArg.Parsed)
+                {
+                    Console.Error.Write("You told me to talk to domain " + domainArg.Value + " so I'm gonna do that.");
+                    if (!(usernameArg.Parsed) || !(passwordArg.Parsed))
+                    {
+                        Console.Error.Write("If you specify a domain you need to specify a username and password too using -u and -p.");
+                    };
+                    userDefinedDomain = domainArg.Value;
+                    string[] splitDomain = userDefinedDomain.Split('.');
+                    StringBuilder sb = new StringBuilder();
+                    int pi = splitDomain.Length;
+                    int ind = 1;
+                    foreach (string piece in splitDomain)
+                    {
+                        sb.Append("DC=" + piece);
+                        if (pi != ind)
+                        {
+                            sb.Append(",");
+                        }
+                        ind++;
+                    }
+
+                    GlobalVar.UserDefinedDomain = userDefinedDomain;
+                    GlobalVar.UserDefinedDomainDn = sb.ToString();
+                    GlobalVar.UserDefinedPassword = passwordArg.Value;
+                    GlobalVar.UserDefinedUsername = usernameArg.Value;
                 }
 
                 if (noGrepScriptsArg.Parsed)
@@ -211,32 +254,54 @@ public class GlobalVar
             {
                 Console.WriteLine(e.Message);
             }
-            
-            Console.Error.WriteLine("Running as user: " + Environment.UserDomainName + "\\" + Environment.UserName);
+
+            if (GlobalVar.UserDefinedDomain != null)
+            {
+                Console.Error.WriteLine("Running as user: " + GlobalVar.UserDefinedDomain + "\\" + GlobalVar.UserDefinedUsername);
+            }
+            else
+            {
+                Console.Error.WriteLine("Running as user: " + Environment.UserDomainName + "\\" + Environment.UserName);
+            }
             Console.Error.WriteLine("All online checks will be performed in the context of this user.");
 
             // Ask the DC for GPO details
+            string currentDomainString = "";
             if (GlobalVar.OnlineChecks)
             {
-                Console.WriteLine("Trying to figure out what AD domain we're working with.");
-                string currentDomainString = "";
-                try
+                if (userDefinedDomain != "")
                 {
-                    currentDomainString = Domain.GetCurrentDomain().ToString();
+                    currentDomainString = userDefinedDomain;
                 }
-                catch (ActiveDirectoryOperationException e)
+                else
                 {
-                    Console.WriteLine("\nCouldn't talk to the domain properly. If you're trying to run offline you should use the -o switch. Failing that, try rerunning with -d to get more information about the error.");
-                    if (GlobalVar.DebugMode)
+                    Console.WriteLine("Trying to figure out what AD domain we're working with.");
+                    try
                     {
-                        Utility.DebugWrite(e.ToString());
+                        currentDomainString = Domain.GetCurrentDomain().ToString();
                     }
+                    catch (ActiveDirectoryOperationException e)
+                    {
+                        Console.WriteLine("\nCouldn't talk to the domain properly. If you're trying to run offline you should use the -o switch. Failing that, try rerunning with -d to specify a domain or -v to get more information about the error.");
+                        if (GlobalVar.DebugMode)
+                        {
+                            Utility.DebugWrite(e.ToString());
+                        }
 
-                    Environment.Exit(1);
+                        Environment.Exit(1);
+                    }
                 }
 
                 Console.WriteLine("Current AD Domain is: " + currentDomainString);
                 
+                // if we're online, get a bunch of metadata about the GPOs via LDAP
+                JObject domainGpos = new JObject();
+
+                if (GlobalVar.OnlineChecks)
+                {
+                    domainGpos = GetDomainGpoData.DomainGpoData;
+                }
+
                 Console.WriteLine("");
 
                 if (sysvolDir == "")
@@ -271,7 +336,7 @@ public class GlobalVar
             List<string> sysvolPolDirs = new List<string>();
             List<string> sysvolScriptDirs = new List<string>();
 
-            if (noNTFRS)
+            if (noNtfrs)
             {
                 Console.WriteLine("... but I'm not going to look in any of them except .\\Policies and .\\Scripts because you told me not to.");
                 sysvolPolDirs.Add(sysvolDir + "Policies\\");
@@ -294,13 +359,6 @@ public class GlobalVar
                 }
             }
 
-            // if we're online, get a bunch of metadata about the GPOs via LDAP
-            JObject domainGpos = new JObject();
-
-            if (GlobalVar.OnlineChecks)
-            {
-                domainGpos = GetDomainGpoData.DomainGpoData;
-            }
 
             // get all the policy dirs
             List<string> gpoPaths = new List<string>();
