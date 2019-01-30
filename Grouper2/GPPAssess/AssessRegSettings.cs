@@ -50,14 +50,20 @@ namespace Grouper2
                 foreach (JToken gppRegCollection in gppRegCollections)
                 {
                     JToken assessedGppRegCollection = GetAssessedRegistryCollection(gppRegCollection);
-                    assessedRegistryCollections.Add(inc.ToString(), assessedGppRegCollection);
-                    inc++;
+                    if (assessedGppRegCollection != null)
+                    {
+                        assessedRegistryCollections.Add(inc.ToString(), assessedGppRegCollection);
+                        inc++;
+                    }
                 }
             }
             else
             {
                 JToken assessedGppRegCollection = GetAssessedRegistryCollection(gppRegCollections);
-                assessedRegistryCollections.Add("0", assessedGppRegCollection);
+                if (assessedGppRegCollection != null)
+                {
+                    assessedRegistryCollections.Add("0", assessedGppRegCollection);
+                }
             }
 
             if (assessedRegistryCollections != null && assessedRegistryCollections.HasValues)
@@ -103,6 +109,14 @@ namespace Grouper2
                 {
                     assessedRegistryCollection.Add("Registry Settings in Collection", assessedRegistrySettingses);
                 }
+                else
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                return null;
             }
 
             if ((assessedRegistryCollection != null) && assessedRegistryCollection.HasValues)
@@ -126,14 +140,20 @@ namespace Grouper2
                 foreach (JToken gppRegSetting in gppRegSettingses)
                 {
                     JToken assessedGppRegSetting = GetAssessedRegistrySetting(gppRegSetting);
-                    assessedRegistrySettingses.Add(inc.ToString(), assessedGppRegSetting);
-                    inc++;
+                    if (assessedGppRegSetting != null)
+                    {
+                        assessedRegistrySettingses.Add(inc.ToString(), assessedGppRegSetting);
+                        inc++;
+                    }
                 }
             }
             else
             {
                 JObject assessedGppRegSetting = GetAssessedRegistrySetting(gppRegSettingses);
-                assessedRegistrySettingses.Add("0", assessedGppRegSetting);
+                if (assessedGppRegSetting != null)
+                {
+                    assessedRegistrySettingses.Add("0", assessedGppRegSetting);
+                }
             }
 
             if (assessedRegistrySettingses != null && assessedRegistrySettingses.HasValues)
@@ -146,20 +166,37 @@ namespace Grouper2
         private JObject GetAssessedRegistrySetting(JToken gppRegSetting)
         {
             JObject assessedRegistrySetting = new JObject();
-
+            int interestLevel = 1;
             assessedRegistrySetting.Add("Display Name", Utility.GetSafeString(gppRegSetting, "@name"));
             assessedRegistrySetting.Add("Status", Utility.GetSafeString(gppRegSetting, "@status"));
             assessedRegistrySetting.Add("Changed", Utility.GetSafeString(gppRegSetting, "@changed"));
             assessedRegistrySetting.Add("Action", Utility.GetActionString(gppRegSetting["Properties"]["@action"].ToString()));
             assessedRegistrySetting.Add("Default", Utility.GetSafeString(gppRegSetting["Properties"], "@default"));
             assessedRegistrySetting.Add("Hive", Utility.GetSafeString(gppRegSetting["Properties"], "@hive"));
-            assessedRegistrySetting.Add("Key", Utility.GetSafeString(gppRegSetting["Properties"], "@key"));
-            assessedRegistrySetting.Add("Name", Utility.GetSafeString(gppRegSetting["Properties"], "@name"));
+            string key = Utility.GetSafeString(gppRegSetting["Properties"], "@key");
+            JObject investigatedKey = Utility.InvestigateString(key);
+            if ((int) investigatedKey["InterestLevel"] >= interestLevel)
+            {
+                interestLevel = (int) investigatedKey["InterestLevel"];
+            }
+            assessedRegistrySetting.Add("Key", investigatedKey);
+            string name = Utility.GetSafeString(gppRegSetting["Properties"], "@name");
+            JObject investigatedName = Utility.InvestigateString(name);
+            if ((int)investigatedName["InterestLevel"] >= interestLevel)
+            {
+                interestLevel = (int)investigatedKey["InterestLevel"];
+            }
+            assessedRegistrySetting.Add("Name", investigatedName);
             assessedRegistrySetting.Add("Type", Utility.GetSafeString(gppRegSetting["Properties"], "@type"));
-            assessedRegistrySetting.Add("Value", Utility.GetSafeString(gppRegSetting["Properties"], "@value"));
+            string value = Utility.GetSafeString(gppRegSetting["Properties"], "@value");
+            JObject investigatedValue = Utility.InvestigateString(value);
+            if ((int)investigatedValue["InterestLevel"] >= interestLevel)
+            {
+                interestLevel = (int)investigatedKey["InterestLevel"];
+            }
+            assessedRegistrySetting.Add("Value", investigatedValue);
 
-            // this is the method that ACTUALLY looks at reg keys. blugh.
-            if ((gppRegSetting != null) && gppRegSetting.HasValues)
+            if (interestLevel >= GlobalVar.IntLevelToShow)
             {
                 return new JObject(assessedRegistrySetting);
             }
