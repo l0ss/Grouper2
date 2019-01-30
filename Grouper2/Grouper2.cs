@@ -674,7 +674,7 @@ public class GlobalVar
                         }
                     }
                 }
-
+                
                 JObject allFindings = new JObject();
 
                 // if there are any Findings, add it to the final output.
@@ -811,18 +811,26 @@ public class GlobalVar
 
                 return null;
             }
-            JArray processedAases = new JArray();
+            JObject processedAases = new JObject();
             foreach (string aasFile in aasFiles)
             {
                 JObject parsedAasFile = Parsers.ParseAASFile(aasFile);
                 JObject assessedAasFile = AasAssess.AssessAasFile(parsedAasFile);
                 if (assessedAasFile != null && assessedAasFile.HasValues)
                 {
-                    processedAases.Add(assessedAasFile);
+                    processedAases.Add(aasFile, assessedAasFile);
                 }
             }
+            
+            JArray aasResult = new JArray();
 
-            return processedAases;
+            if ((processedAases != null) && (processedAases.HasValues))
+            {
+                aasResult.Add(new JObject(new JProperty("Assigned Applications", processedAases)));
+                return aasResult;
+            }
+
+            return null;
         }
 
         private static JArray ProcessGpXml(string Path)

@@ -6,8 +6,8 @@ namespace Grouper2
     {
         public static JObject AssessAasFile(JObject parsedAasFile)
         {
+            JObject assessedAasFile = new JObject();
             int interestLevel = 3;
-
             if (parsedAasFile["MSI Path"] != null)
             {
                 string msiPath = parsedAasFile["MSI Path"].ToString();
