@@ -382,7 +382,7 @@ namespace Grouper2
                         Color = ConsoleColor.Gray,
                         Columns = {GridLength.Auto, GridLength.Auto},
                         Children = { },
-
+                        Stroke = LineThickness.None
                     };
 
                     foreach (JProperty child in value)
