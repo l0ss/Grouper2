@@ -15,10 +15,7 @@ namespace Grouper2
         {
             // munge it to a JObject
             JToken gpo = inputKvp.Value;
-
-            ////////////////////////////////////////
-            ///  Title and Properties
-            ////////////////////////////////////////
+            
             JToken gpoProps = gpo["GPOProps"];
             // title it with either the display name or the uid, depending on what we have
             string gpoTitle = "";
@@ -46,7 +43,7 @@ namespace Grouper2
                 new Span("##############") { Color = ConsoleColor.Yellow }
             );
 
-            Grid gpoPropsGrid = JPropsToGrid(gpoProps);
+            Grid gpoPropsGrid = JsonToGrid(gpoProps, 0);
             outputDocument.Children.Add(gpoPropsGrid);
 
             // grab all our findings
@@ -106,13 +103,13 @@ namespace Grouper2
                     {
                         findingsDocument.Children.Add(
                             new Span("GPP Drive Mappings") { Color = ConsoleColor.Magenta }, "\n",
-                            new Span("~~~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
+                            new Span("~~~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }
                         );
                         foreach (JToken findings in cat.Value)
                         {
                             foreach (JToken finding in findings)
                             {
-                                findingsDocument.Children.Add(JPropsToGrid(finding));
+                                findingsDocument.Children.Add(JsonToGrid(finding, 0));
                             }
                         }
                         continue;
@@ -121,30 +118,18 @@ namespace Grouper2
                     {
                         findingsDocument.Children.Add(
                             new Span("OS Privileges") { Color = ConsoleColor.Magenta }, "\n",
-                            new Span("~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
+                            new Span("~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }
                         );
-                                findingsDocument.Children.Add(JPropsToGrid(cat.Value));
-                        
-                        /*
-                        Grid privGrid = new Grid();
-                        foreach (JProperty privilege in cat.Value)
-                        {
-                            Cell privName = new Cell(privilege.Name);
-                            Grid privTrustees = JPropsToGrid(privilege.Value);
-                            privGrid.Children.Add(privName, privTrustees);
-                        }*/
+                        findingsDocument.Children.Add(JsonToGrid(cat.Value, 0));
                         continue;
                     }
                     if (cat.Key == "Group Membership")
                     {
                         findingsDocument.Children.Add(
                             new Span("Group Membership") { Color = ConsoleColor.Magenta }, "\n",
-                            new Span("~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
+                            new Span("~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }
                         );
-                        foreach (JToken groupFinding in cat.Value)
-                        {
-                            //findingsDocument.Children.Add(JPropsToGrid(groupFinding));
-                        }
+                        findingsDocument.Children.Add(JsonToGrid(cat.Value, 0));
                         continue;
                     }
                     if (cat.Key == "Groups")
@@ -153,10 +138,28 @@ namespace Grouper2
                             new Span("GPP Users and Groups") { Color = ConsoleColor.Magenta }, "\n",
                             new Span("~~~~~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
                         );
-                        foreach (JToken ungFinding in cat.Value)
+                        JToken gppUsers = cat.Value["GPP Users"];
+                        JToken gppGroups = cat.Value["GPP Groups"];
+
+                        if (gppGroups != null)
                         {
-                            //findingsDocument.Children.Add(JPropsToGrid(ungFinding));
+                            findingsDocument.Children.Add(new Span("GPP Groups"), "\n");
+                            foreach (JProperty groupFinding in gppGroups)
+                            {
+                                findingsDocument.Children.Add(JsonToGrid(groupFinding.Value, 0));
+                            }
                         }
+
+                        if (gppUsers != null)
+                        {
+                            findingsDocument.Children.Add(new Span("GPP Users"), "\n");
+                            foreach (JProperty userFinding in gppUsers)
+                            {
+                                findingsDocument.Children.Add(JsonToGrid(userFinding.Value, 0));
+                            }
+                            
+                        }
+                        
                         continue;
                     }
                     if (cat.Key == "DataSources")
@@ -165,9 +168,9 @@ namespace Grouper2
                             new Span("GPP Data Sources") { Color = ConsoleColor.Magenta }, "\n",
                             new Span("~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
                         );
-                        foreach (JToken datasourceFinding in cat.Value)
+                        foreach (JProperty datasourceFinding in cat.Value)
                         {
-                            //findingsDocument.Children.Add(JPropsToGrid(datasourceFinding));
+                            findingsDocument.Children.Add(JsonToGrid(datasourceFinding.Value, 0));
                         }
                         continue;
                     }
@@ -177,9 +180,9 @@ namespace Grouper2
                             new Span("GPP Printer Mappings") { Color = ConsoleColor.Magenta }, "\n",
                             new Span("~~~~~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
                         );
-                        foreach (JToken printerFinding in cat.Value)
+                        foreach (JProperty printerFinding in cat.Value)
                         {
-                            //findingsDocument.Children.Add(JPropsToGrid(printerFinding));
+                            findingsDocument.Children.Add(JsonToGrid(printerFinding.Value, 0));
                         }
                         continue;
                     }
@@ -189,9 +192,9 @@ namespace Grouper2
                             new Span("GPP Files") { Color = ConsoleColor.Magenta }, "\n",
                             new Span("~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
                         );
-                        foreach (JToken fileFinding in cat.Value)
+                        foreach (JProperty fileFinding in cat.Value)
                         {
-                            //findingsDocument.Children.Add(JPropsToGrid(fileFinding));
+                            findingsDocument.Children.Add(JsonToGrid(fileFinding.Value, 0));
                         }
                         continue;
                     }
@@ -203,7 +206,7 @@ namespace Grouper2
                         );
                         foreach (JToken schedtaskFinding in cat.Value)
                         {
-                            //findingsDocument.Children.Add(JPropsToGrid(schedtaskFinding));
+                            //findingsDocument.Children.Add(JsonToGrid(schedtaskFinding));
                         }
                         continue;
                     }
@@ -215,7 +218,7 @@ namespace Grouper2
                         );
                         foreach (JToken aasFinding in cat.Value)
                         {
-                            //findingsDocument.Children.Add(JPropsToGrid(aasFinding));
+                            //findingsDocument.Children.Add(JsonToGrid(aasFinding));
                         }
                         continue;
                     }
@@ -227,7 +230,7 @@ namespace Grouper2
                         );
                         foreach (JToken sgsFinding in cat.Value)
                         {
-                            //findingsDocument.Children.Add(JPropsToGrid(sgsFinding));
+                            //findingsDocument.Children.Add(JsonToGrid(sgsFinding));
                         }
                         continue;
                     }
@@ -239,7 +242,7 @@ namespace Grouper2
                         );
                         foreach (JToken ntserviceFinding in cat.Value)
                         {
-                            //findingsDocument.Children.Add(JPropsToGrid(ntserviceFinding));
+                            //findingsDocument.Children.Add(JsonToGrid(ntserviceFinding));
                         }
                         continue;
                     }
@@ -251,7 +254,7 @@ namespace Grouper2
                         );
                         foreach (JToken shortcutFinding in cat.Value)
                         {
-                            //findingsDocument.Children.Add(JPropsToGrid(shortcutFinding));
+                            //findingsDocument.Children.Add(JsonToGrid(shortcutFinding));
                         }
                         continue;
                     }
@@ -263,7 +266,7 @@ namespace Grouper2
                         );
                         foreach (JToken sysaccFinding in cat.Value)
                         {
-                            //findingsDocument.Children.Add(JPropsToGrid(sysaccFinding));
+                            //findingsDocument.Children.Add(JsonToGrid(sysaccFinding));
                         }
                         continue;
                     }
@@ -275,7 +278,7 @@ namespace Grouper2
                         );
                         foreach (JToken krbpolFinding in cat.Value)
                         {
-                            //findingsDocument.Children.Add(JPropsToGrid(krbpolFinding));
+                            //findingsDocument.Children.Add(JsonToGrid(krbpolFinding));
                         }
                         continue;
                     }
@@ -289,7 +292,7 @@ namespace Grouper2
                         );
                         foreach (JToken regvalFinding in cat.Value)
                         {
-                            findingsDocument.Children.Add(JPropsToGrid(regvalFinding));
+                            findingsDocument.Children.Add(JsonToGrid(regvalFinding));
                         }
                         */
                         continue;
@@ -302,7 +305,7 @@ namespace Grouper2
                         );
                         foreach (JToken regsetFinding in cat.Value)
                         {
-                            //findingsDocument.Children.Add(JPropsToGrid(regsetFinding));
+                            //findingsDocument.Children.Add(JsonToGrid(regsetFinding));
                         }
                         continue;
                     }
@@ -314,7 +317,7 @@ namespace Grouper2
                         );
                         foreach (JToken regkeyFinding in cat.Value)
                         {
-                            //findingsDocument.Children.Add(JPropsToGrid(regkeyFinding));
+                            //findingsDocument.Children.Add(JsonToGrid(regkeyFinding));
                         }
                         continue; ;
                     }
@@ -326,7 +329,7 @@ namespace Grouper2
                         );
                         foreach (JToken envvarFinding in cat.Value)
                         {
-                            //findingsDocument.Children.Add(JPropsToGrid(envvarFinding));
+                            //findingsDocument.Children.Add(JsonToGrid(envvarFinding));
                         }
                         continue;
                     }
@@ -338,7 +341,7 @@ namespace Grouper2
                         );
                         foreach (JToken iniFileFinding in cat.Value)
                         {
-                            //findingsDocument.Children.Add(JPropsToGrid(iniFileFinding));
+                            //findingsDocument.Children.Add(JsonToGrid(iniFileFinding));
                         }
                         continue;
                     }
@@ -350,7 +353,7 @@ namespace Grouper2
                         );
                         foreach (JToken scriptFinding in cat.Value)
                         {
-                            //findingsDocument.Children.Add(JPropsToGrid(scriptFinding));
+                            //findingsDocument.Children.Add(JsonToGrid(scriptFinding));
                         }
                         continue;
                     }
@@ -365,26 +368,50 @@ namespace Grouper2
             return findingsDocument;
         }
 
-        private static Grid JPropsToGrid(JToken jprops)
+        private static Grid JsonToGrid(JToken jprops, int iteration)
         {
+            iteration++;
+
+            ConsoleColor gridColor = ConsoleColor.White;
+
+            switch (iteration)
+            {
+                case 1:
+                    gridColor = ConsoleColor.White;
+                    break;
+                case 2:
+                    gridColor = ConsoleColor.DarkGray;
+                    break;
+              
+                default:
+                    gridColor = ConsoleColor.Black;
+                    break;
+            }
+
             Grid grid = new Grid
             {
                 Color = ConsoleColor.White,
                 Columns = {GridLength.Auto, GridLength.Auto},
-                Children = { },
                 Stroke = LineThickness.Single,
-                StrokeColor = ConsoleColor.DarkGray
+                StrokeColor = gridColor
             };
 
             foreach (JProperty jprop in jprops)
             {
+                string name = jprop.Name;
                 JToken value = jprop.Value;
                 if ((value.Count() == 1) || (value.Count() == 0))
                 {
-                    if (jprop.Value is JObject)
+                    if (jprop.Value is JArray)
                     {
-                        //Utility.DebugWrite(jprop.Value.ToString());
-                        grid.Children.Add(new Cell(jprop.Name), new Cell(JPropsToGrid(jprop.Value)));
+                        foreach (JToken arrayItem in jprop.Value)
+                        {
+                            grid.Children.Add(new Cell(name), new Cell(JsonToGrid(arrayItem, iteration)));
+                        }
+                    }
+                    else if (jprop.Value is JObject)
+                    {
+                        grid.Children.Add(new Cell(jprop.Name), new Cell(JsonToGrid(jprop.Value, iteration)));
                     }
                     else
                     {
@@ -393,25 +420,26 @@ namespace Grouper2
                 }
                 else if (value.Count() > 1)
                 {
-                    /*
-                    Grid subGrid = new Grid
+                    if (value is JArray)
                     {
-                        Color = ConsoleColor.Gray,
-                        Columns = {GridLength.Auto, GridLength.Auto},
-                        Children = { },
-                        Stroke = LineThickness.None
-                    };
-
-                    foreach (JProperty child in value)
-                    {
-                        subGrid.Children.Add(new Cell(child.Name), new Cell(child.Value.ToString()));
+                        Grid subGrid = new Grid
+                        {
+                            Columns = {GridLength.Auto},
+                            Stroke = LineThickness.None
+                        };
+                        foreach (JToken arrayItem in value)
+                        {
+                            subGrid.Children.Add(new Cell(JsonToGrid(arrayItem, iteration)));
+                        }
+                        grid.Children.Add(new Cell(name), new Cell(subGrid));
                     }
-                    */
-                    Grid subGrid = JPropsToGrid(value);
-                    grid.Children.Add(new Cell(jprop.Name), new Cell(subGrid));
+                    else
+                    {
+                        Grid subGrid = JsonToGrid(value, iteration);
+                        grid.Children.Add(new Cell(name), new Cell(subGrid));
+                    }
                 }
-            } 
-            
+            }
             return grid;
         }
     }

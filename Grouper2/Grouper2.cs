@@ -462,27 +462,21 @@ public class GlobalVar
             }
 
 
-            try
-            {
-                // Final output is finally happening finally here:
+            // Final output is finally happening finally here:
 
-                if (prettyOutput)
-                {
-                    foreach (KeyValuePair<string, JToken> gpo in grouper2Output)
-                    {
-                        Console.Error.WriteLine("\n");
-                        Output.GetAssessedGPOOutput(gpo);
-                    }
-                }
-                else
-                {
-                    Console.WriteLine(grouper2Output);
-                }
-            }
-            catch (Exception e)
+            if (prettyOutput)
             {
-                Utility.DebugWrite(e.ToString());
+                foreach (KeyValuePair<string, JToken> gpo in grouper2Output)
+                {
+                    Console.Error.WriteLine("\n");
+                    Output.GetAssessedGPOOutput(gpo);
+                }
             }
+            else
+            {
+                Console.WriteLine(grouper2Output);
+            }
+            
 
             // get the time it took to do the thing and give to user
             DateTime grouper2EndTime = DateTime.Now;
