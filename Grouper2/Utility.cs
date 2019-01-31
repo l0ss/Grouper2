@@ -391,6 +391,10 @@ namespace Grouper2
         public static bool CanIRead(string inPath)
         {
             bool canRead = false;
+            if (!GlobalVar.OnlineChecks)
+            {
+                return false;
+            }
             try
             {
                 FileStream stream = File.OpenRead(inPath);

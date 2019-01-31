@@ -53,7 +53,7 @@ namespace Grouper2
             {
                 string fromPath = gppFileProps["@fromPath"].ToString();
 
-                if (GlobalVar.OnlineChecks && (fromPath.Length > 0))
+                if (fromPath.Length > 0)
                 {
                     JObject assessedPath = Utility.InvestigatePath(gppFileProps["@fromPath"].ToString());
                     assessedFile.Add("From Path", assessedPath);
