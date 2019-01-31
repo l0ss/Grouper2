@@ -108,11 +108,11 @@ namespace Grouper2
                             new Span("GPP Drive Mappings") { Color = ConsoleColor.Magenta }, "\n",
                             new Span("~~~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
                         );
-                        foreach (JToken driveFindings in cat.Value)
+                        foreach (JToken findings in cat.Value)
                         {
-                            foreach (JToken driveFinding in driveFindings)
+                            foreach (JToken finding in findings)
                             {
-                                findingsDocument.Children.Add(JPropsToGrid(driveFinding));
+                                findingsDocument.Children.Add(JPropsToGrid(finding));
                             }
                         }
                         continue;
@@ -123,10 +123,16 @@ namespace Grouper2
                             new Span("OS Privileges") { Color = ConsoleColor.Magenta }, "\n",
                             new Span("~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
                         );
-                        foreach (JToken privFinding in cat.Value)
+                                findingsDocument.Children.Add(JPropsToGrid(cat.Value));
+                        
+                        /*
+                        Grid privGrid = new Grid();
+                        foreach (JProperty privilege in cat.Value)
                         {
-                            //findingsDocument.Children.Add(JPropsToGrid(privFinding));
-                        }
+                            Cell privName = new Cell(privilege.Name);
+                            Grid privTrustees = JPropsToGrid(privilege.Value);
+                            privGrid.Children.Add(privName, privTrustees);
+                        }*/
                         continue;
                     }
                     if (cat.Key == "Group Membership")
@@ -363,9 +369,11 @@ namespace Grouper2
         {
             Grid grid = new Grid
             {
-                Color = ConsoleColor.Gray,
+                Color = ConsoleColor.White,
                 Columns = {GridLength.Auto, GridLength.Auto},
-                Children = { }
+                Children = { },
+                Stroke = LineThickness.Single,
+                StrokeColor = ConsoleColor.DarkGray
             };
 
             foreach (JProperty jprop in jprops)
@@ -373,10 +381,19 @@ namespace Grouper2
                 JToken value = jprop.Value;
                 if ((value.Count() == 1) || (value.Count() == 0))
                 {
-                    grid.Children.Add(new Cell(jprop.Name), new Cell(jprop.Value.ToString()));
+                    if (jprop.Value is JObject)
+                    {
+                        //Utility.DebugWrite(jprop.Value.ToString());
+                        grid.Children.Add(new Cell(jprop.Name), new Cell(JPropsToGrid(jprop.Value)));
+                    }
+                    else
+                    {
+                        grid.Children.Add(new Cell(jprop.Name), new Cell(jprop.Value.ToString()));
+                    }
                 }
                 else if (value.Count() > 1)
                 {
+                    /*
                     Grid subGrid = new Grid
                     {
                         Color = ConsoleColor.Gray,
@@ -389,6 +406,8 @@ namespace Grouper2
                     {
                         subGrid.Children.Add(new Cell(child.Name), new Cell(child.Value.ToString()));
                     }
+                    */
+                    Grid subGrid = JPropsToGrid(value);
                     grid.Children.Add(new Cell(jprop.Name), new Cell(subGrid));
                 }
             } 

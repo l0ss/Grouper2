@@ -37,32 +37,34 @@ internal static partial class AssessInf
                         foreach (JToken trusteeJToken in privRight.Value)
                         {
                             string trustee = trusteeJToken.ToString();
+                            string trusteeClean = trustee.Trim('*');
                             if (GlobalVar.OnlineChecks)
                             {
-                                trustees.Add(GetTrustee(trustee));
+                                trustees.Add(GetTrustee(trusteeClean));
                             }
                             else
                             {
-                                trustees.Add(new JProperty(trustee, "Unable to resolve SID"));
+                                trustees.Add(new JProperty(trusteeClean, "Unable to resolve SID"));
                             }
                         }
                     }
                     else
                     {
+                        string trusteeClean = privRight.Value.ToString().Trim('*');
                         if (GlobalVar.OnlineChecks)
                         {
-                            trustees.Add(GetTrustee(privRight.Value.ToString()));
+                            trustees.Add(GetTrustee(trusteeClean));
                         }
                         else
                         {
-                            trustees.Add("Trustee", privRight.Value.ToString());
+                            trustees.Add(new JProperty(trusteeClean, "Unable to resolve SID"));
                         }
                     }
 
                     // add the results to our jobj of trustees if they are interesting enough.
                     if (interestLevel >= GlobalVar.IntLevelToShow)
                     {
-                        assessedPrivRights.Add(privRight.Name, trustees);
+                        assessedPrivRights.Add(new JProperty(privRight.Name, trustees));
                     }
                 }
             }
@@ -75,24 +77,23 @@ internal static partial class AssessInf
     {
         string displayName = "";
         // clean up the trustee SID
-        string trusteeClean = trustee.Trim('*');
 
         try
         {
-            string resolvedSid = LDAPstuff.GetUserFromSid(trusteeClean);
+            string resolvedSid = LDAPstuff.GetUserFromSid(trustee);
             displayName = resolvedSid;
         }
         catch (IdentityNotMappedException)
         {
-            displayName = "Failed to resolve SID.";
+            displayName = "Unable to resolve SID.";
             // check if it's a well known trustee in our JankyDB
-            JToken checkedSid = Utility.CheckSid(trusteeClean);
+            JToken checkedSid = Utility.CheckSid(trustee);
             if (checkedSid != null)
             {
                 displayName = (string)checkedSid["displayName"];
             }
         }
 
-        return new JProperty(trusteeClean, displayName);
+        return new JProperty(trustee, displayName);
     }
 }
