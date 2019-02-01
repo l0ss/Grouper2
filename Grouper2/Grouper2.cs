@@ -524,7 +524,7 @@ public class GlobalVar
                         if (scriptFileInfo.Length < 200000)
                         {
                             // feed the whole thing through Utility.InvestigateFileContents
-                            JObject investigatedScript = Utility.InvestigateFileContents(scriptDirFile);
+                            JObject investigatedScript = FileSystem.InvestigateFileContents(scriptDirFile);
                             // if we got anything good, add the result to processedScripts
                             if (investigatedScript != null)
                             {

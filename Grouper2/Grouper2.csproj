@@ -105,6 +105,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AasAssess.cs" />
+    <Compile Include="FileSystem.cs" />
     <Compile Include="GPPAssess\AssessGpp.cs" />
     <Compile Include="AssessHandlers.cs" />
     <Compile Include="Output.cs" />

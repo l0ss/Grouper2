@@ -44,7 +44,7 @@ namespace Grouper2
             
             JToken gppIniProps = gppIni["Properties"];
             string gppIniAction = Utility.GetActionString(gppIniProps["@action"].ToString());
-            JToken gppIniPath = Utility.InvestigatePath(Utility.GetSafeString(gppIniProps, "@path"));
+            JToken gppIniPath = FileSystem.InvestigatePath(Utility.GetSafeString(gppIniProps, "@path"));
             JToken gppIniSection = Utility.InvestigateString(Utility.GetSafeString(gppIniProps, "@section"));
             JToken gppIniValue = Utility.InvestigateString(Utility.GetSafeString(gppIniProps, "@value"));
             JToken gppIniProperty = Utility.InvestigateString(Utility.GetSafeString(gppIniProps, "@property"));

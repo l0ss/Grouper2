@@ -45,7 +45,7 @@ namespace Grouper2
             assessedShortcut.Add("Target Type", gppShortcutProps["@targetType"]);
             string arguments = gppShortcutProps["@arguments"].ToString();
             assessedShortcut.Add("Arguments", arguments);
-            JObject investigatedIconPath = Utility.InvestigatePath(gppShortcutProps["@iconPath"].ToString());
+            JObject investigatedIconPath = FileSystem.InvestigatePath(gppShortcutProps["@iconPath"].ToString());
             if (investigatedIconPath["InterestLevel"] != null)
             {
                 if ((int)investigatedIconPath["InterestLevel"] > interestLevel)
@@ -59,7 +59,7 @@ namespace Grouper2
             assessedShortcut.Add("Working Directory", gppShortcutProps["@startIn"]);
             assessedShortcut.Add("Comment", gppShortcutProps["@comment"]);
 
-            JObject investigatedShortcutPath = Utility.InvestigatePath(gppShortcutProps["@shortcutPath"].ToString());
+            JObject investigatedShortcutPath = FileSystem.InvestigatePath(gppShortcutProps["@shortcutPath"].ToString());
             if (investigatedShortcutPath["InterestLevel"] != null)
             {
                 if ((int) investigatedShortcutPath["InterestLevel"] > interestLevel)
@@ -68,7 +68,7 @@ namespace Grouper2
                 }
             }
 
-            JObject investigatedTargetPath = Utility.InvestigatePath(gppShortcutProps["@shortcutPath"].ToString());
+            JObject investigatedTargetPath = FileSystem.InvestigatePath(gppShortcutProps["@shortcutPath"].ToString());
             if (investigatedTargetPath["InterestLevel"] != null)
             {
                 if ((int) investigatedTargetPath["InterestLevel"] > interestLevel)

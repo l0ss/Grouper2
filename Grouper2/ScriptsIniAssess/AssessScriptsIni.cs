@@ -49,7 +49,7 @@ namespace Grouper2
                     // add cmdLine to result
                     if (cmdLine.Length > 0)
                     {
-                        assessedScriptIni.Add("Command Line", Utility.InvestigatePath(cmdLine));
+                        assessedScriptIni.Add("Command Line", FileSystem.InvestigatePath(cmdLine));
                     }
 
                     if (parameters.Length > 0)

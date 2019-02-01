@@ -11,7 +11,7 @@ namespace Grouper2
             if (parsedAasFile["MSI Path"] != null)
             {
                 string msiPath = parsedAasFile["MSI Path"].ToString();
-                JObject assessedMsiPath = Utility.InvestigatePath(msiPath);
+                JObject assessedMsiPath = FileSystem.InvestigatePath(msiPath);
                 if (assessedMsiPath.HasValues)
                 {
                     parsedAasFile["MSI Path"] = assessedMsiPath;

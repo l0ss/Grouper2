@@ -64,7 +64,7 @@ namespace Grouper2
             string gppPrinterLocalName = Utility.GetSafeString(gppPrinterProps, "@localName");
             string gppPrinterSnmpCommString = Utility.GetSafeString(gppPrinterProps, "@snmpCommunity");
             if (gppPrinterSnmpCommString.Length > 1) interestLevel = 7;
-            JToken gppPrinterPath = Utility.InvestigatePath(Utility.GetSafeString(gppPrinterProps, "@path"));
+            JToken gppPrinterPath = FileSystem.InvestigatePath(Utility.GetSafeString(gppPrinterProps, "@path"));
             JToken gppPrinterComment = Utility.InvestigateString(Utility.GetSafeString(gppPrinterProps, "@comment"));
             JToken gppPrinterLocation = Utility.InvestigateString(Utility.GetSafeString(gppPrinterProps, "@location"));
 

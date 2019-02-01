@@ -86,13 +86,16 @@ namespace Grouper2
                     new Span("#######################") { Color = ConsoleColor.Yellow }, "\n"
                     );
             }
-
-            if (polType == "machine")
+            else if (polType == "machine")
             {
                 findingsDocument.Children.Add(
                     new Span("\nFindings in Machine Policy") { Color = ConsoleColor.Yellow }, "\n",
                     new Span("##########################") { Color = ConsoleColor.Yellow }, "\n"
                     );
+            }
+            else
+            {
+                Utility.DebugWrite("THERE IS A THIRD WAY.");
             }
 
             foreach (JObject polFindingCat in polFindings)
@@ -143,7 +146,7 @@ namespace Grouper2
 
                         if (gppGroups != null)
                         {
-                            findingsDocument.Children.Add(new Span("GPP Groups"));
+                            findingsDocument.Children.Add(new Span("\nGPP Groups\n"), new Span("---------"));
                             foreach (JProperty groupFinding in gppGroups)
                             {
                                 findingsDocument.Children.Add(JsonToGrid(groupFinding.Value, 0));
@@ -152,7 +155,7 @@ namespace Grouper2
 
                         if (gppUsers != null)
                         {
-                            findingsDocument.Children.Add(new Span("GPP Users"));
+                            findingsDocument.Children.Add(new Span("\nGPP Users\n"), new Span("---------"));
                             foreach (JProperty userFinding in gppUsers)
                             {
                                 findingsDocument.Children.Add(JsonToGrid(userFinding.Value, 0));
@@ -378,7 +381,6 @@ namespace Grouper2
                     }
                 }
             }
-            findingsDocument.Children.Add(new Span("\n\n"));
 
             return findingsDocument;
         }

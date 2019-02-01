@@ -61,7 +61,7 @@ namespace Grouper2
 
             
             JObject gppNTServiceProgram =
-                Utility.InvestigatePath(Utility.GetSafeString(gppNTService["Properties"], "@program"));
+                FileSystem.InvestigatePath(Utility.GetSafeString(gppNTService["Properties"], "@program"));
             JObject gppNTServiceArgs =
                 Utility.InvestigateString(Utility.GetSafeString(gppNTService["Properties"], "@args"));
 

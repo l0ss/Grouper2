@@ -55,7 +55,7 @@ namespace Grouper2
 
                 if (fromPath.Length > 0)
                 {
-                    JObject assessedPath = Utility.InvestigatePath(gppFileProps["@fromPath"].ToString());
+                    JObject assessedPath = FileSystem.InvestigatePath(gppFileProps["@fromPath"].ToString());
                     assessedFile.Add("From Path", assessedPath);
                     if (assessedPath["InterestLevel"] != null)
                     {

@@ -121,7 +121,7 @@ namespace Grouper2
                     JObject arguments = new JObject(new JProperty("Arguments", argumentsString));
 
                     
-                    command = Utility.InvestigatePath(commandString);
+                    command = FileSystem.InvestigatePath(commandString);
                     arguments = Utility.InvestigateString(argumentsString);
                     if (arguments["InterestLevel"] != null)
                     {
@@ -155,7 +155,7 @@ namespace Grouper2
 
                     if (GlobalVar.OnlineChecks)
                     {
-                        attachment = Utility.InvestigatePath(attachmentString);
+                        attachment = FileSystem.InvestigatePath(attachmentString);
                         if (attachment["InterestLevel"] != null)
                         {
                             int attachmentInterest = (int) attachment["InterestLevel"];
@@ -199,7 +199,7 @@ namespace Grouper2
 
                 if (GlobalVar.OnlineChecks)
                 {
-                    command = Utility.InvestigatePath(commandString);
+                    command = FileSystem.InvestigatePath(commandString);
                     arguments = Utility.InvestigateString(argumentsString);
 
                     if (arguments["InterestLevel"] != null)
@@ -236,7 +236,7 @@ namespace Grouper2
 
                 if (GlobalVar.OnlineChecks)
                 {
-                    command = Utility.InvestigatePath(commandString);
+                    command = FileSystem.InvestigatePath(commandString);
                     arguments = Utility.InvestigateString(argumentsString);
 
                     if (arguments["InterestLevel"] != null)

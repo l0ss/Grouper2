@@ -64,7 +64,7 @@ namespace Grouper2
             }
 
             string gppDriveLabel = Utility.GetSafeString(gppDrive["Properties"], "@label");
-            JObject gppDrivePath = Utility.InvestigatePath(gppDrive["Properties"]["@path"].ToString());
+            JObject gppDrivePath = FileSystem.InvestigatePath(gppDrive["Properties"]["@path"].ToString());
             if (gppDrivePath["InterestLevel"] != null)
             {
                 int pathInterestLevel = int.Parse(gppDrivePath["InterestLevel"].ToString());
