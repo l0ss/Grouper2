@@ -335,6 +335,11 @@ namespace Grouper2
         {
             int count = dirPath.Length - dirPath.Replace("\\", "").Length;
 
+            if (count < 1)
+            {
+                return null;
+            }
+
             int lastDirSepIndex = IndexOfNth(dirPath, "\\", count);
             
             string parentPath = dirPath.Remove(lastDirSepIndex);
@@ -358,6 +363,10 @@ namespace Grouper2
 
         public static bool DoesFileExist(string inPath)
         {
+            if (!GlobalVar.OnlineChecks)
+            {
+                return false;
+            }
             bool fileExists = false;
             try
             {
@@ -376,6 +385,10 @@ namespace Grouper2
 
         public static bool DoesDirExist(string inPath)
         {
+            if (!GlobalVar.OnlineChecks)
+            {
+                return false;
+            }
             bool dirExists = false;
             try
             {
@@ -552,6 +565,10 @@ namespace Grouper2
 
         public static JObject GetFileDaclJObject(string filePathString)
         {
+            if (!GlobalVar.OnlineChecks)
+            {
+                return new JObject();
+            }
             JObject fileDaclsJObject = new JObject();
             FileSecurity filePathSecObj = new FileSecurity();
             try

@@ -266,10 +266,7 @@ namespace Grouper2
                             new Span("System Access") { Color = ConsoleColor.Magenta }, "\n",
                             new Span("~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
                         );
-                        foreach (JToken sysaccFinding in cat.Value)
-                        {
-                            //findingsDocument.Children.Add(JsonToGrid(sysaccFinding));
-                        }
+                            findingsDocument.Children.Add(JsonToGrid(cat.Value, 0));
                         continue;
                     }
                     if (cat.Key == "Kerberos Policy")
@@ -278,10 +275,8 @@ namespace Grouper2
                             new Span("Kerberos Policy") { Color = ConsoleColor.Magenta }, "\n",
                             new Span("~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
                         );
-                        foreach (JToken krbpolFinding in cat.Value)
-                        {
-                            //findingsDocument.Children.Add(JsonToGrid(krbpolFinding));
-                        }
+                        findingsDocument.Children.Add(JsonToGrid(cat.Value, 0));
+                        
                         continue;
                     }
                     if (cat.Key == "Registry Values")
