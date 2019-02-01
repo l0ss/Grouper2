@@ -180,6 +180,7 @@ namespace Grouper2
                             new Span("GPP Printer Mappings") { Color = ConsoleColor.Magenta }, "\n",
                             new Span("~~~~~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
                         );
+                        //TODO validate this once my azure thing is back online
                         foreach (JProperty printerFinding in cat.Value)
                         {
                             findingsDocument.Children.Add(JsonToGrid(printerFinding.Value, 0));
@@ -204,9 +205,9 @@ namespace Grouper2
                             new Span("GPP Scheduled Tasks") { Color = ConsoleColor.Magenta }, "\n",
                             new Span("~~~~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
                         );
-                        foreach (JToken schedtaskFinding in cat.Value)
+                        foreach (JProperty schedtaskFinding in cat.Value)
                         {
-                            //findingsDocument.Children.Add(JsonToGrid(schedtaskFinding));
+                            findingsDocument.Children.Add(JsonToGrid(schedtaskFinding.Value, 0));
                         }
                         continue;
                     }
@@ -216,9 +217,9 @@ namespace Grouper2
                             new Span("Assigned Applications") { Color = ConsoleColor.Magenta }, "\n",
                             new Span("~~~~~~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
                         );
-                        foreach (JToken aasFinding in cat.Value)
+                        foreach (JProperty aasFinding in cat.Value)
                         {
-                            //findingsDocument.Children.Add(JsonToGrid(aasFinding));
+                            findingsDocument.Children.Add(JsonToGrid(aasFinding.Value, 0));
                         }
                         continue;
                     }

@@ -120,22 +120,21 @@ namespace Grouper2
                     JObject command = new JObject(new JProperty("Command", commandString));
                     JObject arguments = new JObject(new JProperty("Arguments", argumentsString));
 
-                    if (GlobalVar.OnlineChecks)
+                    
+                    command = Utility.InvestigatePath(commandString);
+                    arguments = Utility.InvestigateString(argumentsString);
+                    if (arguments["InterestLevel"] != null)
                     {
-                        command = Utility.InvestigatePath(commandString);
-                        arguments = Utility.InvestigateString(argumentsString);
-                        if (arguments["InterestLevel"] != null)
-                        {
-                            int argumentInterest = (int) arguments["InterestLevel"];
-                            interestLevel = interestLevel + argumentInterest;
-                        }
-
-                        if (command["InterestLevel"] != null)
-                        {
-                            int commandInterest = (int) command["InterestLevel"];
-                            interestLevel = interestLevel + commandInterest;
-                        }
+                        int argumentInterest = (int) arguments["InterestLevel"];
+                        interestLevel = interestLevel + argumentInterest;
                     }
+
+                    if (command["InterestLevel"] != null)
+                    {
+                        int commandInterest = (int) command["InterestLevel"];
+                        interestLevel = interestLevel + commandInterest;
+                    }
+                    
 
                     assessedScheduledTask.Add(
                         new JProperty("Action - Execute Command", new JObject(
