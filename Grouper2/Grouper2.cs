@@ -24,6 +24,7 @@ using CommandLineParser.Exceptions;
 using Grouper2.Properties;
 using System.Threading;
 using System.Threading.Tasks;
+using Alba.CsConsoleFormat;
 
 namespace Grouper2
 {
@@ -94,6 +95,7 @@ public class GlobalVar
             Utility.PrintBanner();
             
             CommandLineParser.CommandLineParser parser = new CommandLineParser.CommandLineParser();
+            ValueArgument<string> htmlArg = new ValueArgument<string>('f', "html", "Path for html output file.");
             SwitchArgument debugArg = new SwitchArgument('v', "verbose", "Enables verbose debug mode. Will also show you the names of any categories of policies that Grouper saw but didn't have any means of processing. I eagerly await your pull request.", false);
             SwitchArgument offlineArg = new SwitchArgument('o', "offline",
                 "Disables checks that require LDAP comms with a DC or SMB comms with file shares found in policy settings. Requires that you define a value for --sysvol.",
@@ -127,6 +129,7 @@ public class GlobalVar
             parser.Arguments.Add(currentPolOnlyArg);
             parser.Arguments.Add(noGrepScriptsArg);
             parser.Arguments.Add(domainArg);
+            parser.Arguments.Add(htmlArg);
 
             // set a few defaults
             string sysvolDir = "";
@@ -137,6 +140,8 @@ public class GlobalVar
             bool noNtfrs = false;
             bool noGrepScripts = false;
             string userDefinedDomain = "";
+            bool htmlOut = false;
+            string htmlOutPath = "";
 
             try
             {
@@ -180,6 +185,11 @@ public class GlobalVar
                     GlobalVar.IntLevelToShow = 1;
                 }
 
+                if (htmlArg.Parsed)
+                {
+                    htmlOut = true;
+                    htmlOutPath = htmlArg.Value;
+                }
                 if (debugArg.Parsed)
                 {
                     Console.Error.WriteLine("\nVerbose debug mode enabled. Hope you like yellow.");
@@ -464,12 +474,28 @@ public class GlobalVar
 
             // Final output is finally happening finally here:
 
-            if (prettyOutput)
+            if (prettyOutput || htmlOut)
             {
+                // gotta add a line feed to make sure we're clear to write the nice output.
+                Console.Error.WriteLine("\n");
+                Document outputDocument = new Document();
+
+                
+                outputDocument.Children.Add(Output.GetG2BannerDocument());
                 foreach (KeyValuePair<string, JToken> gpo in grouper2Output)
                 {
-                    Console.Error.WriteLine("\n");
-                    Output.GetAssessedGPOOutput(gpo);
+                    outputDocument.Children.Add(Output.GetAssessedGPOOutput(gpo));
+                }
+
+                if (prettyOutput)
+                {
+                    ConsoleRenderer.RenderDocument(outputDocument);
+                }
+
+                if (htmlOut)
+                {
+                    ConsoleRenderer.RenderDocument(outputDocument,
+                        new HtmlRenderTarget(File.Create(htmlOutPath), new UTF8Encoding(false)));
                 }
             }
             else

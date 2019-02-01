@@ -11,11 +11,61 @@ namespace Grouper2
 {
     class Output
     {
-        static public void GetAssessedGPOOutput (KeyValuePair<string, JToken> inputKvp)
+        static public Document GetG2BannerDocument()
         {
-            // munge it to a JObject
+            Document outputDocument = new Document();
+            string barf = @"  .,-:::::/  :::::::..       ...      ...    :::::::::::::. .,::::::  :::::::..     .:::.   
+,;;-'````'   ;;;;``;;;;   .;;;;;;;.   ;;     ;;; `;;;```.;;;;;;;''''  ;;;;``;;;;   ,;'``;.  
+[[[   [[[[[[/ [[[,/[[['  ,[[     \[[,[['     [[[  `]]nnn]]'  [[cccc    [[[,/[[['   ''  ,[[' 
+*$$c.    *$$  $$$$$$c    $$$,     $$$$$      $$$   $$$**     $$****    $$$$$$c     .c$$P'   
+ `Y8bo,,,o88o 888b *88bo,*888,_ _,88P88    .d888   888o      888oo,__  888b *88bo,d88 _,oo, 
+   `'YMUP*YMM MMMM   *W*   *YMMMMMP*  *YmmMMMM**   YMMMb     ****YUMMM MMMM   *W* MMMUP**^^ 
+                                                            Now even Grouperer.              
+                                                            github.com/mikeloss/Grouper2    
+                                                            @mikeloss                          ";
+            string[] barfLines = barf.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+
+            ConsoleColor[] patternOne = { ConsoleColor.White, ConsoleColor.Yellow, ConsoleColor.Red, ConsoleColor.Red, ConsoleColor.DarkRed, ConsoleColor.DarkRed, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White };
+            ConsoleColor[] patternTwo =
+            {
+                ConsoleColor.White, ConsoleColor.White, ConsoleColor.Cyan, ConsoleColor.Blue, ConsoleColor.DarkBlue,
+                ConsoleColor.DarkBlue, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White,
+            };
+            int i = 0;
+            foreach (string barfLine in barfLines)
+            {
+                string barfOne = barfLine.Substring(0, 82);
+                string barfTwo = barfLine.Substring(82, 9);
+                outputDocument.Children.Add(
+                    new Span(barfOne) { Color = patternOne[i] }, new Span(barfTwo) { Color = patternTwo[i] }, "\n"
+                );
+                i += 1;
+            }
+
+            return outputDocument;
+        }
+
+        static public Document GetAssessedGPOOutput (KeyValuePair<string, JToken> inputKvp)
+        {
             JToken gpo = inputKvp.Value;
-            
+
+            // catch that final 'scripts' section when it comes in
+            if (inputKvp.Key == "Scripts")
+            {
+                JToken scripts = inputKvp.Value;
+                Utility.DebugWrite(inputKvp.Value.ToString());
+                Document scriptsDoc = new Document();
+                scriptsDoc.Children.Add(
+                    new Span("Scripts found in SYSVOL") {Color = ConsoleColor.Green}, "\n",
+                    new Span("-----------------------") { Color = ConsoleColor.Green}
+                );
+                foreach (JProperty script in scripts)
+                {
+                    scriptsDoc.Children.Add(JsonToGrid(script.First, 0));
+                }
+                return scriptsDoc;
+            }
+
             JToken gpoProps = gpo["GPOProps"];
             // title it with either the display name or the uid, depending on what we have
             string gpoTitle = "";
@@ -30,10 +80,13 @@ namespace Grouper2
 
 
             Document outputDocument = new Document();
+
+
+
             ////////////////////////////////////////
             ///  Title and Properties
             ////////////////////////////////////////
-            
+
             outputDocument.Children.Add(
                 // nice Title
                 new Span(gpoTitle) {Color = ConsoleColor.Green}, "\n",
@@ -49,6 +102,7 @@ namespace Grouper2
             // grab all our findings
             JToken uPolFindings = inputKvp.Value["Findings"]["User Policy"];
             JToken mPolFindings = inputKvp.Value["Findings"]["Machine Policy"];
+            JToken scriptFindings = inputKvp.Value["Scripts"];
             
             // create a document for each to go in
             Document userPolFindingsDoc = new Document();
@@ -65,6 +119,11 @@ namespace Grouper2
             {
                 machinePolFindingsDoc = GetFindingsDocument(mPolFindings, "machine");
             }
+
+            if (scriptFindings != null)
+            {
+                Utility.DebugWrite(scriptFindings.ToString());
+            }
             
             // add our findings docs to our final doc
             outputDocument.Children.Add(
@@ -72,7 +131,7 @@ namespace Grouper2
                 machinePolFindingsDoc
                 );
 
-            ConsoleRenderer.RenderDocument(outputDocument);
+            return outputDocument;
         }
 
         private static Document GetFindingsDocument(JToken polFindings, string polType)
@@ -373,28 +432,37 @@ namespace Grouper2
 
         private static Grid JsonToGrid(JToken jprops, int iteration)
         {
+            // HERE BE DRAGONS
             iteration++;
 
             ConsoleColor gridColor = ConsoleColor.White;
+            GridLength col1Width = GridLength.Auto;
+            GridLength col2Width = GridLength.Auto;
 
             switch (iteration)
             {
                 case 1:
                     gridColor = ConsoleColor.Gray;
+                    //col1Width = GridLength.Char(20);
+                    //col2Width = GridLength.Char(80);
                     break;
                 case 2:
                     gridColor = ConsoleColor.DarkGray;
+                    //col1Width = GridLength.Char(20);
+                    //col2Width = GridLength.Auto;
                     break;
               
                 default:
                     gridColor = ConsoleColor.Black;
+                    //col1Width = GridLength.Auto;
+                    //col2Width = GridLength.Auto;
                     break;
             }
 
             Grid grid = new Grid
             {
                 Color = ConsoleColor.White,
-                Columns = {GridLength.Auto, GridLength.Auto},
+                Columns = {col1Width, col2Width},
                 Stroke = LineThickness.Single,
                 StrokeColor = gridColor
             };
@@ -427,20 +495,21 @@ namespace Grouper2
                     {
                         Grid subGrid = new Grid
                         {
-                            StrokeColor = gridColor,
-                            Columns = {GridLength.Auto},
-                            Stroke = LineThickness.None
+                            Color = ConsoleColor.White,
+                            Columns = { GridLength.Auto},
+                            Stroke = LineThickness.Single,
+                            StrokeColor = gridColor
                         };
                         foreach (JToken arrayItem in value)
                         {
-                            subGrid.Children.Add(new Cell(JsonToGrid(arrayItem, iteration)));
+                            subGrid.Children.Add(new Cell(arrayItem.ToString()));
                         }
                         grid.Children.Add(new Cell(name), new Cell(subGrid));
                     }
                     else
                     {
                         Grid subGrid = JsonToGrid(value, iteration);
-                        grid.Children.Add(new Cell(name), new Cell(subGrid));
+                        grid.Children.Add(new Cell(name), subGrid);
                     }
                 }
             }
