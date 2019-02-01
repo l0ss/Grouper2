@@ -297,27 +297,17 @@ namespace Grouper2
                             new Span("GPP Registry Settings") { Color = ConsoleColor.Magenta }, "\n",
                             new Span("~~~~~~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }
                         );
-
-                        // TODO patched out until azure back online
                         
-                        /*
                         foreach (JProperty regsetFindings in cat.Value)
                         {
-                            Console.WriteLine("1");
-                            Utility.DebugWrite(regsetFindings.ToString());
                             foreach (JObject regsetFinding in regsetFindings)
                             {
-                                Console.WriteLine("2");
-                                Utility.DebugWrite(regsetFinding.ToString());
-                                foreach (JProperty thing in regsetFinding.Values())
+                                foreach (JToken thing in regsetFinding.Values())
                                 {
-                                    Utility.DebugWrite(thing.ToString());
+                                    findingsDocument.Children.Add(JsonToGrid(thing, 0));
                                 }
-                                //JProperty findingVal = regsetFinding.Value;
-                                //findingsDocument.Children.Add(JsonToGrid(findingVal, 0));
                             }
                         }
-                        */
                         continue;
                     }
                     if (cat.Key == "Registry Keys")

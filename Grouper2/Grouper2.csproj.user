@@ -12,7 +12,7 @@
     <StartArguments>-o -s "..\..\TestPolicies" -d</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugLiveFromDC|AnyCPU'">
-    <StartArguments>-d l0sslab2008r2.local -u mike -p Password1</StartArguments>
+    <StartArguments>-g</StartArguments>
     <StartAction>Project</StartAction>
     <StartProgram>C:\Windows\System32\runas.exe</StartProgram>
   </PropertyGroup>
