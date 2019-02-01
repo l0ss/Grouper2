@@ -225,13 +225,14 @@ namespace Grouper2
                     }
                     if (cat.Key == "Service General Setting")
                     {
+                        //TODO double check this in Online mode
                         findingsDocument.Children.Add(
                             new Span("Windows Services") { Color = ConsoleColor.Magenta }, "\n",
                             new Span("~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
                         );
-                        foreach (JToken sgsFinding in cat.Value)
+                        foreach (JProperty sgsFinding in cat.Value)
                         {
-                            //findingsDocument.Children.Add(JsonToGrid(sgsFinding));
+                            findingsDocument.Children.Add(JsonToGrid(sgsFinding.Value, 0));
                         }
                         continue;
                     }
@@ -241,9 +242,9 @@ namespace Grouper2
                             new Span("GPP NT Services") { Color = ConsoleColor.Magenta }, "\n",
                             new Span("~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
                         );
-                        foreach (JToken ntserviceFinding in cat.Value)
+                        foreach (JProperty ntserviceFinding in cat.Value)
                         {
-                            //findingsDocument.Children.Add(JsonToGrid(ntserviceFinding));
+                            findingsDocument.Children.Add(JsonToGrid(ntserviceFinding.Value, 0));
                         }
                         continue;
                     }
@@ -253,9 +254,9 @@ namespace Grouper2
                             new Span("GPP Shortcuts") { Color = ConsoleColor.Magenta }, "\n",
                             new Span("~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
                         );
-                        foreach (JToken shortcutFinding in cat.Value)
+                        foreach (JProperty shortcutFinding in cat.Value)
                         {
-                            //findingsDocument.Children.Add(JsonToGrid(shortcutFinding));
+                            findingsDocument.Children.Add(JsonToGrid(shortcutFinding.Value, 0));
                         }
                         continue;
                     }

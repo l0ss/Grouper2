@@ -45,30 +45,45 @@ namespace Grouper2
             assessedShortcut.Add("Target Type", gppShortcutProps["@targetType"]);
             string arguments = gppShortcutProps["@arguments"].ToString();
             assessedShortcut.Add("Arguments", arguments);
-            assessedShortcut.Add("Icon Path", Utility.InvestigatePath(gppShortcutProps["@iconPath"].ToString()));
+            JObject investigatedIconPath = Utility.InvestigatePath(gppShortcutProps["@iconPath"].ToString());
+            if (investigatedIconPath["InterestLevel"] != null)
+            {
+                if ((int)investigatedIconPath["InterestLevel"] > interestLevel)
+                {
+                    interestLevel = (int)investigatedIconPath["InterestLevel"];
+                }
+            }
+            
+            assessedShortcut.Add("Icon Path", investigatedIconPath);
             assessedShortcut.Add("Icon Index", gppShortcutProps["@iconIndex"]);
             assessedShortcut.Add("Working Directory", gppShortcutProps["@startIn"]);
             assessedShortcut.Add("Comment", gppShortcutProps["@comment"]);
 
-            if (GlobalVar.OnlineChecks)
+            JObject investigatedShortcutPath = Utility.InvestigatePath(gppShortcutProps["@shortcutPath"].ToString());
+            if (investigatedShortcutPath["InterestLevel"] != null)
             {
-                assessedShortcut.Add("Shortcut Path",
-                    Utility.InvestigatePath(gppShortcutProps["@shortcutPath"].ToString()));
-                assessedShortcut.Add("Target Path",
-                    Utility.InvestigatePath(gppShortcutProps["@targetPath"].ToString()));
-            }
-            else
-            {
-                assessedShortcut.Add("Shortcut Path", gppShortcutProps["@shortcutPath"].ToString());
-                assessedShortcut.Add("Target Path", gppShortcutProps["@targetPath"].ToString());
+                if ((int) investigatedShortcutPath["InterestLevel"] > interestLevel)
+                {
+                    interestLevel = (int) investigatedShortcutPath["InterestLevel"];
+                }
             }
 
-            // TODO get the interest levels from the results of InvestigatePath
+            JObject investigatedTargetPath = Utility.InvestigatePath(gppShortcutProps["@shortcutPath"].ToString());
+            if (investigatedTargetPath["InterestLevel"] != null)
+            {
+                if ((int) investigatedTargetPath["InterestLevel"] > interestLevel)
+                {
+                    interestLevel = (int) investigatedTargetPath["InterestLevel"];
+                }
+            }
+
+            assessedShortcut.Add("Shortcut Path", investigatedShortcutPath);
+            assessedShortcut.Add("Target Path", investigatedTargetPath);
 
             // if it's too boring to be worth showing, return an empty jobj.
             if (interestLevel < GlobalVar.IntLevelToShow)
             {
-                assessedShortcut = new JObject();
+                return null;
             }
 
             return assessedShortcut;
