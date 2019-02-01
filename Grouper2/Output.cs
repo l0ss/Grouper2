@@ -53,7 +53,6 @@ namespace Grouper2
             if (inputKvp.Key == "Scripts")
             {
                 JToken scripts = inputKvp.Value;
-                Utility.DebugWrite(inputKvp.Value.ToString());
                 Document scriptsDoc = new Document();
                 scriptsDoc.Children.Add(
                     new Span("Scripts found in SYSVOL") {Color = ConsoleColor.Green}, "\n",
@@ -447,13 +446,13 @@ namespace Grouper2
                     //col2Width = GridLength.Char(80);
                     break;
                 case 2:
-                    gridColor = ConsoleColor.DarkGray;
+                    gridColor = ConsoleColor.Gray;
                     //col1Width = GridLength.Char(20);
                     //col2Width = GridLength.Auto;
                     break;
               
                 default:
-                    gridColor = ConsoleColor.Black;
+                    gridColor = ConsoleColor.DarkGray;
                     //col1Width = GridLength.Auto;
                     //col2Width = GridLength.Auto;
                     break;

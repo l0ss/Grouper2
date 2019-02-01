@@ -65,8 +65,8 @@ class LDAPstuff
                     err = System.Runtime.InteropServices.Marshal.GetLastWin32Error();
             }
         }
-        if (err != 0)
-            Console.WriteLine(@"Error : {0}", err);
+        if ((err != 0) && GlobalVar.DebugMode)
+            Utility.DebugWrite(@"Error : " + err);
 
         string lookupResult = "";
         if (referencedDomainName.ToString().Length > 0)

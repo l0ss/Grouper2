@@ -37,7 +37,6 @@ namespace Grouper2
         
         static JProperty AssessGppDataSource(JToken gppDataSource)
         {
-            //Utility.DebugWrite(gppDataSource.ToString());
             int interestLevel = 1;
             string gppDataSourceUid = Utility.GetSafeString(gppDataSource, "@uid");
             string gppDataSourceName = Utility.GetSafeString(gppDataSource, "@name");
@@ -66,8 +65,11 @@ namespace Grouper2
                 assessedGppDataSource.Add("Changed", gppDataSourceChanged);
                 assessedGppDataSource.Add("Action", gppDataSourceAction);
                 assessedGppDataSource.Add("Username", gppDataSourceUserName);
-                assessedGppDataSource.Add("cPassword", gppDataSourcecPassword);
-                assessedGppDataSource.Add("Decrypted Password", gppDataSourcePassword);
+                if (gppDataSourcecPassword.Length > 0)
+                {
+                    assessedGppDataSource.Add("cPassword", gppDataSourcecPassword);
+                    assessedGppDataSource.Add("Decrypted Password", gppDataSourcePassword);
+                }
                 assessedGppDataSource.Add("DSN", gppDataSourceDsn);
                 assessedGppDataSource.Add("Driver", gppDataSourceDriver);
                 assessedGppDataSource.Add("Description", gppDataSourceDescription);

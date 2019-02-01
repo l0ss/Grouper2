@@ -89,8 +89,11 @@ namespace Grouper2
                 assessedGppPrinter.Add("Changed", gppPrinterChanged);
                 assessedGppPrinter.Add("Action", gppPrinterAction);
                 assessedGppPrinter.Add("Username", gppPrinterUsername);
-                assessedGppPrinter.Add("cPassword", gppPrintercPassword);
-                assessedGppPrinter.Add("Decrypted Password", gppPrinterPassword);
+                if (gppPrintercPassword.Length > 0)
+                {
+                    assessedGppPrinter.Add("cPassword", gppPrintercPassword);
+                    assessedGppPrinter.Add("Decrypted Password", gppPrinterPassword);
+                }
                 assessedGppPrinter.Add("Local Name", gppPrinterLocalName);
                 assessedGppPrinter.Add("Address", gppPrinterAddress);
                 assessedGppPrinter.Add("Path", gppPrinterPath);
