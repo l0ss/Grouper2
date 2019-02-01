@@ -7,7 +7,7 @@ internal static partial class AssessInf
     public static JObject AssessPrivRights(JToken privRights)
     {
         JObject jsonData = JankyDb.Instance;
-        JArray intPrivRights = (JArray) jsonData["privRights"]["item"];
+        JArray intPrivRights = (JArray) jsonData["privRights"];
 
         // create an object to put the results in
         JObject assessedPrivRights = new JObject();

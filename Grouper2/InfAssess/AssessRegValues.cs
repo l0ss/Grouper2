@@ -7,10 +7,9 @@ internal static partial class AssessInf
 {
     public static JObject AssessRegValues(JToken regValues)
     {
-        int interestLevel = 15;
         JObject jsonData = JankyDb.Instance;
         // get our data about what regkeys are interesting
-        JArray intRegKeys = (JArray) jsonData["regKeys"]["item"];
+        JArray intRegKeys = (JArray) jsonData["regKeys"];
         // set up a jobj for our results to go into
         JObject assessedRegValues = new JObject();
 
@@ -56,7 +55,7 @@ internal static partial class AssessInf
             }
         }
 
-        if (interestLevel >= GlobalVar.IntLevelToShow)
+        if (assessedRegValues.HasValues)
         {
             return assessedRegValues;
         }

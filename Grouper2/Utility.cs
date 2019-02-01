@@ -266,7 +266,7 @@ namespace Grouper2
         public static JToken CheckSid(string sid)
         {
             JObject jsonData = JankyDb.Instance;
-            JArray wellKnownSids = (JArray)jsonData["trustees"]["item"];
+            JArray wellKnownSids = (JArray)jsonData["trustees"];
 
             bool sidMatches = false;
             // iterate over the list of well known sids to see if any match.

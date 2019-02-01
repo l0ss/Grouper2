@@ -1,6 +1,5 @@
 {
-  "privRights": {
-    "item": [
+  "privRights": [
       {
         "privRight": "SeTrustedCredManAccessPrivilege",
         "msDesc": null,
@@ -145,11 +144,9 @@
         "interestLevel": null,
         "remotelyExploitable": null
       }
-    ]
-  },
+    ],
 
-  "trustees": {
-    "item": [
+  "trustees": [
       {
         "SID": "S-1-1-0",
         "RID": null,
@@ -502,18 +499,18 @@
         "highPriv": null,
         "lowPriv": null
       },
-	   {
-	    "SID": "S-1-5-32-554",
-	    "RID": null,
-	    "friendlyName": null,
-	    "displayName": "Pre-Windows 2000 Compatible Access",
-	    "domainTrustee": null,
-	    "localTrustee": null,
-	    "description": "An alias added by Windows 2000. A backward compatibility group which allows read access on all users and groups in the domain.",
-	    "highPriv": null,
-	    "lowPriv": true,
-	    "isGroup": null
-	   },
+      {
+       "SID": "S-1-5-32-554",
+       "RID": null,
+       "friendlyName": null,
+       "displayName": "Pre-Windows 2000 Compatible Access",
+       "domainTrustee": null,
+       "localTrustee": null,
+       "description": "An alias added by Windows 2000. A backward compatibility group which allows read access on all users and groups in the domain.",
+       "highPriv": null,
+       "lowPriv": true,
+       "isGroup": null
+      },
       {
         "SID": "S-1-5-32-555",
         "RID": null,
@@ -689,11 +686,9 @@
         "localTrustee": null,
         "description": "A group that includes all service processes that are configured on the system. Membership is controlled by the operating system."
       }
-    ]
-  },
+    ],
 
-  "regKeys": {
-    "item": [
+  "regKeys": [
       {
         "msDesc": "User Account Control: Run all administrators in Admin Approval Mode",
         "friendlyDesc": null,
@@ -705,7 +700,7 @@
       {
         "msDesc": "User Account Control: Admin Approval Mode for the Built-in Administrator account",
         "friendlyDesc": null,
-        "intLevel": "2",
+        "intLevel": "3",
         "regKey": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System!FilterAdministratorToken",
         "defVal": "0",
         "intValue": null
@@ -713,7 +708,7 @@
       {
         "msDesc": "Local Account Token Filter Policy",
         "friendlyDesc": null,
-        "intLevel": "2",
+        "intLevel": "3",
         "regKey": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System!LocalAccountTokenFilterPolicy",
         "defVal": "0",
         "intValue": null
@@ -729,7 +724,7 @@
       {
         "msDesc": "Network security: Configure encryption types allowed for Kerberos",
         "friendlyDesc": null,
-        "intLevel": "4",
+        "intLevel": "3",
         "regKey": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\Kerberos\\Parameters!SupportedEncryptionTypes",
         "defVal": "0",
         "intValue": null
@@ -990,184 +985,158 @@
       {
         "msDesc": null,
         "friendlyDesc": null,
-        "intLevel": null,
+        "intLevel": "3",
         "regKey": "MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\RestrictAnonymous",
         "intValue": "false"
       },
       {
         "msDesc": null,
         "friendlyDesc": null,
-        "intLevel": null,
+        "intLevel": "4",
         "regKey": "MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\RestrictAnonymousSAM",
         "intValue": "false"
       },
       {
         "msDesc": null,
         "friendlyDesc": null,
-        "intLevel": null,
+        "intLevel": "4",
         "regKey": "MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\SubmitControl",
         "intValue": "true"
       },
       {
         "msDesc": null,
         "friendlyDesc": null,
-        "intLevel": null,
+        "intLevel": "3",
         "regKey": "MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\UseMachineId",
         "intValue": "true"
       },
       {
         "msDesc": null,
         "friendlyDesc": null,
-        "intLevel": null,
+        "intLevel": "5",
         "regKey": "MACHINE\\System\\CurrentControlSet\\Control\\Print\\Providers\\LanMan Print Services\\Servers\\AddPrinterDrivers",
-        "intValue": false
+        "intValue": "false"
       },
       {
         "msDesc": null,
         "friendlyDesc": null,
-        "intLevel": null,
+        "intLevel": "5",
         "regKey": "MACHINE\\System\\CurrentControlSet\\Control\\SecurePipeServers\\Winreg\\AllowedExactPaths\\Machine",
-        "intValue": null
+        "intValue": "Any"
       },
       {
         "msDesc": null,
         "friendlyDesc": null,
-        "intLevel": null,
+        "intLevel": "5",
         "regKey": "MACHINE\\System\\CurrentControlSet\\Control\\SecurePipeServers\\Winreg\\AllowedPaths\\Machine",
-        "intValue": null
+        "intValue": "Any"
       },
       {
         "msDesc": null,
         "friendlyDesc": null,
-        "intLevel": null,
+        "intLevel": "5",
         "regKey": "MACHINE\\System\\CurrentControlSet\\Services\\LanManServer\\Parameters\\NullSessionPipes",
-        "intValue": null
+        "intValue": "Any"
       },
       {
         "msDesc": null,
         "friendlyDesc": null,
-        "intLevel": null,
+        "intLevel": "2",
         "regKey": "MACHINE\\System\\CurrentControlSet\\Services\\LanManServer\\Parameters\\NullSessionShares",
-        "intValue": null
+        "intValue": "Any"
       },
       {
         "msDesc": null,
         "friendlyDesc": null,
-        "intLevel": null,
+        "intLevel": "2",
         "regKey": "MACHINE\\System\\CurrentControlSet\\Services\\LanManServer\\Parameters\\RestrictNullSessAccess",
-        "intValue": null
+        "intValue": "false"
       },
       {
         "msDesc": null,
         "friendlyDesc": null,
-        "intLevel": null,
+        "intLevel": "8",
         "regKey": "SOFTWARE\\Network Associates\\ePolicy Orchestrator",
-        "intValue": null
+        "intValue": "Any"
       },
       {
         "msDesc": null,
         "friendlyDesc": null,
-        "intLevel": null,
+        "intLevel": "8",
         "regKey": "SOFTWARE\\FileZilla Server",
-        "intValue": null
+        "intValue": "Any"
       },
       {
         "msDesc": null,
         "friendlyDesc": null,
-        "intLevel": null,
+        "intLevel": "8",
         "regKey": "SOFTWARE\\Wow6432Node\\FileZilla Server",
-        "intValue": null
+        "intValue": "Any"
       },
       {
         "msDesc": null,
         "friendlyDesc": null,
-        "intLevel": null,
+        "intLevel": "8",
         "regKey": "SOFTWARE\\Wow6432Node\\McAfee\\DesktopProtection - McAfee VSE",
-        "intValue": null
+        "intValue": "Any"
       },
       {
         "msDesc": null,
         "friendlyDesc": null,
-        "intLevel": null,
+        "intLevel": "8",
         "regKey": "SOFTWARE\\McAfee\\DesktopProtection - McAfee VSE",
-        "intValue": null
+        "intValue": "Any"
       },
       {
         "msDesc": null,
         "friendlyDesc": null,
-        "intLevel": null,
+        "intLevel": "8",
         "regKey": "SOFTWARE\\ORL\\WinVNC3",
-        "intValue": null
+        "intValue": "Any"
       },
       {
         "msDesc": null,
         "friendlyDesc": null,
-        "intLevel": null,
+        "intLevel": "8",
         "regKey": "SOFTWARE\\ORL\\WinVNC3\\Default",
-        "intValue": null
+        "intValue": "Any"
       },
       {
         "msDesc": null,
         "friendlyDesc": null,
-        "intLevel": null,
+        "intLevel": "8",
         "regKey": "SOFTWARE\\ORL\\WinVNC\\Default",
-        "intValue": null
+        "intValue": "Any"
       },
       {
         "msDesc": null,
         "friendlyDesc": null,
-        "intLevel": null,
+        "intLevel": "8",
         "regKey": "SOFTWARE\\RealVNC\\WinVNC4",
-        "intValue": null
+        "intValue": "Any"
       },
       {
         "msDesc": null,
         "friendlyDesc": null,
-        "intLevel": null,
+        "intLevel": "8",
         "regKey": "SOFTWARE\\RealVNC\\Default",
-        "intValue": null
+        "intValue": "Any"
       },
       {
         "msDesc": null,
         "friendlyDesc": null,
-        "intLevel": null,
+        "intLevel": "8",
         "regKey": "SOFTWARE\\TightVNC\\Server",
-        "intValue": null
+        "intValue": "Any"
       },
       {
         "msDesc": null,
         "friendlyDesc": null,
-        "intLevel": null,
+        "intLevel": "10",
         "regKey": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon",
-        "intValue": null
+        "intValue": "Any"
       }
-    ]
-  },
-
-  "Other Settings": {
-    "item": [
-      {
-        "searchString": "EnableGuestAccount",
-        "intValue": "1"
-      },
-      {
-        "searchString": "EnableAdminAccount",
-        "intValue": "1"
-      },
-      {
-        "searchString": "LSAAnonymousNameLookup",
-        "intValue": "1"
-      },
-      {
-        "searchString": "NewAdministratorName",
-        "intValue": null
-      },
-      {
-        "searchString": "NewGuestName",
-        "intValue": null
-      }
-    ]
-  },
+    ],
 
   "interestingExtensions": [
     "exe",
@@ -1176,27 +1145,48 @@
     "lnk",
     "hta",
     "ps1",
-	"vba",
-	"vbs",
-	"config",
-	"ini",
-	"cfg",
-	"conf",
-	"scr"
+    "vba",
+    "vbs",
+    "config",
+    "ini",
+    "cfg",
+    "conf",
+    "scr",
+    "kdb",
+    "kdbx",
+    "asc",
+    "ppk",
+    "pri",
+    "ssh",
+    "pgp",
+    "key",
+    "rdp"
   ],
 
   "interestingWords": [
+    "nattend.xml",
+    "passw",
+    "kdb",
+    "putty.config",
+    "winscp.ini",
+    "id_rsa",
+    "id_dsa",
+    "web.config",
+    "ppk",
+    "ssh",
+    "rdp",
+    "cred",
+    "-p ",
+    "/u ",
+    "psexec",
+    "net user",
+    "key",
     "vnc",
     "vpn",
-    "pwd",
-    "cred",
-    "key",
-    "pass",
-	"powershell",
-	"cmd",
-	"command",
-	"path",
-	"config",
-	"net user"
+    "powershell",
+    "cmd",
+    "/c ",
+    "path",
+    "-command"
   ]
 }

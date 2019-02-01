@@ -45,7 +45,7 @@ namespace Grouper2
             if (regValues != null)
             {
                 JObject matchedRegValues = AssessInf.AssessRegValues(regValues);
-                if (matchedRegValues.Count > 0)
+                if (matchedRegValues != null)
                 {
                     assessedGpTmpl.Add("Registry Values", matchedRegValues);
                 }
