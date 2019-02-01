@@ -14,7 +14,6 @@ namespace Grouper2
         public static JObject GetAssessedScriptsIni(JObject parsedScriptsIni)
         {
             JObject assessedScriptsIni = new JObject();
-            //Utility.DebugWrite(parsedScriptsIni.ToString());
 
             foreach (KeyValuePair<string, JToken> parsedScriptIniType in parsedScriptsIni)
             {
@@ -48,22 +47,14 @@ namespace Grouper2
                     }
 
                     // add cmdLine to result
-                    if (GlobalVar.OnlineChecks && (cmdLine.Length > 0))
+                    if (cmdLine.Length > 0)
                     {
                         assessedScriptIni.Add("Command Line", Utility.InvestigatePath(cmdLine));
                     }
-                    else
-                    {
-                        assessedScriptIni.Add("Command Line", cmdLine);
-                    }
 
-                    if (GlobalVar.OnlineChecks && (parameters.Length > 0))
+                    if (parameters.Length > 0)
                     {
                         assessedScriptIni.Add("Parameters", Utility.InvestigateString(parameters));
-                    }
-                    else
-                    {
-                        assessedScriptIni.Add("Parameters", parameters);
                     }
                     
 

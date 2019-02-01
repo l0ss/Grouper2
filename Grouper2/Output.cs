@@ -136,14 +136,14 @@ namespace Grouper2
                     {
                         findingsDocument.Children.Add(
                             new Span("GPP Users and Groups") { Color = ConsoleColor.Magenta }, "\n",
-                            new Span("~~~~~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
+                            new Span("~~~~~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }
                         );
                         JToken gppUsers = cat.Value["GPP Users"];
                         JToken gppGroups = cat.Value["GPP Groups"];
 
                         if (gppGroups != null)
                         {
-                            findingsDocument.Children.Add(new Span("GPP Groups"), "\n");
+                            findingsDocument.Children.Add(new Span("GPP Groups"));
                             foreach (JProperty groupFinding in gppGroups)
                             {
                                 findingsDocument.Children.Add(JsonToGrid(groupFinding.Value, 0));
@@ -152,21 +152,19 @@ namespace Grouper2
 
                         if (gppUsers != null)
                         {
-                            findingsDocument.Children.Add(new Span("GPP Users"), "\n");
+                            findingsDocument.Children.Add(new Span("GPP Users"));
                             foreach (JProperty userFinding in gppUsers)
                             {
                                 findingsDocument.Children.Add(JsonToGrid(userFinding.Value, 0));
                             }
-                            
                         }
-                        
                         continue;
                     }
                     if (cat.Key == "DataSources")
                     {
                         findingsDocument.Children.Add(
                             new Span("GPP Data Sources") { Color = ConsoleColor.Magenta }, "\n",
-                            new Span("~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
+                            new Span("~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }
                         );
                         foreach (JProperty datasourceFinding in cat.Value)
                         {
@@ -178,7 +176,7 @@ namespace Grouper2
                     {
                         findingsDocument.Children.Add(
                             new Span("GPP Printer Mappings") { Color = ConsoleColor.Magenta }, "\n",
-                            new Span("~~~~~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
+                            new Span("~~~~~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }
                         );
                         //TODO validate this once my azure thing is back online
                         foreach (JProperty printerFinding in cat.Value)
@@ -191,7 +189,7 @@ namespace Grouper2
                     {
                         findingsDocument.Children.Add(
                             new Span("GPP Files") { Color = ConsoleColor.Magenta }, "\n",
-                            new Span("~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
+                            new Span("~~~~~~~~~") { Color = ConsoleColor.Magenta }
                         );
                         foreach (JProperty fileFinding in cat.Value)
                         {
@@ -203,7 +201,7 @@ namespace Grouper2
                     {
                         findingsDocument.Children.Add(
                             new Span("GPP Scheduled Tasks") { Color = ConsoleColor.Magenta }, "\n",
-                            new Span("~~~~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
+                            new Span("~~~~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }
                         );
                         foreach (JProperty schedtaskFinding in cat.Value)
                         {
@@ -215,7 +213,7 @@ namespace Grouper2
                     {
                         findingsDocument.Children.Add(
                             new Span("Assigned Applications") { Color = ConsoleColor.Magenta }, "\n",
-                            new Span("~~~~~~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
+                            new Span("~~~~~~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }
                         );
                         foreach (JProperty aasFinding in cat.Value)
                         {
@@ -228,7 +226,7 @@ namespace Grouper2
                         //TODO double check this in Online mode
                         findingsDocument.Children.Add(
                             new Span("Windows Services") { Color = ConsoleColor.Magenta }, "\n",
-                            new Span("~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
+                            new Span("~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }
                         );
                         foreach (JProperty sgsFinding in cat.Value)
                         {
@@ -240,7 +238,7 @@ namespace Grouper2
                     {
                         findingsDocument.Children.Add(
                             new Span("GPP NT Services") { Color = ConsoleColor.Magenta }, "\n",
-                            new Span("~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
+                            new Span("~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }
                         );
                         foreach (JProperty ntserviceFinding in cat.Value)
                         {
@@ -252,7 +250,7 @@ namespace Grouper2
                     {
                         findingsDocument.Children.Add(
                             new Span("GPP Shortcuts") { Color = ConsoleColor.Magenta }, "\n",
-                            new Span("~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
+                            new Span("~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }
                         );
                         foreach (JProperty shortcutFinding in cat.Value)
                         {
@@ -264,7 +262,7 @@ namespace Grouper2
                     {
                         findingsDocument.Children.Add(
                             new Span("System Access") { Color = ConsoleColor.Magenta }, "\n",
-                            new Span("~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
+                            new Span("~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }
                         );
                             findingsDocument.Children.Add(JsonToGrid(cat.Value, 0));
                         continue;
@@ -273,7 +271,7 @@ namespace Grouper2
                     {
                         findingsDocument.Children.Add(
                             new Span("Kerberos Policy") { Color = ConsoleColor.Magenta }, "\n",
-                            new Span("~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
+                            new Span("~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }
                         );
                         findingsDocument.Children.Add(JsonToGrid(cat.Value, 0));
                         
@@ -285,7 +283,7 @@ namespace Grouper2
                         /*
                         findingsDocument.Children.Add(
                             new Span("Registry Values") { Color = ConsoleColor.Magenta }, "\n",
-                            new Span("~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
+                            new Span("~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }
                         );
                         foreach (JToken regvalFinding in cat.Value)
                         {
@@ -298,23 +296,40 @@ namespace Grouper2
                     {
                         findingsDocument.Children.Add(
                             new Span("GPP Registry Settings") { Color = ConsoleColor.Magenta }, "\n",
-                            new Span("~~~~~~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
+                            new Span("~~~~~~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }
                         );
-                        foreach (JToken regsetFinding in cat.Value)
+
+                        // TODO patched out until azure back online
+                        
+                        /*
+                        foreach (JProperty regsetFindings in cat.Value)
                         {
-                            //findingsDocument.Children.Add(JsonToGrid(regsetFinding));
+                            Console.WriteLine("1");
+                            Utility.DebugWrite(regsetFindings.ToString());
+                            foreach (JObject regsetFinding in regsetFindings)
+                            {
+                                Console.WriteLine("2");
+                                Utility.DebugWrite(regsetFinding.ToString());
+                                foreach (JProperty thing in regsetFinding.Values())
+                                {
+                                    Utility.DebugWrite(thing.ToString());
+                                }
+                                //JProperty findingVal = regsetFinding.Value;
+                                //findingsDocument.Children.Add(JsonToGrid(findingVal, 0));
+                            }
                         }
+                        */
                         continue;
                     }
                     if (cat.Key == "Registry Keys")
                     {
                         findingsDocument.Children.Add(
                             new Span("GPP Registry Keys") { Color = ConsoleColor.Magenta }, "\n",
-                            new Span("~~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
+                            new Span("~~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }
                         );
-                        foreach (JToken regkeyFinding in cat.Value)
+                        foreach (JProperty regkeyFinding in cat.Value)
                         {
-                            //findingsDocument.Children.Add(JsonToGrid(regkeyFinding));
+                            findingsDocument.Children.Add(JsonToGrid(regkeyFinding.Value, 0));
                         }
                         continue; ;
                     }
@@ -322,11 +337,11 @@ namespace Grouper2
                     {
                         findingsDocument.Children.Add(
                             new Span("GPP Env Vars") { Color = ConsoleColor.Magenta }, "\n",
-                            new Span("~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
+                            new Span("~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }
                         );
-                        foreach (JToken envvarFinding in cat.Value)
+                        foreach (JProperty envvarFinding in cat.Value)
                         {
-                            //findingsDocument.Children.Add(JsonToGrid(envvarFinding));
+                            findingsDocument.Children.Add(JsonToGrid(envvarFinding.Value, 0));
                         }
                         continue;
                     }
@@ -334,11 +349,11 @@ namespace Grouper2
                     {
                         findingsDocument.Children.Add(
                             new Span("GPP Ini Files") { Color = ConsoleColor.Magenta }, "\n",
-                            new Span("~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
+                            new Span("~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }
                         );
-                        foreach (JToken iniFileFinding in cat.Value)
+                        foreach (JProperty iniFileFinding in cat.Value)
                         {
-                            //findingsDocument.Children.Add(JsonToGrid(iniFileFinding));
+                            findingsDocument.Children.Add(JsonToGrid(iniFileFinding.Value, 0));
                         }
                         continue;
                     }
@@ -346,11 +361,14 @@ namespace Grouper2
                     {
                         findingsDocument.Children.Add(
                             new Span("Scripts") { Color = ConsoleColor.Magenta }, "\n",
-                            new Span("~~~~~~~") { Color = ConsoleColor.Magenta }, "\n"
+                            new Span("~~~~~~~") { Color = ConsoleColor.Magenta }
                         );
-                        foreach (JToken scriptFinding in cat.Value)
+                        foreach (JProperty scriptFindings in cat.Value)
                         {
-                            //findingsDocument.Children.Add(JsonToGrid(scriptFinding));
+                            foreach (JProperty scriptFinding in scriptFindings.Value)
+                            {
+                                findingsDocument.Children.Add(JsonToGrid(scriptFinding.Value, 0));
+                            }
                         }
                         continue;
                     }
@@ -374,7 +392,7 @@ namespace Grouper2
             switch (iteration)
             {
                 case 1:
-                    gridColor = ConsoleColor.White;
+                    gridColor = ConsoleColor.Gray;
                     break;
                 case 2:
                     gridColor = ConsoleColor.DarkGray;
@@ -421,6 +439,7 @@ namespace Grouper2
                     {
                         Grid subGrid = new Grid
                         {
+                            StrokeColor = gridColor,
                             Columns = {GridLength.Auto},
                             Stroke = LineThickness.None
                         };
