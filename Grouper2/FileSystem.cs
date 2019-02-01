@@ -44,28 +44,28 @@ namespace Grouper2
             }
             else
             {
-                return new JObject(new JProperty("I don't think there's a path here", inPath));
+                return new JObject(new JProperty("NotAPath?", inPath));
             }
 
             if (inPath.Contains("http://") || inPath.Contains("https://"))
             {
-                return new JObject(new JProperty("I think this is an HTTP/S URL, not a file path", inPath));
+                return new JObject(new JProperty("HTTP/S URL?", inPath));
             }
 
             if (inPath.Contains("://") && !(inPath.Contains("http://")))
             {
-                return new JObject(new JProperty("I think this is some non-http URI like ftp or something.", inPath));
+                return new JObject(new JProperty("URI?", inPath));
             }
 
             if (inPath.Contains('%'))
             {
-                return new JObject(new JProperty("I think this path contains an environment variable so I can't assess it properly. Maybe do it manually?", inPath));
+                return new JObject(new JProperty("Env var found in path", inPath));
             }
 
             // if it doesn't seem to have any path separators it's probably a single file on sysvol.
             if (!inPath.Contains('\\') && !inPath.Contains('/'))
             {
-                return new JObject(new JProperty("I think this is a single file on sysvol.", inPath));
+                return new JObject(new JProperty("No path separators, file in SYSVOL?", inPath));
             }
             // figure out if it's a file path or just a directory
             if (fileName == "")
