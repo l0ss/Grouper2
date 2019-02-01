@@ -150,7 +150,15 @@ namespace Grouper2
             catch (System.ArgumentException)
             {
                 Console.WriteLine("Tried to check file permissions on invalid path: " + filePathString.ToString());
-                return fileDaclsJObject;
+                return null;
+            }
+            catch (System.UnauthorizedAccessException e)
+            {
+                if (GlobalVar.DebugMode)
+                {
+                    Utility.DebugWrite(e.ToString());
+                }
+                return null;
             }
 
             AuthorizationRuleCollection fileAccessRules =
