@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Grouper2;
 using Newtonsoft.Json.Linq;
 
@@ -18,33 +19,49 @@ internal static partial class AssessInf
             // iterate over the list of interesting keys in our json "db".
             foreach (JToken intRegKey in intRegKeys)
             {
-                // if it matches
+                // if it matches an interesting key
                 if ((string) intRegKey["regKey"] == regValue.Name)
                 {
+                    // get the name
                     string matchedRegKey = regValue.Name;
-                    //create a list to put the values in
-                    List<string> regKeyValueList = new List<string>();
-                    foreach (string thing in regValue.Value)
+                    string keyTypeNum = regValue.Value[0].ToString();
+                    string keyTypeString = "";
+                    switch (keyTypeNum)
                     {
-                        // put the values in the list
-                        regKeyValueList.Add(thing);
+                        case "4":
+                            keyTypeString = "REG_DWORD";
+                            break;
+                        case "7":
+                            keyTypeString = "REG_MULTI_SZ";
+                            break;
                     }
 
-                    string[] regKeyValueArray = regKeyValueList.ToArray();
-                    if (interestLevel >= GlobalVar.IntLevelToShow)
+                    if (keyTypeString == "REG_DWORD")
                     {
-                        JArray regKeyValueJArray = new JArray();
-                        foreach (string value in regKeyValueArray)
+                        // if it's a dword it'll only have one value
+                        assessedRegValues.Add(matchedRegKey, regValue.Value[1].ToString());
+                    }
+                    else if (keyTypeString == "REG_MULTI_SZ")
+                    {
+                        // if it's a multi we'll need to process the rest of the values
+                        JArray regValuesJArray = new JArray();
+                        foreach (JToken value in regValue.Value.Skip(1))
                         {
-                            regKeyValueJArray.Add(value);
+                            regValuesJArray.Add(value.ToString());
                         }
-
-                        assessedRegValues.Add(matchedRegKey, regKeyValueJArray);
+                        assessedRegValues.Add(matchedRegKey, regValuesJArray);
                     }
+                    
                 }
             }
         }
 
-        return assessedRegValues;
+        if (interestLevel >= GlobalVar.IntLevelToShow)
+        {
+            return assessedRegValues;
+        }
+
+        return null;
+
     }
 }

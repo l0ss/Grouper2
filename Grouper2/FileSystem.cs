@@ -23,7 +23,7 @@ namespace Grouper2
             bool isDirPath = false;
             bool parentDirExists = false;
             bool parentDirWritable = false;
-            bool extIsInteresting = false;
+            //bool extIsInteresting = false;
             string fileExt = "";
             string extantParentDir = "";
             string writableParentDir = "";

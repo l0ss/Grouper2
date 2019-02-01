@@ -68,16 +68,18 @@ namespace Grouper2
 
             if (interestLevel >= GlobalVar.IntLevelToShow)
             {
-                JObject assessedGppIni = new JObject();
-                assessedGppIni.Add("Name", gppIniName);
-                assessedGppIni.Add("Changed", gppIniChanged);
-                assessedGppIni.Add("Path", gppIniPath);
-                assessedGppIni.Add("Action", gppIniAction);
-                assessedGppIni.Add("Status", gppIniStatus);
-                assessedGppIni.Add("Section", gppIniSection);
-                assessedGppIni.Add("Value", gppIniValue);
-                assessedGppIni.Add("Property", gppIniProperty);
-               
+                JObject assessedGppIni = new JObject
+                {
+                    {"Name", gppIniName},
+                    {"Changed", gppIniChanged},
+                    {"Path", gppIniPath},
+                    {"Action", gppIniAction},
+                    {"Status", gppIniStatus},
+                    {"Section", gppIniSection},
+                    {"Value", gppIniValue},
+                    {"Property", gppIniProperty}
+                };
+
                 return new JProperty(gppIniUid, assessedGppIni);
             }
 
