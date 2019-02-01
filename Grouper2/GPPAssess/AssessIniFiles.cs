@@ -20,7 +20,10 @@ namespace Grouper2
             else
             {
                 JProperty assessedGppIni = AssessGppIni(gppCategory["Ini"]);
-                assessedGppInis.Add(assessedGppIni);
+                if (assessedGppIni != null)
+                {
+                    assessedGppInis.Add(assessedGppIni);
+                }
             }
 
             if (assessedGppInis.HasValues)

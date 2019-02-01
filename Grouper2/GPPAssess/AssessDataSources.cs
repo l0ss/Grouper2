@@ -12,7 +12,10 @@ namespace Grouper2
                 foreach (JToken gppDataSource in gppCategory["DataSource"])
                 {
                     JProperty assessedGppDataSource = AssessGppDataSource(gppDataSource);
-                    assessedGppDataSources.Add(assessedGppDataSource);
+                    if (assessedGppDataSource != null)
+                    {
+                        assessedGppDataSources.Add(assessedGppDataSource);
+                    }
                 }
             }
             else

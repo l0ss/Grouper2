@@ -13,7 +13,7 @@ namespace Grouper2
                 foreach (JObject gppShortcuts in gppCategory["Shortcut"])
                 {
                     JObject assessedShortcut = GetAssessedShortcut(gppShortcuts);
-                    if (assessedShortcut.HasValues)
+                    if ((assessedShortcut != null) && assessedShortcut.HasValues)
                     {
                         assessedShortcuts.Add(gppShortcuts["@uid"].ToString(), assessedShortcut);
                     }
