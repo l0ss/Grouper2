@@ -985,13 +985,6 @@
       {
         "msDesc": null,
         "friendlyDesc": null,
-        "intLevel": "3",
-        "regKey": "MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\RestrictAnonymous",
-        "intValue": "false"
-      },
-      {
-        "msDesc": null,
-        "friendlyDesc": null,
         "intLevel": "4",
         "regKey": "MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\RestrictAnonymousSAM",
         "intValue": "false"

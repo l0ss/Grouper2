@@ -282,17 +282,13 @@ namespace Grouper2
                     }
                     if (cat.Key == "Registry Values")
                     {
-                        // TODO patched out until registry values thing is done
-                        /*
                         findingsDocument.Children.Add(
                             new Span("Registry Values") { Color = ConsoleColor.Magenta }, "\n",
                             new Span("~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }
                         );
-                        foreach (JToken regvalFinding in cat.Value)
-                        {
-                            findingsDocument.Children.Add(JsonToGrid(regvalFinding));
-                        }
-                        */
+                        
+                            findingsDocument.Children.Add(JsonToGrid(cat.Value, 0));
+                        
                         continue;
                     }
                     if (cat.Key == "RegistrySettings")
