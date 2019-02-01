@@ -97,7 +97,7 @@ namespace Grouper2
 
             if (inString.ToLower().Contains("\\\\"))
             {
-                interestingWordsFound.Add("Possible UNC path found");
+                interestingWordsFound.Add("UNC path?");
                 //Utility.DebugWrite("Think I found a UNC path: " + inString);
                 //TODO do something here to investigate the path.
                 if (interestLevel <= 2)
@@ -108,7 +108,7 @@ namespace Grouper2
 
             if (inString.ToLower().Contains(":\\"))
             {
-                interestingWordsFound.Add("Possible mapped drive path found");
+                interestingWordsFound.Add("Mapped drive letter?");
                 //Utility.DebugWrite("Maybe this is a path with a drive letter?");
                 if (interestLevel <= 2)
                 {
@@ -116,9 +116,9 @@ namespace Grouper2
                 }
             }
 
-            if (inString.ToLower().Contains("http"))
+            if (inString.ToLower().Contains("://"))
             {
-                interestingWordsFound.Add("Possible URL found");
+                interestingWordsFound.Add("URI?");
                 if (interestLevel <= 2)
                 {
                     interestLevel = 2;

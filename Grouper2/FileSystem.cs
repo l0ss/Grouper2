@@ -44,7 +44,7 @@ namespace Grouper2
             }
             else
             {
-                return new JObject(new JProperty("NotAPath?", inPath));
+                return new JObject(new JProperty("Not a path?", inPath));
             }
 
             if (inPath.Contains("http://") || inPath.Contains("https://"))
@@ -142,7 +142,7 @@ namespace Grouper2
                         {
                             Utility.DebugWrite(e.ToString());
                         }
-                        return new JObject(new JProperty("This doesn't seem to be a file path", inPath));
+                        return new JObject(new JProperty("Not a path?", inPath));
                     }
 
                     // get the first parent dir
@@ -161,7 +161,7 @@ namespace Grouper2
                         {
                             Utility.DebugWrite(e.ToString());
                         }
-                        return new JObject(new JProperty("I don't think this is a file path", inPath));
+                        return new JObject(new JProperty("Not a path?", inPath));
                     }
 
                     // iterate until the path root 
@@ -213,15 +213,15 @@ namespace Grouper2
                 {
                     filePathAssessment.Add("File exists", true);
                     // TODO check if file extensions are interesting.
-                    filePathAssessment.Add("File extension is interesting", extIsInteresting);
-                    filePathAssessment.Add("File is readable", fileReadable);
+                    //filePathAssessment.Add("File extension interesting", extIsInteresting);
+                    filePathAssessment.Add("File readable", fileReadable);
                     if (fileContentsInteresting)
                     {
-                        filePathAssessment.Add("File contains interesting strings", fileContentsInteresting);
+                        filePathAssessment.Add("File contents interesting", "True");
                         filePathAssessment.Add("Interesting strings found", interestingWordsFromFile );
                         interestLevel = interestLevel + 2;
                     }
-                    filePathAssessment.Add("File is writable", fileWritable);
+                    filePathAssessment.Add("File writable", fileWritable);
                     if (fileWritable) interestLevel = interestLevel + 10;
                     // TODO see if I can do anything more with these.
                     filePathAssessment.Add("File DACLs", fileDacls);
@@ -232,7 +232,7 @@ namespace Grouper2
                     filePathAssessment.Add("Directory exists", dirExists);
                     if (dirExists)
                     {
-                        filePathAssessment.Add("Directory is writable", dirWritable);
+                        filePathAssessment.Add("Directory writable", dirWritable);
                         if (dirWritable) interestLevel = interestLevel + 10;
                         filePathAssessment.Add("Directory DACL", dirDacls);
                     }
@@ -241,7 +241,7 @@ namespace Grouper2
                         filePathAssessment.Add("Parent dir exists", true);
                         if (parentDirWritable)
                         {
-                            filePathAssessment.Add("Parent dir writable", parentDirWritable);
+                            filePathAssessment.Add("Parent dir writable", "True");
                             interestLevel = interestLevel + 10;
                             filePathAssessment.Add("Writable parent dir", writableParentDir);
                         }
@@ -258,7 +258,7 @@ namespace Grouper2
                 if (dirExists)
                 {
                     filePathAssessment.Add("Directory is writable", dirWritable);
-                    if (parentDirWritable) interestLevel = interestLevel + 10;
+                    if (dirWritable) interestLevel = interestLevel + 10;
                     filePathAssessment.Add("Directory DACLs", dirDacls);
                 }
                 else if (parentDirExists)
@@ -266,7 +266,7 @@ namespace Grouper2
                     filePathAssessment.Add("Parent dir exists", true);
                     if (parentDirWritable)
                     {
-                        filePathAssessment.Add("Parent dir writable", parentDirWritable);
+                        filePathAssessment.Add("Parent dir writable", "True");
                         interestLevel = interestLevel + 10;
                         filePathAssessment.Add("Writable parent dir", writableParentDir);
                     }
