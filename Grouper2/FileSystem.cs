@@ -1,6 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Security;
+using System.Security.AccessControl;
+using System.Security.Permissions;
 using Newtonsoft.Json.Linq;
 
 namespace Grouper2
@@ -375,6 +378,38 @@ namespace Grouper2
 
         public static bool CanIWrite(string inPath)
         {
+            // get the file attributes for file or directory
+            
+            bool isFile;
+            bool isDir;
+            CurrentUserSecurity currentUserSecurity = new CurrentUserSecurity();
+
+            FileSystemRights modifyAccess = FileSystemRights.Modify;
+            try
+            {
+                FileAttributes attr = File.GetAttributes(inPath);
+                if (attr.HasFlag(FileAttributes.Directory))
+                {
+                    DirectoryInfo dirInfo = new DirectoryInfo(inPath);
+                    return currentUserSecurity.HasAccess(dirInfo, modifyAccess);
+                }
+                else
+                {
+                    FileInfo fileInfo = new FileInfo(inPath);
+                    return currentUserSecurity.HasAccess(fileInfo, modifyAccess);
+                }
+            }
+            catch (System.IO.FileNotFoundException e)
+            {
+
+            }
+
+            return false;
+        }
+        
+        /*
+        public static bool CanIWrite(string inPath)
+        {
             bool canWrite = false;
             try
             {
@@ -414,6 +449,7 @@ namespace Grouper2
             }
             return canWrite;
         }
+        */
 
         public static JObject InvestigateFileContents(string inString)
         {
