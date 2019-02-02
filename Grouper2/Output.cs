@@ -282,15 +282,14 @@ namespace Grouper2
                     }
                     if (cat.Key == "Service General Setting")
                     {
-                        //TODO double check this in Online mode
                         findingsDocument.Children.Add(
                             new Span("Windows Services") { Color = ConsoleColor.Magenta }, "\n",
                             new Span("~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }
                         );
-                        //foreach (JProperty sgsFinding in cat.Value)
-                        //{
-                            findingsDocument.Children.Add(JsonToGrid(cat.Value, 0));
-                        //}
+                        foreach (JProperty sgsFinding in cat.Value)
+                        {
+                            findingsDocument.Children.Add(JsonToGrid(sgsFinding.Value, 0));
+                        }
                         continue;
                     }
                     if (cat.Key == "NTServices")

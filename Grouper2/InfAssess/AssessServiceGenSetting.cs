@@ -12,8 +12,11 @@ internal static partial class AssessInf
 
         JObject assessedSvcGenSettings = new JObject();
 
+        int inc = 0;
+
         foreach (KeyValuePair<string, JToken> svcGenSetting in svcGenSettingsJObject)
         {
+            inc++;
             int interestLevel = 3;
             string serviceName = svcGenSetting.Key.Trim('"','\\');
             JArray svcSettings = (JArray)svcGenSetting.Value;
@@ -100,8 +103,9 @@ internal static partial class AssessInf
                 {
                     if (assessedSddl.HasValues)
                     {
+                        assessedSddl.AddFirst(new JProperty("Service", serviceName));
                         assessedSddl.Add("Startup Type", startupString);
-                        assessedSvcGenSettings.Add(serviceName, assessedSddl);
+                        assessedSvcGenSettings.Add(inc.ToString(), assessedSddl);
                     }
                 }
             }
