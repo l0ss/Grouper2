@@ -26,7 +26,7 @@ namespace Grouper2
             bool isDirPath = false;
             bool parentDirExists = false;
             bool parentDirWritable = false;
-            //bool extIsInteresting = false;
+            bool extIsInteresting = false;
             string fileExt = "";
             string extantParentDir = "";
             string writableParentDir = "";
@@ -34,14 +34,10 @@ namespace Grouper2
             JObject fileDacls = new JObject();
             JObject dirDacls = new JObject();
             JArray interestingWordsFromFile = new JArray();
-
-            string fileName = "";
             string dirPath = "";
-
 
             if (inPath.Length > 1)
             {
-                fileName = Path.GetFileName(inPath);
                 dirPath = Path.GetDirectoryName(inPath);
                 fileExt = Path.GetExtension(inPath);
             }
@@ -70,27 +66,26 @@ namespace Grouper2
             {
                 return new JObject(new JProperty("No path separators, file in SYSVOL?", inPath));
             }
-            // figure out if it's a file path or just a directory
-            if (fileName == "")
+            // figure out if it's a file path or just a directory even if the file doesn't exist
+
+            string pathFileComponent = Path.GetFileName(inPath);
+
+            if (pathFileComponent == "")
             {
                 isDirPath = true;
+                isFilePath = false;
             }
             else
             {
+                isDirPath = false;
                 isFilePath = true;
-            }
-
-            if (isDirPath)
-            {
-                dirExists = FileSystem.DoesDirExist(inPath);
             }
 
             if (isFilePath)
             {
-                fileExt = Path.GetExtension(inPath);
                 // check if the file exists
                 fileExists = FileSystem.DoesFileExist(inPath);
-                
+
                 if (fileExists)
                 {
                     // if it does, the parent Dir must exist.
@@ -99,6 +94,16 @@ namespace Grouper2
                     fileReadable = FileSystem.CanIRead(inPath);
                     // check if we can write it
                     fileWritable = FileSystem.CanIWrite(inPath);
+                    // see what the file extension is and if it's interesting
+                    fileExt = Path.GetExtension(inPath);
+                    foreach (string intExt in interestingFileExts)
+                    {
+                        if ((fileExt.ToLower().Trim('.')) == (intExt.ToString().ToLower()))
+                        {
+                            extIsInteresting = true;
+                        }
+                    }
+
                     // if we can read it, have a look if it has interesting strings in it.
                     if (fileReadable)
                     {
@@ -114,25 +119,32 @@ namespace Grouper2
                             }
                         }
                     }
+
                     // get the file permissions
                     fileDacls = Utility.GetFileDaclJObject(inPath);
                 }
-                else
-                {
-                    dirExists = FileSystem.DoesDirExist(dirPath);
-                    if (dirExists)
-                    {
-                        dirDacls = Utility.GetFileDaclJObject(dirPath);
-                        string dirWriteTestPath = Path.Combine(dirPath, "testFileFromGrouper2Assessment.txt");
-                        //TODO this is fucking gross and messy but I can't think of a better way of doing it. ideally I want to delete these if i create them but putting File.Delete anywhere in this gives me the willies.
-                        dirWritable = FileSystem.CanIWrite(dirWriteTestPath);
-                    }
-                }
+                
+            }
+
+            if (isDirPath)
+            {
+                dirExists = FileSystem.DoesDirExist(inPath);
+            }
+            else if (!isDirPath && !fileExists)
+            {
+                dirExists = FileSystem.DoesDirExist(dirPath);
+            }
+
+            if (dirExists)
+            {
+                dirDacls = Utility.GetFileDaclJObject(dirPath);
+                dirWritable = FileSystem.CanIWrite(dirPath);
             }
             // if the dir doesn't exist, iterate up the file path checking if any exist and if we can write to any of them.
             if (!dirExists)
             {
-                if (dirPath != null)
+                // we want to allow a path like C: but not one like "\"
+                if ((dirPath != null) && (dirPath.Length > 1))
                 {
                     // get the root of the path
                     try
@@ -177,12 +189,8 @@ namespace Grouper2
                         {
                             // get the dir dacls
                             parentDirDacls = Utility.GetFileDaclJObject(dirPathParent);
-                            // set up a path for us to try and write to
-                            string parentDirWriteTestPath =
-                                Path.Combine(dirPathParent, "testFileFromGrouper2Assessment.txt");
-                            // this is fucking gross and messy but I can't think of a better way of doing it. ideally I want to delete these if i create them but putting File.Delete anywhere in this gives me the willies.
-                            // try to write to it
-                            parentDirWritable = FileSystem.CanIWrite(parentDirWriteTestPath);
+                            // check if it's writable
+                            parentDirWritable = FileSystem.CanIWrite(dirPathParent);
                             if (parentDirWritable)
                             {
                                 writableParentDir = dirPathParent;
@@ -215,8 +223,11 @@ namespace Grouper2
                 if (fileExists)
                 {
                     filePathAssessment.Add("File exists", true);
-                    // TODO check if file extensions are interesting.
-                    //filePathAssessment.Add("File extension interesting", extIsInteresting);
+                    if (extIsInteresting)
+                    {
+                        interestLevel = interestLevel + 2;
+                        filePathAssessment.Add("File extension interesting", extIsInteresting);
+                    }
                     filePathAssessment.Add("File readable", fileReadable);
                     if (fileContentsInteresting)
                     {
@@ -226,7 +237,6 @@ namespace Grouper2
                     }
                     filePathAssessment.Add("File writable", fileWritable);
                     if (fileWritable) interestLevel = interestLevel + 10;
-                    // TODO see if I can do anything more with these.
                     filePathAssessment.Add("File DACLs", fileDacls);
                 }
                 else
@@ -236,7 +246,10 @@ namespace Grouper2
                     if (dirExists)
                     {
                         filePathAssessment.Add("Directory writable", dirWritable);
-                        if (dirWritable) interestLevel = interestLevel + 10;
+                        if (!(inPath.StartsWith("C:") || inPath.StartsWith("D:")))
+                        {
+                            if (dirWritable) interestLevel = interestLevel + 10;
+                        }
                         filePathAssessment.Add("Directory DACL", dirDacls);
                     }
                     else if (parentDirExists)
@@ -245,12 +258,16 @@ namespace Grouper2
                         if (parentDirWritable)
                         {
                             filePathAssessment.Add("Parent dir writable", "True");
-                            interestLevel = interestLevel + 10;
+                            if (!(inPath.StartsWith("C:") || inPath.StartsWith("D:")))
+                            {
+                                interestLevel = interestLevel + 10;
+                            }
                             filePathAssessment.Add("Writable parent dir", writableParentDir);
                         }
                         else
                         {
                             filePathAssessment.Add("Extant parent dir", extantParentDir);
+                            filePathAssessment.Add("Parent dir DACLs", parentDirDacls);
                         }
                     }
                 }
@@ -261,7 +278,11 @@ namespace Grouper2
                 if (dirExists)
                 {
                     filePathAssessment.Add("Directory is writable", dirWritable);
-                    if (dirWritable) interestLevel = interestLevel + 10;
+                    // quick n dirty way of excluding local drives while keeping mapped network drives.
+                    if (!(inPath.StartsWith("C:") || inPath.StartsWith("D:")))
+                    {
+                        if (dirWritable) interestLevel = interestLevel + 10;
+                    }
                     filePathAssessment.Add("Directory DACLs", dirDacls);
                 }
                 else if (parentDirExists)
@@ -270,7 +291,10 @@ namespace Grouper2
                     if (parentDirWritable)
                     {
                         filePathAssessment.Add("Parent dir writable", "True");
-                        interestLevel = interestLevel + 10;
+                        if (!(inPath.StartsWith("C:") || inPath.StartsWith("D:")))
+                        {
+                            interestLevel = interestLevel + 10;
+                        }
                         filePathAssessment.Add("Writable parent dir", writableParentDir);
                     }
                     else
@@ -378,36 +402,49 @@ namespace Grouper2
 
         public static bool CanIWrite(string inPath)
         {
-            // get the file attributes for file or directory
+            // this will return true if write or modify or take ownership or any of those other good perms are available.
             
-            bool isFile;
-            bool isDir;
             CurrentUserSecurity currentUserSecurity = new CurrentUserSecurity();
 
-            FileSystemRights modifyAccess = FileSystemRights.Modify;
+            FileSystemRights[] fsRights = new[]
+            {
+                FileSystemRights.Write,
+                FileSystemRights.Modify,
+                FileSystemRights.FullControl,
+                FileSystemRights.TakeOwnership,
+                FileSystemRights.ChangePermissions,
+                FileSystemRights.AppendData,
+                FileSystemRights.CreateFiles,
+                FileSystemRights.CreateDirectories,
+                FileSystemRights.WriteData
+            };
+
             try
             {
                 FileAttributes attr = File.GetAttributes(inPath);
-                if (attr.HasFlag(FileAttributes.Directory))
+                foreach (FileSystemRights fsRight in fsRights)
                 {
-                    DirectoryInfo dirInfo = new DirectoryInfo(inPath);
-                    return currentUserSecurity.HasAccess(dirInfo, modifyAccess);
-                }
-                else
-                {
-                    FileInfo fileInfo = new FileInfo(inPath);
-                    return currentUserSecurity.HasAccess(fileInfo, modifyAccess);
+                    if (attr.HasFlag(FileAttributes.Directory))
+                    {
+                        DirectoryInfo dirInfo = new DirectoryInfo(inPath);
+                        return currentUserSecurity.HasAccess(dirInfo, fsRight);
+                    }
+                    else
+                    {
+                        FileInfo fileInfo = new FileInfo(inPath);
+                        return currentUserSecurity.HasAccess(fileInfo, fsRight);
+                    }
                 }
             }
             catch (System.IO.FileNotFoundException e)
             {
-
+                return false;
             }
-
             return false;
         }
         
         /*
+        // this approach works but has the problem of creating messy files
         public static bool CanIWrite(string inPath)
         {
             bool canWrite = false;
