@@ -92,7 +92,8 @@ public class GlobalVar
         private static void Main(string[] args)
         {
             DateTime grouper2StartTime = DateTime.Now;
-            Utility.PrintBanner();
+            
+            
             
             CommandLineParser.CommandLineParser parser = new CommandLineParser.CommandLineParser();
             ValueArgument<string> htmlArg = new ValueArgument<string>('f', "html", "Path for html output file.");
@@ -275,6 +276,9 @@ public class GlobalVar
                 Console.Error.WriteLine("\nRunning as user: " + Environment.UserDomainName + "\\" + Environment.UserName);
             }
             Console.Error.WriteLine("\nAll online checks will be performed in the context of this user.");
+
+
+            if (!prettyOutput) Utility.PrintBanner();
 
             // Ask the DC for GPO details
             string currentDomainString = "";
