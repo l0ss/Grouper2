@@ -26,8 +26,11 @@ internal static partial class AssessInf
 
         JObject assessedRegKeys = new JObject();
 
+        int inc = 0;
+
         foreach (KeyValuePair<string, JToken> regKey in regKeysJObject)
         {
+            inc++;
             interestLevel = 1;
             string keyPath = regKey.Key.Trim('"');
             JArray keyValues = (JArray) regKey.Value;
@@ -107,8 +110,9 @@ internal static partial class AssessInf
             {
                 if (assessedSddl.HasValues)
                 {
+                    assessedSddl.AddFirst(new JProperty("RegKey", keyPath));
                     assessedSddl.Add("Inheritance", inheritanceString);
-                    assessedRegKeys.Add(keyPath, assessedSddl);
+                    assessedRegKeys.Add(inc.ToString(), assessedSddl);
                 }
             }
         }

@@ -287,10 +287,10 @@ namespace Grouper2
                             new Span("Windows Services") { Color = ConsoleColor.Magenta }, "\n",
                             new Span("~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }
                         );
-                        foreach (JProperty sgsFinding in cat.Value)
-                        {
-                            findingsDocument.Children.Add(JsonToGrid(sgsFinding.Value, 0));
-                        }
+                        //foreach (JProperty sgsFinding in cat.Value)
+                        //{
+                            findingsDocument.Children.Add(JsonToGrid(cat.Value, 0));
+                        //}
                         continue;
                     }
                     if (cat.Key == "NTServices")
@@ -342,9 +342,7 @@ namespace Grouper2
                             new Span("Registry Values") { Color = ConsoleColor.Magenta }, "\n",
                             new Span("~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }
                         );
-                        
                             findingsDocument.Children.Add(JsonToGrid(cat.Value, 0));
-                        
                         continue;
                     }
                     if (cat.Key == "RegistrySettings")
@@ -372,9 +370,9 @@ namespace Grouper2
                             new Span("GPP Registry Keys") { Color = ConsoleColor.Magenta }, "\n",
                             new Span("~~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }
                         );
-                        foreach (JProperty regkeyFinding in cat.Value)
+                        foreach (JProperty regKeyFinding in cat.Value)
                         {
-                            findingsDocument.Children.Add(JsonToGrid(regkeyFinding.Value, 0));
+                            findingsDocument.Children.Add(JsonToGrid(regKeyFinding.Value, 0));
                         }
                         continue; ;
                     }
