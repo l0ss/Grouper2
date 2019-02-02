@@ -107,10 +107,8 @@ internal static partial class AssessInf
             {
                 if (assessedSddl.HasValues)
                 {
-                    assessedRegKeys.Add(keyPath, new JObject(
-                        new JProperty("Permissions", assessedSddl),
-                        new JProperty("Inheritance", inheritanceString)
-                    ));
+                    assessedSddl.Add("Inheritance", inheritanceString);
+                    assessedRegKeys.Add(keyPath, assessedSddl);
                 }
             }
         }

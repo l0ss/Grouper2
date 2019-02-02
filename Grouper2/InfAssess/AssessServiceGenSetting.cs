@@ -100,10 +100,8 @@ internal static partial class AssessInf
                 {
                     if (assessedSddl.HasValues)
                     {
-                        assessedSvcGenSettings.Add(serviceName, new JObject(
-                            new JProperty("Permissions", assessedSddl),
-                            new JProperty("Startup Type", startupString)
-                        ));
+                        assessedSddl.Add("Startup Type", startupString);
+                        assessedSvcGenSettings.Add(serviceName, assessedSddl);
                     }
                 }
             }

@@ -76,10 +76,8 @@ namespace Grouper2
             {
                 gpoTitle = gpoProps["UID"].ToString();
             }
-
-
+            
             Document outputDocument = new Document();
-
 
 
             ////////////////////////////////////////
