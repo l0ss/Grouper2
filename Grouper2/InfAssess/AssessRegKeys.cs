@@ -52,58 +52,82 @@ internal static partial class AssessInf
                     break;
             }
 
-            // go parse the SDDL
-            JObject parsedSddl = ParseSDDL.ParseSddlString(sddl, SecurableObjectType.RegistryKey);
-
             // then assess the results based on interestLevel
             JObject assessedSddl = new JObject();
 
-            string[] defaultSids = new string[]
+            // go parse the SDDL
+            if (GlobalVar.OnlineChecks)
             {
-                "CREATOR_OWNER",
-                "World Authority",
-                "LOCAL_SYSTEM",
-                "BUILTIN_ADMINISTRATORS",
-                "Flags"
-            };
+                JObject parsedSddl = ParseSDDL.ParseSddlString(sddl, SecurableObjectType.WindowsService);
+                
 
-            if (parsedSddl["Owner"] != null)
-            {
-                assessedSddl.Add("Owner", parsedSddl["Owner"].ToString());
-            }
-
-            if (parsedSddl["Group"] != null)
-            {
-                assessedSddl.Add("Group", parsedSddl["Group"].ToString());
-            }
-
-            if (parsedSddl["DACL"] != null)
-            {
-                JObject assessedDacl = new JObject();
-                foreach (KeyValuePair<string, JToken> ace in JObject.FromObject(parsedSddl["DACL"]))
+                if (parsedSddl["Owner"] != null)
                 {
-                    // unless we are at interest level zero (show all defaults)
-                    bool boringSidMatch = false;
-                    foreach (string boringSid in defaultSids)
-                    {
-                        if (ace.Key.Contains(boringSid)) boringSidMatch = true;
-                    }
-
-                    if ((boringSidMatch) && (GlobalVar.IntLevelToShow > 0))
-                    {
-                        continue;
-                    }
-
-                    else
-                    {
-                        assessedDacl.Add(ace.Key, ace.Value);
-                    }
+                    assessedSddl.Add("Owner", parsedSddl["Owner"].ToString());
+                    interestLevel = 4;
                 }
 
-                if (assessedDacl.HasValues)
+                if (parsedSddl["Group"] != null)
                 {
-                    assessedSddl.Add("DACL", assessedDacl);
-                };
+                    assessedSddl.Add("Group", parsedSddl["Group"].ToString());
+                    interestLevel = 4;
+                }
+
+                JObject assessedDacl = new JObject();
+                if (parsedSddl["DACL"] != null)
+                {
+                    string[] boringSidEndings = new string[]
+                        {"-3-0", "-5-9", "5-18", "-512", "-519", "SY", "BA", "DA", "CO", "ED", "PA", "CG", "DD", "EA", "LA",};
+                    string[] interestingSidEndings = new string[]
+                        {"DU", "WD", "IU", "BU", "AN", "AU", "BG", "DC", "DG", "LG"};
+
+                    foreach (JProperty ace in parsedSddl["DACL"].Children())
+                    {
+                        int aceInterestLevel = 0;
+                        string trusteeSid = ace.Value["SID"].ToString();
+
+                        bool boringUserPresent = false;
+                        foreach (string boringSidEnding in boringSidEndings)
+                        {
+                            if (trusteeSid.EndsWith(boringSidEnding))
+                            {
+                                boringUserPresent = true;
+                                break;
+                            }
+                        }
+
+                        bool interestingUserPresent = false;
+                        foreach (string interestingSidEnding in interestingSidEndings)
+                        {
+                            if (trusteeSid.EndsWith(interestingSidEnding))
+                            {
+                                interestingUserPresent = true;
+                                break;
+                            }
+                        }
+
+                        if (interestingUserPresent/* && interestingRightPresent*/)
+                        {
+                            aceInterestLevel = 10;
+                        }
+                        else if (boringUserPresent)
+                        {
+                            aceInterestLevel = 0;
+                        }
+
+                        if (aceInterestLevel >= GlobalVar.IntLevelToShow)
+                        {
+                            // pass the whole thing on
+                            assessedSddl.Add(ace);
+                        }
+                    }
+
+                    if (assessedDacl.HasValues)
+                    {
+                        assessedSddl.Add("DACL", assessedDacl);
+                    };
+                }
+                
             }
 
             if (interestLevel >= GlobalVar.IntLevelToShow)

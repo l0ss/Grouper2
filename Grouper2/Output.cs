@@ -437,26 +437,23 @@ namespace Grouper2
             {
                 case 1:
                     gridColor = ConsoleColor.Gray;
-                    //col1Width = GridLength.Char(20);
-                    //col2Width = GridLength.Char(80);
                     break;
                 case 2:
                     gridColor = ConsoleColor.Gray;
-                    //col1Width = GridLength.Char(20);
-                    //col2Width = GridLength.Auto;
                     break;
-              
                 default:
                     gridColor = ConsoleColor.DarkGray;
-                    //col1Width = GridLength.Auto;
-                    //col2Width = GridLength.Auto;
                     break;
             }
 
             Grid grid = new Grid
             {
                 Color = ConsoleColor.White,
-                Columns = {col1Width, col2Width},
+                Columns =
+                {
+                    new Column { Width = col1Width, MinWidth = 5, MaxWidth = 20},
+                    new Column { Width = col2Width, MinWidth = 20}
+                },
                 Stroke = LineThickness.Single,
                 StrokeColor = gridColor
             };

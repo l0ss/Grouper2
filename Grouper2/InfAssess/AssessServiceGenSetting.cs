@@ -46,68 +46,81 @@ internal static partial class AssessInf
                 // then assess the results based on interestLevel
                 JObject assessedSddl = new JObject();
 
-                string[] defaultSids = new string[]
-                {
-                    "CREATOR_OWNER",
-                    "World Authority",
-                    "LOCAL_SYSTEM",
-                    "BUILTIN_ADMINISTRATORS",
-                    "Flags"
-                };
-
                 if (parsedSddl["Owner"] != null)
                 {
                     assessedSddl.Add("Owner", parsedSddl["Owner"].ToString());
-                    interestLevel = 6;
+                    interestLevel = 4;
                 }
 
                 if (parsedSddl["Group"] != null)
                 {
                     assessedSddl.Add("Group", parsedSddl["Group"].ToString());
-                    interestLevel = 6;
+                    interestLevel = 4;
                 }
 
                 if (parsedSddl["DACL"] != null)
                 {
                     JObject assessedDacl = new JObject();
-                    foreach (KeyValuePair<string, JToken> ace in JObject.FromObject(parsedSddl["DACL"]))
+
+                    string[] boringSidEndings = new string[]
+                        {"-3-0", "-5-9", "5-18", "-512", "-519", "SY", "BA", "DA", "CO", "ED", "PA", "CG", "DD", "EA", "LA",};
+                    string[] interestingSidEndings = new string[]
+                        {"DU", "WD", "IU", "BU", "AN", "AU", "BG", "DC", "DG", "LG"};
+
+                    foreach (JProperty ace in parsedSddl["DACL"].Children())
                     {
-                        // unless we are at interest level zero (show all defaults)
-                        bool boringSidMatch = false;
-                        foreach (string boringSid in defaultSids)
+                        int aceInterestLevel = 0;
+                        string trusteeSid = ace.Value["SID"].ToString();
+
+                        bool boringUserPresent = false;
+                        foreach (string boringSidEnding in boringSidEndings)
                         {
-                            if (ace.Key.Contains(boringSid)) boringSidMatch = true;
+                            if (trusteeSid.EndsWith(boringSidEnding))
+                            {
+                                boringUserPresent = true;
+                                break;
+                            }
                         }
 
-                        if ((boringSidMatch) && (GlobalVar.IntLevelToShow > 0))
+                        bool interestingUserPresent = false;
+                        foreach (string interestingSidEnding in interestingSidEndings)
                         {
-                            continue;
+                            if (trusteeSid.EndsWith(interestingSidEnding))
+                            {
+                                interestingUserPresent = true;
+                                break;
+                            }
                         }
 
-                        else
+                        if (interestingUserPresent/* && interestingRightPresent*/)
                         {
-                            assessedDacl.Add(ace.Key, ace.Value);
+                            aceInterestLevel = 10;
+                        }
+                        else if (boringUserPresent)
+                        {
+                            aceInterestLevel = 0;
+                        }
+
+                        if (aceInterestLevel >= GlobalVar.IntLevelToShow)
+                        {
+                            // pass the whole thing on
+                            assessedSddl.Add(ace);
                         }
                     }
 
                     if (assessedDacl.HasValues)
                     {
-                        interestLevel = 6;
                         assessedSddl.Add("DACL", assessedDacl);
-                    }
-
-                    ;
+                    };
                 }
-
-                if (interestLevel >= GlobalVar.IntLevelToShow)
+                
+                if (assessedSddl.HasValues)
                 {
-                    if (assessedSddl.HasValues)
-                    {
-                        assessedSddl.AddFirst(new JProperty("Service", serviceName));
-                        assessedSddl.Add("Startup Type", startupString);
-                        assessedSvcGenSettings.Add(inc.ToString(), assessedSddl);
-                    }
+                    assessedSddl.AddFirst(new JProperty("Service", serviceName));
+                    assessedSddl.Add("Startup Type", startupString);
+                    assessedSvcGenSettings.Add(inc.ToString(), assessedSddl);
                 }
+            
             }
             else
             {

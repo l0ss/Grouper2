@@ -88,11 +88,12 @@ namespace Sddl.Parser
 
             if (anyFlags)
             {
-                parsedAcl.Add("Flags", JArray.FromObject(Flags));
+                //parsedAcl.Add("Flags", JArray.FromObject(Flags));
             }
 
             if (anyAces)
             {
+                int inc = 0;
                 foreach (Ace ace in Aces)
                 {
                     JObject parsedAce = new JObject();
@@ -121,13 +122,31 @@ namespace Sddl.Parser
 
                     JArray aceRights = JArray.FromObject(ace.Rights);
 
-                    parsedAce.Add("Rights", aceRights);
-                    parsedAce.Add("Flags", aceFlagsJArray);
-
-                    parsedAcl.Add((aceType + " - " + aceSidAlias + " - " + aceSidRaw), parsedAce);
+                    string displayName = LDAPstuff.GetUserFromSid(aceSidRaw);
+                    parsedAce.Add("SID", aceSidRaw);
+                    parsedAce.Add("Name", displayName);
+                    parsedAce.Add("Type", aceType);
+                    if (aceRights.Count > 1)
+                    {
+                        parsedAce.Add("Rights", aceRights);
+                    }
+                    else if (aceRights.Count == 1)
+                    {
+                        parsedAce.Add("Rights", aceRights[0].ToString());
+                    }
+                    if (aceFlagsJArray.Count > 1)
+                    {
+                        parsedAce.Add("Flags", aceFlagsJArray);
+                    }
+                    else if (aceFlagsJArray.Count == 1)
+                    {
+                        parsedAce.Add("Flags", aceFlagsJArray[0].ToString());
+                    }
+                    
+                    parsedAcl.Add(new JProperty(inc.ToString(), parsedAce));
+                    inc++;
                 }
             }
-
             return parsedAcl;
         }
 

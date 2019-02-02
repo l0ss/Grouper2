@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.DirectoryServices;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Principal;
 using System.Text;
 using Grouper2;
@@ -192,80 +193,99 @@ class LDAPstuff
                 gpoData.Add("GPO Status", gpoEnabledStatus);
                 // get the acl
                 ActiveDirectorySecurity gpoAcl = gpoDe.ObjectSecurity;
-                // Get the owner in a really dumb way
-                string gpoSddl = gpoAcl.GetSecurityDescriptorSddlForm(AccessControlSections.Owner);
-                JObject parsedOwner = ParseSDDL.ParseSddlString(gpoSddl, SecurableObjectType.DirectoryServiceObject);
-                string gpoOwner = parsedOwner["Owner"].ToString();
-                gpoData.Add("Owner", gpoOwner);
+              // // Get the owner in a really dumb way
+              // string gpoSddl = gpoAcl.GetSecurityDescriptorSddlForm(AccessControlSections.Owner);
+              // JObject parsedOwner = ParseSDDL.ParseSddlString(gpoSddl, SecurableObjectType.DirectoryServiceObject);
+              // string gpoOwner = parsedOwner["Owner"].ToString();
+              // gpoData.Add("Owner", gpoOwner);
                 // make a JObject to put the stuff in
                 JObject gpoAclJObject = new JObject();;
 
-                //iterate over the aces in the acl
-                foreach (ActiveDirectoryAccessRule gpoAce in gpoAcl.GetAccessRules(true, true,
-                    typeof(System.Security.Principal.SecurityIdentifier)))
+                AccessControlSections sections = AccessControlSections.All;
+                string sddlString = gpoAcl.GetSecurityDescriptorSddlForm(sections);
+                JObject parsedSDDL = ParseSDDL.ParseSddlString(sddlString, SecurableObjectType.DirectoryServiceObject);
+                
+                foreach (KeyValuePair<string, JToken> thing in parsedSDDL)
                 {
-                    int aceInterestLevel = 1;
-                    ActiveDirectoryRights adRightsObj = gpoAce.ActiveDirectoryRights;
-
-
-                    // get the rights quick and dirty
-                    string adRights = gpoAce.ActiveDirectoryRights.ToString();
-                    // clean the commas out
-                    string cleanAdRights = adRights.Replace(", ", " ");
-                    // chuck them into an array
-                    string[] adRightsArray = cleanAdRights.Split(' ');
-                    List<string> adRightsList = adRightsArray.ToList();
-                    // handle extended rights
-                    if ((adRightsObj & ActiveDirectoryRights.ExtendedRight) != 0)
+                    if (thing.Key == "Owner")
                     {
-                        //Utility.DebugWrite("Fuck, I still have to deal with Extended Rights.");
-                        string extendedRightString = guidDict[Convert.ToString(gpoAce.ObjectType)];
-                        adRightsList.Add(extendedRightString);
-                        //Utility.DebugWrite("Extended Right " + extendedRightString + " found.");
+                        gpoAclJObject.Add("Owner", thing.Value.ToString());
+                        continue;
                     }
 
-                    // an array of interesting privs
-                    string[] intRightsArray = new string[]
+                    if (thing.Key == "Group")
                     {
-                        "WriteOwner", "GenericAll", "WriteProperty", "WriteDacl", "CreateChild", "DeleteChild", "Self",
-                        "DeleteTree", "Delete"
-                    };
-                    // if we see one of these, the ACE just got more interesting.
-                    foreach (string right in adRightsArray)
+                        gpoAclJObject.Add("Group", thing.Value);
+                        continue;
+                    }
+
+                    if (thing.Key == "DACL")
                     {
-                        if (intRightsArray.Contains(right))
+                        foreach (JProperty ace in thing.Value.Children())
                         {
-                            aceInterestLevel++;
+                            int aceInterestLevel = 1;
+                            bool interestingRightPresent = false;
+                            if (ace.Value["Rights"] != null)
+                            {
+                                string[] intRightsArray0 = new string[]
+                                {
+                                    "WRITE_OWNER", "CREATE_CHILD", "WRITE_PROPERTY", "WRITE_DAC", "SELF_WRITE", "CONTROL_ACCESS"
+                                };
+
+                                foreach (string right in intRightsArray0)
+                                {
+                                    if (ace.Value["Rights"].Contains(right))
+                                    {
+                                        interestingRightPresent = true;
+                                    }
+                                }
+                            }
+
+                            string trusteeSid = ace.Value["SID"].ToString();
+                            string[] boringSidEndings = new string[]
+                                {"-3-0", "-5-9", "5-18", "-512", "-519", "SY", "BA", "DA", "CO", "ED", "PA", "CG", "DD", "EA", "LA",};
+                            string[] interestingSidEndings = new string[]
+                                {"DU", "WD", "IU", "BU", "AN", "AU", "BG", "DC", "DG", "LG"};
+                            
+                            bool boringUserPresent = false;
+                            foreach (string boringSidEnding in boringSidEndings)
+                            {
+                                if (trusteeSid.EndsWith(boringSidEnding))
+                                {
+                                    boringUserPresent = true;
+                                    break;
+                                }
+                            }
+
+                            bool interestingUserPresent = false;
+                            foreach (string interestingSidEnding in interestingSidEndings)
+                            {
+                                if (trusteeSid.EndsWith(interestingSidEnding))
+                                {
+                                    interestingUserPresent = true;
+                                    break;
+                                }
+                            }
+
+                            if (interestingUserPresent && interestingRightPresent)
+                            {
+                                aceInterestLevel = 10;
+                            }
+                            else if (boringUserPresent)
+                            {
+                                aceInterestLevel = 0;
+                            }
+
+                            if (aceInterestLevel >= GlobalVar.IntLevelToShow)
+                            {
+                                // pass the whole thing on
+                                gpoAclJObject.Add(ace);
+                            }
                         }
                     }
 
-                    string trusteeSid = gpoAce.IdentityReference.ToString();
-                    // array of sid endings for the SIDs of default high-priv trustees.
-                    // this is extremely lazy but it will work for now.
-                    string[] boringSidEndings = new string[] {"-3-0", "-5-9", "5-18", "-512", "-519"};
-                    // if the last 4 chars of trusteeSid match an entry in boringSidEndings, reduce the interest level back to default.
-                    if (boringSidEndings.Contains(trusteeSid.Substring((trusteeSid.Length - 4), 4)))
-                    {
-                        aceInterestLevel = 0;
-                    }
-
-                    string trusteeName = GetUserFromSid(trusteeSid);
-                    string acType = gpoAce.AccessControlType.ToString();
-                    string trusteeNAcType = trusteeName + " - " + acType + " - " + trusteeSid;
-
-                    if (aceInterestLevel >= GlobalVar.IntLevelToShow)
-                    {
-                        // create a JObject of the new stuff we know 
-                        JObject aceToMerge = new JObject()
-                        {
-                            new JProperty(trusteeNAcType, new JArray(JArray.FromObject(adRightsArray)))
-                        };
-                        gpoAclJObject.Merge(aceToMerge, new JsonMergeSettings
-                        {
-                            MergeArrayHandling = MergeArrayHandling.Union
-                        });
-                    }
                 }
+                
 
                 //add the JObject to our blob of data about the gpo
                 if (gpoAclJObject.HasValues)
