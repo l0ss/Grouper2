@@ -54,3 +54,8 @@ At a high level Grouper2 does like this:
 
 Heaps. Have a look in the Issues for the repo and just start chewing I guess.
 If you want to discuss via Slack you can ping me (l0ss) on the BloodHound Slack, joinable at https://bloodhoundgang.herokuapp.com/.
+
+## Credits and Thanks
+
+SDDL parsing from https://github.com/zacateras/
+Thanks to @skorov8 for providing some useful registry key data.
