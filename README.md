@@ -80,5 +80,6 @@ If you want to discuss via Slack you can ping me (l0ss) on the BloodHound Slack,
 
 ## Credits and Thanks
 
+ - Much assistance and code cleanup from @liamosaur
  - SDDL parsing from https://github.com/zacateras/
  - Thanks to @skorov8 for providing some useful registry key data.
