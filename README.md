@@ -61,21 +61,17 @@ If you want to see the other options, do ```-h```.
 
 OK have a look at this:
 
-![A picture of some Grouper2 output](./G2-example1.png  | width = 300)
+![A picture of some Grouper2 output](./G2-example1.png)
 
 In the screenshot above we can see an "Assigned Application" policy that is still being pushed to computers, but the MSI file to install is missing, and the directory it's being installed from is writable by the current user. 
 
 If you created a hacked up MSI (e.g. with msfvenom) and then modified it to match the UIDs at the bottom of the picture, it would get executed on machines targeted by the GPO. Sweet!
 
-![A picture of some Grouper2 output](./G2-example2.png  | width = 300)
+![A picture of some Grouper2 output](./G2-example2.png)
 
 In this one you can see that someone's done something absolutely insane to the ACLS on the registry.
 
-One more example.
-
-![A picture of some Grouper2 output](./G2-example3.png | width = 300)
-
-
+You get the picture.
 
 ## What remains to be done?
 
