@@ -1,7 +1,7 @@
-# Grouper2
+![A picture of the Grouper2 banner](./G2-banner.jpg)
+
 C# rewrite of Grouper - way better than the original.
 
-![A picture of the Grouper2 banner](./G2-banner.png)
 
 ## What is it for? 
 
