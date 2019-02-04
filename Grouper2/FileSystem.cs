@@ -481,10 +481,23 @@ namespace Grouper2
 
         public static JObject InvestigateFileContents(string inString)
         {
-            string fileString = File.ReadAllText(inString).ToLower();
-            
-            // feed the whole thing through Utility.InvestigateString
-            JObject investigatedFileContents = Utility.InvestigateString(fileString);
+            string fileString;
+            JObject investigatedFileContents = new JObject();
+            try
+            {
+                fileString = File.ReadAllText(inString).ToLower();
+
+
+                // feed the whole thing through Utility.InvestigateString
+                investigatedFileContents = Utility.InvestigateString(fileString);
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                if (GlobalVar.DebugMode)
+                {
+                    Utility.DebugWrite(e.ToString());
+                }
+            }
             
             if (investigatedFileContents["InterestLevel"] != null)
             {
