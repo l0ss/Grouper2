@@ -400,28 +400,37 @@ public class GlobalVar
             Console.Error.WriteLine("\n" + gpoPaths.Count.ToString() + " GPOs to process.");
             Console.Error.WriteLine("\nStarting processing GPOs with " + maxThreads.ToString() + " threads.");
             
+            JObject taskErrors = new JObject();
+
             // Create a task for each GPO
             foreach (string gpoPath in gpoPaths)
             {
                 Task t = gpoFactory.StartNew(() =>
                 {
-                    JObject gpoFindings = ProcessGpo(gpoPath);
-                    if (gpoFindings != null)
+                    try
                     {
-                        if (gpoFindings.HasValues)
+                        JObject gpoFindings = ProcessGpo(gpoPath);
+                        if (gpoFindings != null)
                         {
-                            lock (grouper2Output)
+                            if (gpoFindings.HasValues)
                             {
-                                if (!(gpoPath.Contains("NTFRS")))
+                                lock (grouper2Output)
                                 {
-                                    grouper2Output.Add(("Current Policy - " + gpoPath), gpoFindings);
-                                }
-                                else
-                                {
-                                    grouper2Output.Add(gpoPath, gpoFindings);
+                                    if (!(gpoPath.Contains("NTFRS")))
+                                    {
+                                        grouper2Output.Add(("Current Policy - " + gpoPath), gpoFindings);
+                                    }
+                                    else
+                                    {
+                                        grouper2Output.Add(gpoPath, gpoFindings);
+                                    }
                                 }
                             }
                         }
+                    }
+                    catch (Exception e)
+                    {
+                        taskErrors.Add(gpoPath, e.ToString());
                     }
                 }, gpocts.Token);
                 gpoTasks.Add(t);
@@ -433,22 +442,30 @@ public class GlobalVar
             // create a little counter to provide status updates
             int totalGpoTasksCount = gpoTaskArray.Length;
             int incompleteTaskCount = gpoTaskArray.Length;
-            Console.WriteLine("");
-            while (incompleteTaskCount > 0)
+            int remainingTaskCount = gpoTaskArray.Length;
+            
+            while (remainingTaskCount > 0)
             {
                 Task[] incompleteTasks =
                     Array.FindAll(gpoTaskArray, element => element.Status != TaskStatus.RanToCompletion);
                 incompleteTaskCount = incompleteTasks.Length;
-            
-                int completeTaskCount = totalGpoTasksCount - incompleteTaskCount;
+                Task[] faultedTasks = Array.FindAll(gpoTaskArray,
+                    element => element.Status == TaskStatus.Faulted);
+                int faultedTaskCount = faultedTasks.Length;
+                int completeTaskCount = totalGpoTasksCount - incompleteTaskCount - faultedTaskCount;
                 int percentage = (int) Math.Round((double) (100 * completeTaskCount) / totalGpoTasksCount);
                 string percentageString = percentage.ToString();
                 Console.Error.Write("");
             
                 Console.Error.Write("\r" + completeTaskCount.ToString() + "/" + totalGpoTasksCount.ToString() +
-                              " GPOs processed. " + percentageString + "% complete.");
-            }
+                              " GPOs processed. " + percentageString + "% complete. ");
+                if (faultedTaskCount > 0)
+                {
+                    Console.Error.Write(faultedTaskCount.ToString() + " GPOs failed to process.");
+                }
 
+                remainingTaskCount = incompleteTaskCount - faultedTaskCount;
+            }
 
             // make double sure tasks all finished
             Task.WaitAll(gpoTasks.ToArray());
@@ -465,6 +482,11 @@ public class GlobalVar
                 }
             }
 
+            if (GlobalVar.DebugMode)
+            {
+                Console.Error.WriteLine("Errors in processing GPOs:");
+                Console.Error.WriteLine(taskErrors.ToString());
+            }
 
             // Final output is finally happening finally here:
 
