@@ -5,6 +5,7 @@ namespace Grouper2
 {
     public partial class AssessGpp
     {
+        // ReSharper disable once UnusedMember.Local
         private JObject GetAssessedDrives(JObject gppCategory)
         {   
             JObject assessedGppDrives = new JObject();

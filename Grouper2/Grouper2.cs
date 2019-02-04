@@ -14,7 +14,6 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.DirectoryServices.ActiveDirectory;
 using System.IO;
 using System.Linq;
@@ -529,7 +528,7 @@ public class GlobalVar
                 }
             }
 
-            Console.WriteLine("\n\nPress any key to exit.");
+            Console.Error.WriteLine("\n\nDone! Press any key to exit.");
             // wait for 'anykey'
             Console.ReadKey();
         }

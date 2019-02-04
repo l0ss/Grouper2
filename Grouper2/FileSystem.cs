@@ -1,9 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Security;
 using System.Security.AccessControl;
-using System.Security.Permissions;
 using Newtonsoft.Json.Linq;
 
 namespace Grouper2
@@ -149,6 +147,7 @@ namespace Grouper2
                     // get the root of the path
                     try
                     {
+                        // ReSharper disable once UnusedVariable
                         string pathRoot = Path.GetPathRoot(dirPath);
                     }
                     catch (ArgumentException e)
