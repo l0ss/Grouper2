@@ -73,6 +73,7 @@ namespace Grouper2
         {
             //define what a heading looks like
             Regex headingRegex = new Regex(@"^\[(\w+\s?)+\]$");
+
             string[] infContentArray = File.ReadAllLines(infFile);
 
             string infContentString = String.Join(Environment.NewLine, infContentArray);

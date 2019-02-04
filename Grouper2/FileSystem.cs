@@ -487,7 +487,6 @@ namespace Grouper2
             {
                 fileString = File.ReadAllText(inString).ToLower();
 
-
                 // feed the whole thing through Utility.InvestigateString
                 investigatedFileContents = Utility.InvestigateString(fileString);
             }

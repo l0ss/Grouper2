@@ -774,7 +774,18 @@ public class GlobalVar
             foreach (string infFile in gpttmplInfFiles)
             {
                 //parse the inf file into a manageable format
-                JObject parsedInfFile = Parsers.ParseInf(infFile);
+                JObject parsedInfFile = new JObject();
+                try
+                {
+                    parsedInfFile = Parsers.ParseInf(infFile);
+                }
+                catch (UnauthorizedAccessException e)
+                {
+                    if (GlobalVar.DebugMode)
+                    {
+                        Utility.DebugWrite(e.ToString());
+                    }
+                }
                 //send the inf file to be assessed
                 JObject assessedGpTmpl = AssessHandlers.AssessGptmpl(parsedInfFile);
 
@@ -851,7 +862,20 @@ public class GlobalVar
             JObject processedAases = new JObject();
             foreach (string aasFile in aasFiles)
             {
-                JObject parsedAasFile = Parsers.ParseAasFile(aasFile);
+                JObject parsedAasFile = new JObject();
+                try
+                {
+                    parsedAasFile = Parsers.ParseAasFile(aasFile);
+                }
+                catch (UnauthorizedAccessException e)
+                {
+                    if (GlobalVar.DebugMode)
+                    {
+                        Utility.DebugWrite(e.ToString());
+                    }
+                    continue;
+                }
+
                 JObject assessedAasFile = AasAssess.AssessAasFile(parsedAasFile);
                 if (assessedAasFile != null && assessedAasFile.HasValues)
                 {
