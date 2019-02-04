@@ -72,7 +72,7 @@ namespace Grouper2
             return offset;
         }
 
-        private bool IsValidPath(string path, bool allowRelativePaths = false)
+        public static bool IsValidPath(string path, bool allowRelativePaths = false)
         {
             // lifted from Dao Seeker on stackoverflow.com https://stackoverflow.com/questions/6198392/check-whether-a-path-is-valid
             bool isValid = true;
@@ -108,7 +108,10 @@ namespace Grouper2
             foreach (string stringBit in stringBits)
             {
                 string cleanedBit = stringBit.Trim('\'', '\"');
-
+                if (IsValidPath(cleanedBit, false))
+                {
+                    foundFilePaths.Add(cleanedBit);
+                }
             }
 
             return foundFilePaths;
@@ -134,37 +137,26 @@ namespace Grouper2
                     interestLevel = 4;
                 }
             }
-            
-            // TODO for each of these I need to separate out the interesting part of the string from the rest of it.
 
-            if (inString.ToLower().Contains("\\\\"))
+            List<string> foundFilePaths = FindFilePathsInString(inString);
+
+            JArray investigatedPaths = new JArray();
+
+            foreach (string foundFilePath in foundFilePaths)
             {
-                interestingWordsFound.Add("UNC path?");
-                //Utility.DebugWrite("Think I found a UNC path: " + inString);
-                //TODO do something here to investigate the path.
-                if (interestLevel <= 2)
+                JObject investigatedPath = FileSystem.InvestigatePath(foundFilePath);
+
+                int pathInterestLevel = Int32.Parse(investigatedPath["InterestLevel"].ToString());
+
+                if (pathInterestLevel >= GlobalVar.IntLevelToShow)
                 {
-                    interestLevel = 2;
+                    investigatedPaths.Add(investigatedPath);
                 }
             }
 
-            if (inString.ToLower().Contains(":\\"))
+            if (investigatedPaths.Count > 0)
             {
-                interestingWordsFound.Add("Mapped drive letter?");
-                //Utility.DebugWrite("Maybe this is a path with a drive letter?");
-                if (interestLevel <= 2)
-                {
-                    interestLevel = 2;
-                }
-            }
-
-            if (inString.ToLower().Contains("://"))
-            {
-                interestingWordsFound.Add("URI?");
-                if (interestLevel <= 2)
-                {
-                    interestLevel = 2;
-                }
+                investigationResults.Add("Paths", investigatedPaths);
             }
 
             if (interestingWordsFound.Count > 0)

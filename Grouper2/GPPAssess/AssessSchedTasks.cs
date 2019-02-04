@@ -155,7 +155,7 @@ namespace Grouper2
 
                     if (GlobalVar.OnlineChecks)
                     {
-                        attachment = FileSystem.InvestigatePath(attachmentString);
+                        attachment = Utility.InvestigateString(attachmentString);
                         if (attachment["InterestLevel"] != null)
                         {
                             int attachmentInterest = (int) attachment["InterestLevel"];

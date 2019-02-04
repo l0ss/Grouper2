@@ -19,30 +19,49 @@ internal static partial class AssessInf
 
         // basically with this we literally only check if they've deviated from defaults, except on TicketValidateClient.
 
-        if (kerbPolicy["MaxTicketAge"].ToString() != "10")
+        if (kerbPolicy["MaxTicketAge"] != null)
         {
-            interestLevel = 1;
-            assessedKerbPolicy.Add("Maximum Ticket Age", kerbPolicy["MaxTicketAge"].ToString() + " hours");
+            if (kerbPolicy["MaxTicketAge"].ToString() != "10")
+            {
+                interestLevel = 1;
+                assessedKerbPolicy.Add("Maximum Ticket Age", kerbPolicy["MaxTicketAge"].ToString() + " hours");
+            }
         }
-        if (kerbPolicy["MaxRenewAge"].ToString() != "7")
+
+        if (kerbPolicy["MaxRenewAge"] != null)
         {
-            interestLevel = 1;
-            assessedKerbPolicy.Add("Maximum lifetime for user ticket renewal", kerbPolicy["MaxRenewAge"].ToString() + " days");
+            if (kerbPolicy["MaxRenewAge"].ToString() != "7")
+            {
+                interestLevel = 1;
+                assessedKerbPolicy.Add("Maximum lifetime for user ticket renewal", kerbPolicy["MaxRenewAge"].ToString() + " days");
+            }
         }
-        if (kerbPolicy["MaxServiceAge"].ToString() != "600")
+
+        if (kerbPolicy["MaxServiceAge"] != null)
         {
-            interestLevel = 1;
-            assessedKerbPolicy.Add("Maximum lifetime for service ticket", kerbPolicy["MaxServiceAge"].ToString() + " minutes");
+            if (kerbPolicy["MaxServiceAge"].ToString() != "600")
+            {
+                interestLevel = 1;
+                assessedKerbPolicy.Add("Maximum lifetime for service ticket", kerbPolicy["MaxServiceAge"].ToString() + " minutes");
+            }
         }
-        if (kerbPolicy["MaxClockSkew"].ToString() != "5")
+
+        if (kerbPolicy["MaxClockSkew"] != null)
         {
-            interestLevel = 1;
-            assessedKerbPolicy.Add("Maximum clock skew", kerbPolicy["MaxClockSkew"].ToString() + " minutes");
+            if (kerbPolicy["MaxClockSkew"].ToString() != "5")
+            {
+                interestLevel = 1;
+                assessedKerbPolicy.Add("Maximum clock skew", kerbPolicy["MaxClockSkew"].ToString() + " minutes");
+            }
         }
-        if (kerbPolicy["TicketValidateClient"].ToString() != "1")
+
+        if (kerbPolicy["TicketValidateClient"] != null)
         {
-            interestLevel = 2;
-            assessedKerbPolicy.Add("Enforce user logon restrictions", "False");
+            if (kerbPolicy["TicketValidateClient"].ToString() != "1")
+            {
+                interestLevel = 2;
+                assessedKerbPolicy.Add("Enforce user logon restrictions", "False");
+            }
         }
 
         if (interestLevel <= GlobalVar.IntLevelToShow)

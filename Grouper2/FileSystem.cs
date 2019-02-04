@@ -215,7 +215,7 @@ namespace Grouper2
             
             // put all the values we just collected into a jobject for reporting and calculate how interesting it is.
             JObject filePathAssessment = new JObject();
-            int interestLevel = 0;
+            int interestLevel = 1;
             filePathAssessment.Add("Path assessed", inPath);
             if (isFilePath)
             {
