@@ -504,6 +504,7 @@ public class GlobalVar
             else
             {
                 Console.WriteLine(grouper2Output);
+                Console.Error.WriteLine("If you find yourself thinking 'wtf this is very ugly and hard to read', consider trying the -g argument.");
             }
             
 
