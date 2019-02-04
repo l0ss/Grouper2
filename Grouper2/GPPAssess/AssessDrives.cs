@@ -54,14 +54,17 @@ namespace Grouper2
             }
 
             string gppDriveLetter = "";
-            if (gppDrive["Properties"]["@useLetter"].ToString() == "1")
+            if (gppDrive["Properties"]["@useLetter"] != null)
             {
-                gppDriveLetter = Utility.GetSafeString(gppDrive["Properties"], "@letter");
-            }
-            else if (gppDrive["Properties"]["@useLetter"].ToString() == "0")
-            {
-                gppDriveLetter = "First letter available, starting at " +
-                                 Utility.GetSafeString(gppDrive["Properties"], "@letter");
+                if (gppDrive["Properties"]["@useLetter"].ToString() == "1")
+                {
+                    gppDriveLetter = Utility.GetSafeString(gppDrive["Properties"], "@letter");
+                }
+                else if (gppDrive["Properties"]["@useLetter"].ToString() == "0")
+                {
+                    gppDriveLetter = "First letter available, starting at " +
+                                     Utility.GetSafeString(gppDrive["Properties"], "@letter");
+                }
             }
 
             string gppDriveLabel = Utility.GetSafeString(gppDrive["Properties"], "@label");
