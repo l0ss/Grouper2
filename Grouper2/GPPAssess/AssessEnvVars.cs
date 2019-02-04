@@ -28,7 +28,7 @@ namespace Grouper2
             else
             {
                 JProperty assessedGppEv = AssessGppEv(gppCategory["EnvironmentVariable"]);
-                assessedGppEvs.Add(assessedGppEv["uid"].ToString(), assessedGppEv);
+                assessedGppEvs.Add(assessedGppEv);
             }
 
             return assessedGppEvs;
@@ -44,6 +44,4 @@ namespace Grouper2
             return new JProperty(Utility.GetSafeString(gppEv, "@uid"), assessedGppEv);
         }
     }
-
-    
 }
