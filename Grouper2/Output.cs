@@ -18,7 +18,7 @@ namespace Grouper2
  `Y8bo,,,o88o 888b *88bo,*888,_ _,88P88    .d888   888o      888oo,__  888b *88bo,d88 _,oo, 
    `'YMUP*YMM MMMM   *W*   *YMMMMMP*  *YmmMMMM**   YMMMb     ****YUMMM MMMM   *W* MMMUP**^^ 
                                                             Now even Grouperer.              
-                                                            github.com/mikeloss/Grouper2    
+                                                            github.com/l0ss/Grouper2    
                                                             @mikeloss                          ";
             string[] barfLines = barf.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
 
