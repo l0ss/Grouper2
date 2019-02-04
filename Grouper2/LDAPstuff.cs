@@ -160,6 +160,12 @@ class LDAPstuff
                 string gpoDispName = gpoDe.Properties["displayName"].Value.ToString();
                 gpoData.Add("Display Name", gpoDispName);
                 string gpoUid = gpoDe.Properties["name"].Value.ToString();
+                // this is to catch duplicate UIDs caused by Default Domain Policy and Domain Controller Policy having 'well known guids'
+                if (gposData[gpoUid] != null)
+                {
+                    Utility.DebugWrite("\nI think you're in a multi-domain environment cos I just saw two GPOs with the same GUID. You should be careful not to miss stuff in the Default Domain Policy and Default Domain Controller Policy.");
+                    continue;
+                }
                 gpoData.Add("UID", gpoUid);
                 string gpoDn = gpoDe.Properties["distinguishedName"].Value.ToString();
                 gpoData.Add("Distinguished Name", gpoDn);
@@ -292,8 +298,7 @@ class LDAPstuff
                 {
                     gpoData.Add("ACLs", gpoAclJObject);
                 }
-
-                // then add all of the above to the big blob of data about all gpos
+                
                 gposData.Add(gpoUid, gpoData);
             }
         

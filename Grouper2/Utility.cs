@@ -72,6 +72,48 @@ namespace Grouper2
             return offset;
         }
 
+        private bool IsValidPath(string path, bool allowRelativePaths = false)
+        {
+            // lifted from Dao Seeker on stackoverflow.com https://stackoverflow.com/questions/6198392/check-whether-a-path-is-valid
+            bool isValid = true;
+
+            try
+            {
+                string fullPath = Path.GetFullPath(path);
+
+                if (allowRelativePaths)
+                {
+                    isValid = Path.IsPathRooted(path);
+                }
+                else
+                {
+                    string root = Path.GetPathRoot(path);
+                    isValid = string.IsNullOrEmpty(root.Trim(new char[] { '\\', '/' })) == false;
+                }
+            }
+            catch (Exception ex)
+            {
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        public static List<string> FindFilePathsInString(string inString)
+        {
+            List<string> foundFilePaths = new List<string>();
+
+            string[] stringBits = inString.Split(' ');
+
+            foreach (string stringBit in stringBits)
+            {
+                string cleanedBit = stringBit.Trim('\'', '\"');
+
+            }
+
+            return foundFilePaths;
+        }
+
         public static JObject InvestigateString(string inString)
         // general purpose method for returning some information about why a string might be interesting.
         // TODO expand/finish this
