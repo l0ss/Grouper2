@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace Grouper2
+namespace Grouper2.GPPAssess
 {
     public partial class AssessGpp
     {
@@ -41,11 +41,13 @@ namespace Grouper2
         {
             int interestLevel = 1;
 
-            JObject assessedGppNetShare = new JObject();
+            JObject assessedGppNetShare = new JObject
+            {
+                {"Name", Utility.GetSafeString(netShare, "@name")},
+                {"Changed", Utility.GetSafeString(netShare, "@changed")},
+                {"Action", Utility.GetActionString(netShare["Properties"]["@action"].ToString())}
+            };
 
-            assessedGppNetShare.Add("Name", Utility.GetSafeString(netShare, "@name"));
-            assessedGppNetShare.Add("Changed", Utility.GetSafeString(netShare, "@changed"));
-            assessedGppNetShare.Add("Action", Utility.GetActionString(netShare["Properties"]["@action"].ToString()));
             if (netShare["Properties"]["@path"] != null)
             {
                 assessedGppNetShare.Add("Path", FileSystem.InvestigatePath(netShare["Properties"]["@path"].ToString()));

@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Grouper2;
 
-namespace Sddl.Parser
+namespace Grouper2.SddlParser
 {
     public class Ace
     {
@@ -401,8 +400,8 @@ namespace Sddl.Parser
             if (Rights != null && Rights.Any())
             {
                 sb.AppendLineEnv($"{nameof(Rights)}:");
-                for (int i = 0; i < Rights.Length; ++i)
-                    sb.AppendIndentEnv(Rights[i]);
+                foreach (var t in Rights)
+                    sb.AppendIndentEnv(t);
             }
 
             if (ObjectGuid != null)

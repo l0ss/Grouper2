@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace Sddl.Parser
+namespace Grouper2.SddlParser
 {
     internal static class Match
     {
@@ -12,7 +12,7 @@ namespace Sddl.Parser
             reminder = SubstituteEmptyWithNull(input);
             while (reminder != null)
             {
-                string label = Match.OneByPrefix(reminder, tokensToLabels, out reminder);
+                string label = OneByPrefix(reminder, tokensToLabels, out reminder);
 
                 if (label != null)
                     labels.AddLast(label);
@@ -30,7 +30,7 @@ namespace Sddl.Parser
             reminder = mask;
             while (reminder > 0)
             {
-                string label = Match.OneByUint(reminder, tokensToLabels, out reminder);
+                string label = OneByUint(reminder, tokensToLabels, out reminder);
 
                 if (label != null)
                     labels.AddLast(label);

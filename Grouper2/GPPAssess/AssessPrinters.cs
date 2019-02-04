@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace Grouper2
+namespace Grouper2.GPPAssess
 {
     public partial class AssessGpp
     {
@@ -84,11 +84,13 @@ namespace Grouper2
 
             if (interestLevel >= GlobalVar.IntLevelToShow)
             {
-                JObject assessedGppPrinter = new JObject();
-                assessedGppPrinter.Add("Name", gppPrinterName);
-                assessedGppPrinter.Add("Changed", gppPrinterChanged);
-                assessedGppPrinter.Add("Action", gppPrinterAction);
-                assessedGppPrinter.Add("Username", gppPrinterUsername);
+                JObject assessedGppPrinter = new JObject
+                {
+                    {"Name", gppPrinterName},
+                    {"Changed", gppPrinterChanged},
+                    {"Action", gppPrinterAction},
+                    {"Username", gppPrinterUsername}
+                };
                 if (gppPrintercPassword.Length > 0)
                 {
                     assessedGppPrinter.Add("cPassword", gppPrintercPassword);

@@ -1,4 +1,4 @@
-namespace Sddl.Parser
+namespace Grouper2.SddlParser
 {
     /// <summary>
     /// A list of securable object types in Windows is defined here https://msdn.microsoft.com/en-us/library/aa379557(VS.85).aspx.

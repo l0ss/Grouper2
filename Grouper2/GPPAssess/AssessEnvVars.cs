@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
-using System.Security.Cryptography;
 
-namespace Grouper2
+namespace Grouper2.GPPAssess
 {
     public partial class AssessGpp
     {
@@ -37,11 +36,13 @@ namespace Grouper2
 
         static JProperty AssessGppEv(JToken gppEv)
         {
-            JObject assessedGppEv = new JObject();
-            assessedGppEv.Add("Name", Utility.GetSafeString(gppEv, "@name"));
-            assessedGppEv.Add("Status", Utility.GetSafeString(gppEv, "@status"));
-            assessedGppEv.Add("Changed", Utility.GetSafeString(gppEv, "@changed"));
-            assessedGppEv.Add("Action", Utility.GetActionString(gppEv["Properties"]["@action"].ToString()));
+            JObject assessedGppEv = new JObject
+            {
+                {"Name", Utility.GetSafeString(gppEv, "@name")},
+                {"Status", Utility.GetSafeString(gppEv, "@status")},
+                {"Changed", Utility.GetSafeString(gppEv, "@changed")},
+                {"Action", Utility.GetActionString(gppEv["Properties"]["@action"].ToString())}
+            };
             return new JProperty(Utility.GetSafeString(gppEv, "@uid"), assessedGppEv);
         }
     }

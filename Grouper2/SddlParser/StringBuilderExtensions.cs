@@ -1,12 +1,12 @@
 using System;
 using System.Text;
 
-namespace Sddl.Parser
+namespace Grouper2.SddlParser
 {
     internal static class StringBuilderExtensions
     {
-        private readonly static string IndentString = "  ";
-        private readonly static string IndentNewLine = $"{Environment.NewLine}{IndentString}";
+        private static readonly string IndentString = "  ";
+        private static readonly string IndentNewLine = $"{Environment.NewLine}{IndentString}";
 
         public static StringBuilder AppendIndentEnv(this StringBuilder sb, string value)
         {

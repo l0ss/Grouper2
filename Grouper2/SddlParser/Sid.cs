@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using Grouper2;
 
-namespace Sddl.Parser
+namespace Grouper2.SddlParser
 {
     public class Sid
     {
@@ -200,7 +199,7 @@ namespace Sddl.Parser
 
         public override string ToString()
         {
-            return Alias.ToString();
+            return Alias;
         }
     }
 }

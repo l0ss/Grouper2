@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace Grouper2
+namespace Grouper2.GPPAssess
 {
     public partial class AssessGpp
     {
@@ -189,9 +189,11 @@ namespace Grouper2
 
         private JObject GetAssessedGroupMember(JToken member)
         {
-            JObject assessedMember = new JObject();
-            assessedMember.Add("Name", Utility.GetSafeString(member, "@name"));
-            assessedMember.Add("Action", Utility.GetSafeString(member, "@action"));
+            JObject assessedMember = new JObject
+            {
+                {"Name", Utility.GetSafeString(member, "@name")},
+                {"Action", Utility.GetSafeString(member, "@action")}
+            };
             string memberSid = Utility.GetSafeString(member, "@sid");
             if (memberSid.Length > 0)
             {

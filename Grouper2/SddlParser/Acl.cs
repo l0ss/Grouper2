@@ -1,11 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.AccessControl;
 using System.Text;
 using Newtonsoft.Json.Linq;
 
-namespace Sddl.Parser
+namespace Grouper2.SddlParser
 {
     public class Acl
     {
@@ -106,7 +104,7 @@ namespace Sddl.Parser
                     
                     string aceSidAlias = ace.AceSid.Alias;
                     string aceSidRaw = ace.AceSid.Raw;
-                    string aceType = "";
+                    string aceType;
                     if (ace.AceType == "ACCESS_ALLOWED")
                     {
                         aceType = "Allow";

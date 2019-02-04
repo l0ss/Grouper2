@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Security.AccessControl;
 using System.Security.Principal;
-using System.Text;
 
 namespace Grouper2
 {

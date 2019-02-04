@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Security.Policy;
-using System.Security.Principal;
-using System.Text;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 
-namespace Grouper2
+namespace Grouper2.ScriptsIniAssess
 {
     class AssessScriptsIni
     {

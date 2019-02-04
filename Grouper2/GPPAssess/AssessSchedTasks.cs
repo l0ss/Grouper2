@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 
-namespace Grouper2
+namespace Grouper2.GPPAssess
 {
     public partial class AssessGpp
     {
@@ -13,11 +13,7 @@ namespace Grouper2
             //Utility.DebugWrite(gppCategory.ToString());
             //Console.WriteLine("");
 
-            List<string> schedTaskTypes = new List<string>();
-            schedTaskTypes.Add("Task");
-            schedTaskTypes.Add("TaskV2");
-            schedTaskTypes.Add("ImmediateTask");
-            schedTaskTypes.Add("ImmediateTaskV2");
+            List<string> schedTaskTypes = new List<string> {"Task", "TaskV2", "ImmediateTask", "ImmediateTaskV2"};
 
             foreach (string schedTaskType in schedTaskTypes)
             {
@@ -57,12 +53,14 @@ namespace Grouper2
         {
             int interestLevel = 4;
 
-            JObject assessedScheduledTask = new JObject();
+            JObject assessedScheduledTask = new JObject
+            {
+                {"Name", scheduledTask["@name"].ToString()},
+                {"UID", scheduledTask["@uid"].ToString()},
+                {"Type", schedTaskType},
+                {"Changed", scheduledTask["@changed"].ToString()}
+            };
 
-            assessedScheduledTask.Add("Name", scheduledTask["@name"].ToString());
-            assessedScheduledTask.Add("UID", scheduledTask["@uid"].ToString());
-            assessedScheduledTask.Add("Type", schedTaskType);
-            assessedScheduledTask.Add("Changed", scheduledTask["@changed"].ToString());
             if (scheduledTask["Properties"]["@runAs"] != null)
             {
                 assessedScheduledTask.Add("Run As", Utility.GetSafeString(scheduledTask["Properties"], "@runAs"));

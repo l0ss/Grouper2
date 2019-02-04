@@ -3,7 +3,6 @@ using System.Text.RegularExpressions;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Mime;
 using System.Text;
 using Newtonsoft.Json.Linq;
 using System.Xml;
@@ -109,7 +108,7 @@ namespace Grouper2
                     sectionSlices.Add(sectionHeading, sectionFinalLine);
                     fuck++;
                 }
-                catch (System.ArgumentOutOfRangeException)
+                catch (ArgumentOutOfRangeException)
                 {
                     //Utility.DebugWrite(e.ToString());
                     int sectionHeading = headingLines[fuck];
@@ -232,7 +231,7 @@ namespace Grouper2
             return parsedXmlFileToJson;
         }
 
-        public static JObject ParseAASFile(string aasFile)
+        public static JObject ParseAasFile(string aasFile)
         {
             byte[] aasBytes = File.ReadAllBytes(aasFile);
             string aasString = File.ReadAllText(aasFile);
@@ -268,7 +267,7 @@ namespace Grouper2
             // then actually get the thing.
             Array.Copy(aasBytes, 100, prodNameBytes, 0, (prodNameLength - 1));
 
-            string productName = System.Text.Encoding.UTF8.GetString(prodNameBytes, 0, prodNameBytes.Length);
+            string productName = Encoding.UTF8.GetString(prodNameBytes, 0, prodNameBytes.Length);
 
             // file name starts 2 bytes after product name
             int fileNameOffset = 100 + prodNameLength + 1;
@@ -287,7 +286,7 @@ namespace Grouper2
             // then actually get the thing.
             Array.Copy(aasBytes, fileNameOffset, fileNameBytes, 0, fileNameLength);
 
-            string fileName = System.Text.Encoding.UTF8.GetString(fileNameBytes, 0, fileNameBytes.Length);
+            string fileName = Encoding.UTF8.GetString(fileNameBytes, 0, fileNameBytes.Length);
 
             byte[] upgradeCodeBytes = Encoding.UTF8.GetBytes(upgradeCode);
 
@@ -317,7 +316,7 @@ namespace Grouper2
 
             byte[] filePathBytes = new byte[filePathLength - 2];
             Array.Copy(aasBytes, filePathOffset, filePathBytes, 0, filePathLength - 2);
-            string filePath = System.Text.Encoding.UTF8.GetString(filePathBytes, 0, filePathBytes.Length);
+            string filePath = Encoding.UTF8.GetString(filePathBytes, 0, filePathBytes.Length);
 
             string msiPath = Path.Combine(filePath, fileName);
 

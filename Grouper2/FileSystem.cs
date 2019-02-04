@@ -82,21 +82,21 @@ namespace Grouper2
             if (isFilePath)
             {
                 // check if the file exists
-                fileExists = FileSystem.DoesFileExist(inPath);
+                fileExists = DoesFileExist(inPath);
 
                 if (fileExists)
                 {
                     // if it does, the parent Dir must exist.
                     dirExists = true;
                     // check if we can read it
-                    fileReadable = FileSystem.CanIRead(inPath);
+                    fileReadable = CanIRead(inPath);
                     // check if we can write it
-                    fileWritable = FileSystem.CanIWrite(inPath);
+                    fileWritable = CanIWrite(inPath);
                     // see what the file extension is and if it's interesting
                     fileExt = Path.GetExtension(inPath);
                     foreach (string intExt in interestingFileExts)
                     {
-                        if ((fileExt.ToLower().Trim('.')) == (intExt.ToString().ToLower()))
+                        if ((fileExt.ToLower().Trim('.')) == (intExt.ToLower()))
                         {
                             extIsInteresting = true;
                         }
@@ -106,7 +106,7 @@ namespace Grouper2
                     if (fileReadable)
                     {
                         // make sure the file isn't massive so we don't waste ages grepping whole disk images over the network
-                        long fileSize = new System.IO.FileInfo(inPath).Length;
+                        long fileSize = new FileInfo(inPath).Length;
 
                         if (fileSize < 1048576) // 1MB for now. Can tune if too slow.
                         {
@@ -126,17 +126,17 @@ namespace Grouper2
 
             if (isDirPath)
             {
-                dirExists = FileSystem.DoesDirExist(inPath);
+                dirExists = DoesDirExist(inPath);
             }
             else if (!isDirPath && !fileExists)
             {
-                dirExists = FileSystem.DoesDirExist(dirPath);
+                dirExists = DoesDirExist(dirPath);
             }
 
             if (dirExists)
             {
                 dirDacls = Utility.GetFileDaclJObject(dirPath);
-                dirWritable = FileSystem.CanIWrite(dirPath);
+                dirWritable = CanIWrite(dirPath);
             }
             // if the dir doesn't exist, iterate up the file path checking if any exist and if we can write to any of them.
             if (!dirExists)
@@ -164,9 +164,9 @@ namespace Grouper2
 
                     try
                     {
-                        if (FileSystem.GetParentDirPath(dirPath) != null)
+                        if (GetParentDirPath(dirPath) != null)
                         {
-                            dirPathParent = FileSystem.GetParentDirPath(dirPath);
+                            dirPathParent = GetParentDirPath(dirPath);
                         }
                     }
                     catch (ArgumentException e)
@@ -182,33 +182,28 @@ namespace Grouper2
                     while (dirPathParent != null)
                     {
                         // check if the parent dir exists
-                        parentDirExists = FileSystem.DoesDirExist(dirPathParent);
+                        parentDirExists = DoesDirExist(dirPathParent);
                         // if it does
                         if (parentDirExists)
                         {
                             // get the dir dacls
                             parentDirDacls = Utility.GetFileDaclJObject(dirPathParent);
                             // check if it's writable
-                            parentDirWritable = FileSystem.CanIWrite(dirPathParent);
+                            parentDirWritable = CanIWrite(dirPathParent);
                             if (parentDirWritable)
                             {
                                 writableParentDir = dirPathParent;
-                                break;
                             }
-                            else
-                            {
-                                break;
-                            }
+
+                            break;
                         }
-                        else
+
+                        //prepare for next iteration by aiming at the parent dir
+                        if (GetParentDirPath(dirPathParent) != null)
                         {
-                            //prepare for next iteration by aiming at the parent dir
-                            if (FileSystem.GetParentDirPath(dirPathParent) != null)
-                            {
-                                dirPathParent = FileSystem.GetParentDirPath(dirPathParent);
-                            }
-                            else break;
+                            dirPathParent = GetParentDirPath(dirPathParent);
                         }
+                        else break;
                     }
                 }
             }
@@ -333,7 +328,7 @@ namespace Grouper2
             {
                 fileExists = File.Exists(inPath);
             }
-            catch (System.ArgumentException)
+            catch (ArgumentException)
             {
                 if (GlobalVar.DebugMode)
                 {
@@ -355,7 +350,7 @@ namespace Grouper2
             {
                 dirExists = Directory.Exists(inPath);
             }
-            catch (System.ArgumentException)
+            catch (ArgumentException)
             {
                 Utility.DebugWrite("Checked if directory " + inPath + " exists but it doesn't seem to be a valid file path.");
             }
@@ -375,14 +370,14 @@ namespace Grouper2
                 canRead = stream.CanRead;
                 stream.Close();
             }
-            catch (System.UnauthorizedAccessException)
+            catch (UnauthorizedAccessException)
             {
                 if (GlobalVar.DebugMode)
                 {
                     Utility.DebugWrite("Tested read perms for " + inPath + " and couldn't read.");
                 }
             }
-            catch (System.ArgumentException)
+            catch (ArgumentException)
             {
                 if (GlobalVar.DebugMode)
                 {
@@ -405,8 +400,7 @@ namespace Grouper2
             
             CurrentUserSecurity currentUserSecurity = new CurrentUserSecurity();
 
-            FileSystemRights[] fsRights = new[]
-            {
+            FileSystemRights[] fsRights = {
                 FileSystemRights.Write,
                 FileSystemRights.Modify,
                 FileSystemRights.FullControl,
@@ -428,14 +422,12 @@ namespace Grouper2
                         DirectoryInfo dirInfo = new DirectoryInfo(inPath);
                         return currentUserSecurity.HasAccess(dirInfo, fsRight);
                     }
-                    else
-                    {
-                        FileInfo fileInfo = new FileInfo(inPath);
-                        return currentUserSecurity.HasAccess(fileInfo, fsRight);
-                    }
+
+                    FileInfo fileInfo = new FileInfo(inPath);
+                    return currentUserSecurity.HasAccess(fileInfo, fsRight);
                 }
             }
-            catch (System.IO.FileNotFoundException e)
+            catch (FileNotFoundException)
             {
                 return false;
             }

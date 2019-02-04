@@ -1,7 +1,6 @@
-﻿using System.IO;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 
-namespace Grouper2
+namespace Grouper2.GPPAssess
 {
     public partial class AssessGpp
     {
@@ -80,13 +79,15 @@ namespace Grouper2
 
             if (interestLevel >= GlobalVar.IntLevelToShow)
             {
-                JObject assessedGppDrive = new JObject();
-                assessedGppDrive.Add("Name", gppDriveName);
-                assessedGppDrive.Add("Action", gppDriveAction);
-                assessedGppDrive.Add("Changed", gppDriveChanged);
-                assessedGppDrive.Add("Path", gppDrivePath);
-                assessedGppDrive.Add("Drive Letter", gppDriveLetter);
-                assessedGppDrive.Add("Label", gppDriveLabel);
+                JObject assessedGppDrive = new JObject
+                {
+                    {"Name", gppDriveName},
+                    {"Action", gppDriveAction},
+                    {"Changed", gppDriveChanged},
+                    {"Path", gppDrivePath},
+                    {"Drive Letter", gppDriveLetter},
+                    {"Label", gppDriveLabel}
+                };
                 if (gppDrivecPassword.Length > 0)
                 {
                     assessedGppDrive.Add("Username", gppDriveUserName);

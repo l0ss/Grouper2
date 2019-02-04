@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.DirectoryServices;
 using System.Linq;
-using System.Text;
 using Alba.CsConsoleFormat;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Grouper2
 {
     class Output
     {
-        static public Document GetG2BannerDocument()
+        public static Document GetG2BannerDocument()
         {
             Document outputDocument = new Document();
             string barf = @"  .,-:::::/  :::::::..       ...      ...    :::::::::::::. .,::::::  :::::::..     .:::.   
@@ -45,13 +42,12 @@ namespace Grouper2
             return outputDocument;
         }
 
-        static public Document GetAssessedGPOOutput (KeyValuePair<string, JToken> inputKvp)
+        public static Document GetAssessedGpoOutput (KeyValuePair<string, JToken> inputKvp)
         {
             JToken gpo = inputKvp.Value;
 
             ConsoleColor displayNameColor = ConsoleColor.Green;
             ConsoleColor sectionColor = ConsoleColor.Yellow;
-            ConsoleColor findingColor = ConsoleColor.Cyan;
 
             // catch that final 'scripts' section when it comes in
             if (inputKvp.Key == "Scripts")
@@ -139,8 +135,7 @@ namespace Grouper2
         private static Document GetFindingsDocument(JToken polFindings, string polType)
         {
             Document findingsDocument = new Document();
-
-            ConsoleColor displayNameColor = ConsoleColor.Green;
+            
             ConsoleColor sectionColor = ConsoleColor.Yellow;
             ConsoleColor findingColor = ConsoleColor.Cyan;
 
@@ -394,7 +389,7 @@ namespace Grouper2
                         {
                             findingsDocument.Children.Add(JsonToGrid(regKeyFinding.Value, 0));
                         }
-                        continue; ;
+                        continue;
                     }
                     if (cat.Key == "EnvironmentVariables")
                     {
@@ -483,7 +478,7 @@ namespace Grouper2
             {
                 string name = jprop.Name;
                 JToken value = jprop.Value;
-                if ((value.Count() == 1) || (value.Count() == 0))
+                if ((value.Count() == 1) || (!value.Any()))
                 {
                     if (jprop.Value is JArray)
                     {

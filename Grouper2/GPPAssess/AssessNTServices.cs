@@ -1,33 +1,33 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace Grouper2
+namespace Grouper2.GPPAssess
 {
     public partial class AssessGpp
     {
         private JObject GetAssessedNTServices(JObject gppCategory)
         {
-            JObject assessedGppNTServices = new JObject();
+            JObject assessedGppNtServices = new JObject();
 
             if (gppCategory["NTService"] is JArray)
             {
-                foreach (JToken gppNTService in gppCategory["NTService"])
+                foreach (JToken gppNtService in gppCategory["NTService"])
                 {
-                    JProperty assessedGppNTService = AssessGppNTService(gppNTService);
-                    if (assessedGppNTService != null)
+                    JProperty assessedGppNtService = AssessGppNTService(gppNtService);
+                    if (assessedGppNtService != null)
                     {
-                        assessedGppNTServices.Add(assessedGppNTService);
+                        assessedGppNtServices.Add(assessedGppNtService);
                     }
                 }
             }
             else
             {
-                JProperty assessedGppNTService = AssessGppNTService(gppCategory["NTService"]);
-                assessedGppNTServices.Add(assessedGppNTService);
+                JProperty assessedGppNtService = AssessGppNTService(gppCategory["NTService"]);
+                assessedGppNtServices.Add(assessedGppNtService);
             }
 
-            if (assessedGppNTServices.HasValues)
+            if (assessedGppNtServices.HasValues)
             {
-                return assessedGppNTServices;
+                return assessedGppNtServices;
             }
             else
             {
@@ -35,50 +35,50 @@ namespace Grouper2
             }
         }
 
-        static JProperty AssessGppNTService(JToken gppNTService)
+        static JProperty AssessGppNTService(JToken gppNtService)
         {
             int interestLevel = 1;
-            string gppNTServiceUid = Utility.GetSafeString(gppNTService, "@uid");
-            string gppNTServiceChanged = Utility.GetSafeString(gppNTService, "@changed");
-            string gppNTServiceName = Utility.GetSafeString(gppNTService, "@name");
-            string gppNTServiceUserName = Utility.GetSafeString(gppNTService["Properties"], "@accountName");
-            string gppNTServicecPassword = Utility.GetSafeString(gppNTService["Properties"], "@cpassword");
-            string gppNTServicePassword = "";
-            if (gppNTServicecPassword.Length > 0)
+            string gppNtServiceUid = Utility.GetSafeString(gppNtService, "@uid");
+            string gppNtServiceChanged = Utility.GetSafeString(gppNtService, "@changed");
+            string gppNtServiceName = Utility.GetSafeString(gppNtService, "@name");
+            string gppNtServiceUserName = Utility.GetSafeString(gppNtService["Properties"], "@accountName");
+            string gppNtServicecPassword = Utility.GetSafeString(gppNtService["Properties"], "@cpassword");
+            string gppNtServicePassword = "";
+            if (gppNtServicecPassword.Length > 0)
             {
-                gppNTServicePassword = Utility.DecryptCpassword(gppNTServicecPassword);
+                gppNtServicePassword = Utility.DecryptCpassword(gppNtServicecPassword);
                 interestLevel = 10;
             }
             
-            string gppNTServiceTimeout = Utility.GetSafeString(gppNTService["Properties"], "@timeout");
-            string gppNTServiceStartup = Utility.GetSafeString(gppNTService["Properties"], "@startupType");
-            string gppNTServiceAction = Utility.GetSafeString(gppNTService["Properties"], "@serviceAction");
-            string gppNTServiceServiceName = Utility.GetSafeString(gppNTService["Properties"], "@serviceName");
+            string gppNtServiceTimeout = Utility.GetSafeString(gppNtService["Properties"], "@timeout");
+            string gppNtServiceStartup = Utility.GetSafeString(gppNtService["Properties"], "@startupType");
+            string gppNtServiceAction = Utility.GetSafeString(gppNtService["Properties"], "@serviceAction");
+            string gppNtServiceServiceName = Utility.GetSafeString(gppNtService["Properties"], "@serviceName");
 
-            string gppNTServiceFirstFailure = Utility.GetSafeString(gppNTService["Properties"], "@firstFailure");
-            string gppNTServiceSecondFailure = Utility.GetSafeString(gppNTService["Properties"], "@secondFailure");
-            string gppNTServiceThirdFailure = Utility.GetSafeString(gppNTService["Properties"], "@thirdFailure");
-
-            
-            JObject gppNTServiceProgram =
-                FileSystem.InvestigatePath(Utility.GetSafeString(gppNTService["Properties"], "@program"));
-            JObject gppNTServiceArgs =
-                Utility.InvestigateString(Utility.GetSafeString(gppNTService["Properties"], "@args"));
+            string gppNtServiceFirstFailure = Utility.GetSafeString(gppNtService["Properties"], "@firstFailure");
+            string gppNtServiceSecondFailure = Utility.GetSafeString(gppNtService["Properties"], "@secondFailure");
+            string gppNtServiceThirdFailure = Utility.GetSafeString(gppNtService["Properties"], "@thirdFailure");
 
             
+            JObject gppNtServiceProgram =
+                FileSystem.InvestigatePath(Utility.GetSafeString(gppNtService["Properties"], "@program"));
+            JObject gppNtServiceArgs =
+                Utility.InvestigateString(Utility.GetSafeString(gppNtService["Properties"], "@args"));
+
             
-            if (gppNTServiceProgram["InterestLevel"] != null)
+            
+            if (gppNtServiceProgram["InterestLevel"] != null)
             {
-                int progInterestLevelInt = int.Parse(gppNTServiceProgram["InterestLevel"].ToString());
+                int progInterestLevelInt = int.Parse(gppNtServiceProgram["InterestLevel"].ToString());
                 if (progInterestLevelInt > interestLevel)
                 {
                     interestLevel = progInterestLevelInt;
                 }
             }
 
-            if (gppNTServiceArgs["InterestLevel"] != null)
+            if (gppNtServiceArgs["InterestLevel"] != null)
             {
-                int argsInterestLevelInt = int.Parse(gppNTServiceArgs["InterestLevel"].ToString());
+                int argsInterestLevelInt = int.Parse(gppNtServiceArgs["InterestLevel"].ToString());
                 if (argsInterestLevelInt > interestLevel)
                 {
                     interestLevel = argsInterestLevelInt;
@@ -87,26 +87,27 @@ namespace Grouper2
 
             if (interestLevel >= GlobalVar.IntLevelToShow)
             {
-                JObject assessedGppNTService = new JObject();
-                assessedGppNTService.Add("Name", gppNTServiceName);
-                assessedGppNTService.Add("Changed", gppNTServiceChanged);
-                if (gppNTServiceServiceName.Length > 0) assessedGppNTService.Add("Service Name", gppNTServiceName);
-                if (gppNTServicecPassword.Length > 0)
+                JObject assessedGppNtService = new JObject
                 {
-                    assessedGppNTService.Add("Username", gppNTServiceUserName);
-                    assessedGppNTService.Add("cPassword", gppNTServicecPassword);
-                    assessedGppNTService.Add("Decrypted Password", gppNTServicePassword);
+                    {"Name", gppNtServiceName}, {"Changed", gppNtServiceChanged}
+                };
+                if (gppNtServiceServiceName.Length > 0) assessedGppNtService.Add("Service Name", gppNtServiceName);
+                if (gppNtServicecPassword.Length > 0)
+                {
+                    assessedGppNtService.Add("Username", gppNtServiceUserName);
+                    assessedGppNtService.Add("cPassword", gppNtServicecPassword);
+                    assessedGppNtService.Add("Decrypted Password", gppNtServicePassword);
                 }
-                if (gppNTServiceTimeout.Length > 0) assessedGppNTService.Add("Timeout", gppNTServiceTimeout);
-                if (gppNTServiceStartup.Length > 0) assessedGppNTService.Add("Startup Type", gppNTServiceStartup);
-                if (gppNTServiceAction.Length > 0) assessedGppNTService.Add("Action", gppNTServiceAction);
-                if (gppNTServiceFirstFailure.Length > 0) assessedGppNTService.Add("Action on first failure", gppNTServiceFirstFailure);
-                if (gppNTServiceSecondFailure.Length > 0) assessedGppNTService.Add("Action on second failure", gppNTServiceSecondFailure);
-                if (gppNTServiceThirdFailure.Length > 0) assessedGppNTService.Add("Action on third failure", gppNTServiceThirdFailure);
-                if (gppNTServiceProgram.HasValues) assessedGppNTService.Add("Program", gppNTServiceProgram);
-                if (gppNTServiceArgs.HasValues) assessedGppNTService.Add("Args", gppNTServiceArgs);
+                if (gppNtServiceTimeout.Length > 0) assessedGppNtService.Add("Timeout", gppNtServiceTimeout);
+                if (gppNtServiceStartup.Length > 0) assessedGppNtService.Add("Startup Type", gppNtServiceStartup);
+                if (gppNtServiceAction.Length > 0) assessedGppNtService.Add("Action", gppNtServiceAction);
+                if (gppNtServiceFirstFailure.Length > 0) assessedGppNtService.Add("Action on first failure", gppNtServiceFirstFailure);
+                if (gppNtServiceSecondFailure.Length > 0) assessedGppNtService.Add("Action on second failure", gppNtServiceSecondFailure);
+                if (gppNtServiceThirdFailure.Length > 0) assessedGppNtService.Add("Action on third failure", gppNtServiceThirdFailure);
+                if (gppNtServiceProgram.HasValues) assessedGppNtService.Add("Program", gppNtServiceProgram);
+                if (gppNtServiceArgs.HasValues) assessedGppNtService.Add("Args", gppNtServiceArgs);
 
-                return new JProperty(gppNTServiceUid, assessedGppNTService);
+                return new JProperty(gppNtServiceUid, assessedGppNtService);
             }
 
             return null;

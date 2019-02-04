@@ -1,7 +1,6 @@
-﻿using System.Runtime.Remoting.Messaging;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 
-namespace Grouper2
+namespace Grouper2.GPPAssess
 {
     public partial class AssessGpp
     {

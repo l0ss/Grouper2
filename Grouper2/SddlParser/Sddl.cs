@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Grouper2;
 using Newtonsoft.Json.Linq;
 
-namespace Sddl.Parser
+namespace Grouper2.SddlParser
 {
     public class Sddl
     {
@@ -83,21 +82,21 @@ namespace Sddl.Parser
 
         public JObject ToJObject()
         {
-            JObject parsedSDDL = new JObject();
+            JObject parsedSddl = new JObject();
 
             if (Owner != null)
             {
-                parsedSDDL.Add("Owner", Owner.Alias);
+                parsedSddl.Add("Owner", Owner.Alias);
             }
 
             if (Group != null)
             {
-                parsedSDDL.Add("Group", Group.Alias);
+                parsedSddl.Add("Group", Group.Alias);
             }
 
             if (Dacl != null)
             {
-                parsedSDDL.Add("DACL", Dacl.ToJObject());
+                parsedSddl.Add("DACL", Dacl.ToJObject());
             }
             /*
             if (Sacl != null)
@@ -105,7 +104,7 @@ namespace Sddl.Parser
                 parsedSDDL.Add("SACL", Sacl.ToString());
             }*/
 
-            return parsedSDDL;
+            return parsedSddl;
         }
 
         public override string ToString()

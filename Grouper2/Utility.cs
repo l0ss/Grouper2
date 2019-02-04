@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.DirectoryServices.ActiveDirectory;
 using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
@@ -16,10 +15,10 @@ namespace Grouper2
         public static List<string> DedupeList(List<string> listStrings)
         {
             List<string> result = new List<string>();
-            for (int i = 0; i < listStrings.Count; i++)
+            foreach (var t in listStrings)
             {
-                if (!result.Contains(listStrings[i]))
-                    result.Add(listStrings[i]);
+                if (!result.Contains(t))
+                    result.Add(t);
             }
             return result;
         }
@@ -75,7 +74,7 @@ namespace Grouper2
         public static bool IsValidPath(string path, bool allowRelativePaths = false)
         {
             // lifted from Dao Seeker on stackoverflow.com https://stackoverflow.com/questions/6198392/check-whether-a-path-is-valid
-            bool isValid = true;
+            bool isValid;
 
             try
             {
@@ -88,10 +87,10 @@ namespace Grouper2
                 else
                 {
                     string root = Path.GetPathRoot(path);
-                    isValid = string.IsNullOrEmpty(root.Trim(new char[] { '\\', '/' })) == false;
+                    isValid = string.IsNullOrEmpty(root.Trim('\\', '/')) == false;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 isValid = false;
             }
@@ -108,7 +107,7 @@ namespace Grouper2
             foreach (string stringBit in stringBits)
             {
                 string cleanedBit = stringBit.Trim('\'', '\"');
-                if (IsValidPath(cleanedBit, false))
+                if (IsValidPath(cleanedBit))
                 {
                     foundFilePaths.Add(cleanedBit);
                 }
@@ -122,9 +121,8 @@ namespace Grouper2
         // TODO expand/finish this
         {
             int interestLevel = 0;
-            JObject investigationResults = new JObject();
+            JObject investigationResults = new JObject {{"Value", inString}};
 
-            investigationResults.Add("Value", inString);
             // make a list to put any interesting words we find in it
             JArray interestingWordsFound = new JArray();
             // refer to our master list of interesting words
@@ -176,21 +174,21 @@ namespace Grouper2
                 return new JObject();
             }
             JObject fileDaclsJObject = new JObject();
-            FileSecurity filePathSecObj = new FileSecurity();
+            FileSecurity filePathSecObj;
             try
             {
                 filePathSecObj = File.GetAccessControl(filePathString);
             }
-            catch (System.ArgumentException)
+            catch (ArgumentException)
             {
-                Console.WriteLine("Tried to check file permissions on invalid path: " + filePathString.ToString());
+                Console.WriteLine("Tried to check file permissions on invalid path: " + filePathString);
                 return null;
             }
-            catch (System.UnauthorizedAccessException e)
+            catch (UnauthorizedAccessException e)
             {
                 if (GlobalVar.DebugMode)
                 {
-                    Utility.DebugWrite(e.ToString());
+                    DebugWrite(e.ToString());
                 }
                 return null;
             }
@@ -222,10 +220,12 @@ namespace Grouper2
                     fileSystemRightsJArray.Add(x);
                 }
 
-                JObject fileDaclJObject = new JObject();
-                fileDaclJObject.Add(accessControlTypeString, displayNameString);
-                fileDaclJObject.Add("Inherited?", isInheritedString);
-                fileDaclJObject.Add("Rights", fileSystemRightsJArray);
+                JObject fileDaclJObject = new JObject
+                {
+                    {accessControlTypeString, displayNameString},
+                    {"Inherited?", isInheritedString},
+                    {"Rights", fileSystemRightsJArray}
+                };
                 try
                 {
                     fileDaclsJObject.Merge(fileDaclJObject, new JsonMergeSettings
@@ -235,15 +235,15 @@ namespace Grouper2
                     });
                     //fileDaclsJObject.Add((identityReferenceString + " - " + accessControlTypeString), fileDaclJObject);
                 }
-                catch (System.ArgumentException e)
+                catch (ArgumentException e)
                 {
                     if (GlobalVar.DebugMode)
                     {
-                        Utility.DebugWrite(e.ToString());
-                        Utility.DebugWrite("\n" + "Trying to Add:");
-                        Utility.DebugWrite(fileDaclJObject.ToString());
-                        Utility.DebugWrite("\n" + "To:");
-                        Utility.DebugWrite(fileDaclsJObject.ToString());
+                        DebugWrite(e.ToString());
+                        DebugWrite("\n" + "Trying to Add:");
+                        DebugWrite(fileDaclJObject.ToString());
+                        DebugWrite("\n" + "To:");
+                        DebugWrite(fileDaclsJObject.ToString());
                     }
                 } 
             }
@@ -256,7 +256,7 @@ namespace Grouper2
         // by canonically, I mean 'I Reckon'.
         {
             string highOrLow = null;
-            JToken checkedSid = Utility.CheckSid(sid);
+            JToken checkedSid = CheckSid(sid);
             if (checkedSid != null)
             {
                 string highPriv = checkedSid["highPriv"].ToString();
@@ -330,7 +330,7 @@ namespace Grouper2
                 {
                     sidMatches = true;
                 }
-                if (sidMatches == true)
+                if (sidMatches)
                 {
                     JToken checkedSid = wellKnownSid;
                     return checkedSid;
@@ -347,7 +347,7 @@ namespace Grouper2
             {
                 stringOut = json[inString].ToString();
             }
-            catch (System.NullReferenceException)
+            catch (NullReferenceException)
             {
                 stringOut = "";
             }
@@ -393,7 +393,7 @@ namespace Grouper2
             ConsoleColor[] patternTwo =
             {
                 ConsoleColor.White, ConsoleColor.White, ConsoleColor.Cyan, ConsoleColor.Blue, ConsoleColor.DarkBlue,
-                ConsoleColor.DarkBlue, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White,
+                ConsoleColor.DarkBlue, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White
             };
             int i = 0;
             foreach (string barfLine in barfLines)
@@ -409,7 +409,7 @@ namespace Grouper2
         public static string GetActionString(string actionChar)
             // shut up, i know it's not really a char.
         {
-            string actionString = "";
+            string actionString;
 
             switch (actionChar)
             {
@@ -429,8 +429,8 @@ namespace Grouper2
                     actionString = "Replace";
                     break;
                 default:
-                    Utility.DebugWrite("oh no this is new");
-                    Utility.DebugWrite(actionChar);
+                    DebugWrite("oh no this is new");
+                    DebugWrite(actionChar);
                     actionString = "Broken";
                     break;
             }

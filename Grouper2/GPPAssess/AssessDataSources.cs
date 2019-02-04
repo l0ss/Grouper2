@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace Grouper2
+namespace Grouper2.GPPAssess
 {
     public partial class AssessGpp
     {
@@ -61,11 +61,13 @@ namespace Grouper2
 
             if (interestLevel >= GlobalVar.IntLevelToShow)
             {
-                JObject assessedGppDataSource = new JObject();
-                assessedGppDataSource.Add("Name", gppDataSourceName);
-                assessedGppDataSource.Add("Changed", gppDataSourceChanged);
-                assessedGppDataSource.Add("Action", gppDataSourceAction);
-                assessedGppDataSource.Add("Username", gppDataSourceUserName);
+                JObject assessedGppDataSource = new JObject
+                {
+                    {"Name", gppDataSourceName},
+                    {"Changed", gppDataSourceChanged},
+                    {"Action", gppDataSourceAction},
+                    {"Username", gppDataSourceUserName}
+                };
                 if (gppDataSourcecPassword.Length > 0)
                 {
                     assessedGppDataSource.Add("cPassword", gppDataSourcecPassword);

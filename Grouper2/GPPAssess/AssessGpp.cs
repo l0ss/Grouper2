@@ -1,31 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Runtime.Remoting.Messaging;
 using Newtonsoft.Json.Linq;
 
-namespace Grouper2
+namespace Grouper2.GPPAssess
 {
     public partial class AssessGpp
     {
-        private readonly JObject _GPP;
+        private readonly JObject _gpp;
 
-        public AssessGpp(JObject GPP)
+        public AssessGpp(JObject gpp)
         {
-            _GPP = GPP;
+            _gpp = gpp;
         }
 
         public JObject GetAssessed(string assessName)
         {
             //construct the method name based on the assessName and get it using reflection
-            MethodInfo mi = this.GetType().GetMethod("GetAssessed" + assessName, BindingFlags.NonPublic | BindingFlags.Instance);
+            MethodInfo mi = GetType().GetMethod("GetAssessed" + assessName, BindingFlags.NonPublic | BindingFlags.Instance);
             //invoke the found method
             try
             {
-                JObject gppToAssess = (JObject)_GPP[assessName];
+                JObject gppToAssess = (JObject)_gpp[assessName];
                 if (mi != null)
                 {
                     JObject assessedThing = (JObject)mi.Invoke(this, parameters: new object[] { gppToAssess });

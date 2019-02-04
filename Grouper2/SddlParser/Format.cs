@@ -1,14 +1,11 @@
-using System;
-using System.Collections.Generic;
-
-namespace Sddl.Parser
+namespace Grouper2.SddlParser
 {
     internal static class Format
     {
         public static string Unknown(string input)
         {
-            const string UnknownString = "Unknown({0})";
-            return string.Format(UnknownString, input);
+            const string unknownString = "Unknown({0})";
+            return string.Format(unknownString, input);
         }
     }
 }

@@ -1,9 +1,7 @@
 using System;
 using System.Linq;
-using System.IO;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
-using System.Security.Principal;
 
 namespace Grouper2
 {
@@ -30,7 +28,7 @@ namespace Grouper2
 
             if (privRights != null)
                 {
-                    JObject privRightsResults = AssessInf.AssessPrivRights(privRights);
+                    JObject privRightsResults = InfAssess.AssessInf.AssessPrivRights(privRights);
                     if (privRightsResults.Count > 0)
                     {
                         assessedGpTmpl.Add("Privilege Rights", privRightsResults);
@@ -44,7 +42,7 @@ namespace Grouper2
 
             if (regValues != null)
             {
-                JObject matchedRegValues = AssessInf.AssessRegValues(regValues);
+                JObject matchedRegValues = InfAssess.AssessInf.AssessRegValues(regValues);
                 if (matchedRegValues != null)
                 {
                     assessedGpTmpl.Add("Registry Values", matchedRegValues);
@@ -57,7 +55,7 @@ namespace Grouper2
             JToken sysAccess = infToAssess["System Access"];
             if (sysAccess != null)
             {
-                JObject assessedSysAccess = AssessInf.AssessSysAccess(sysAccess);
+                JObject assessedSysAccess = InfAssess.AssessInf.AssessSysAccess(sysAccess);
                 if (assessedSysAccess != null)
                 {
                     assessedGpTmpl.Add("System Access", assessedSysAccess);
@@ -70,7 +68,7 @@ namespace Grouper2
             JToken kerbPolicy = infToAssess["Kerberos Policy"];
             if (kerbPolicy != null)
             {
-                JObject assessedKerbPol = AssessInf.AssessKerbPolicy(kerbPolicy);
+                JObject assessedKerbPol = InfAssess.AssessInf.AssessKerbPolicy(kerbPolicy);
                 if (assessedKerbPol != null)
                 {
                     assessedGpTmpl.Add("Kerberos Policy", assessedKerbPol);
@@ -83,7 +81,7 @@ namespace Grouper2
             JToken regKeys = infToAssess["Registry Keys"];
             if (regKeys != null)
             {
-                JObject assessedRegKeys = AssessInf.AssessRegKeys(regKeys);
+                JObject assessedRegKeys = InfAssess.AssessInf.AssessRegKeys(regKeys);
                 if (assessedRegKeys != null)
                 {
                     assessedGpTmpl.Add("Registry Keys", assessedRegKeys);
@@ -96,7 +94,7 @@ namespace Grouper2
             JToken grpMembership = infToAssess["Group Membership"];
             if (grpMembership != null)
             {
-                JObject assessedgrpMembership = AssessInf.AssessGroupMembership(grpMembership);
+                JObject assessedgrpMembership = InfAssess.AssessInf.AssessGroupMembership(grpMembership);
                 if (assessedgrpMembership != null)
                 {
                     assessedGpTmpl.Add("Group Membership", assessedgrpMembership);
@@ -109,7 +107,7 @@ namespace Grouper2
             JToken svcGenSetting = infToAssess["Service General Setting"];
             if (svcGenSetting != null)
             {
-                JObject assessedSvcGenSetting = AssessInf.AssessServiceGenSetting(svcGenSetting);
+                JObject assessedSvcGenSetting = InfAssess.AssessInf.AssessServiceGenSetting(svcGenSetting);
                 if (assessedSvcGenSetting != null && assessedSvcGenSetting.HasValues)
                 {
                     assessedGpTmpl.Add("Service General Setting", assessedSvcGenSetting);
@@ -140,7 +138,7 @@ namespace Grouper2
 
         public static JObject AssessGppJson(JObject gppToAssess)
         {
-            AssessGpp assessGpp = new AssessGpp(gppToAssess);
+            GPPAssess.AssessGpp assessGpp = new GPPAssess.AssessGpp(gppToAssess);
             // get an array of categories in our GPP to assess to look at
             string[] gppCategories = gppToAssess.Properties().Select(p => p.Name).ToArray();
             // create a dict to put our results into before returning them

@@ -24,6 +24,7 @@ using Grouper2.Properties;
 using System.Threading;
 using System.Threading.Tasks;
 using Alba.CsConsoleFormat;
+using Grouper2.ScriptsIniAssess;
 
 namespace Grouper2
 {
@@ -32,18 +33,7 @@ namespace Grouper2
     {
         private static JObject _instance;
 
-        public static JObject Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    _instance = JObject.Parse(Resources.PolData);
-                }
-
-                return _instance;
-            }
-        }
+        public static JObject Instance => _instance ?? (_instance = JObject.Parse(Resources.PolData));
     }
 
     public static class GetDomainGpoData
@@ -233,7 +223,8 @@ public class GlobalVar
                     if (!(usernameArg.Parsed) || !(passwordArg.Parsed))
                     {
                         Console.Error.Write("\nIf you specify a domain you need to specify a username and password too using -u and -p.");
-                    };
+                    }
+
                     userDefinedDomain = domainArg.Value;
                     string[] splitDomain = userDefinedDomain.Split('.');
                     StringBuilder sb = new StringBuilder();
@@ -440,7 +431,7 @@ public class GlobalVar
             Task[] gpoTaskArray = gpoTasks.ToArray();
             
             // create a little counter to provide status updates
-            int totalGPOTasksCount = gpoTaskArray.Length;
+            int totalGpoTasksCount = gpoTaskArray.Length;
             int incompleteTaskCount = gpoTaskArray.Length;
             Console.WriteLine("");
             while (incompleteTaskCount > 0)
@@ -449,12 +440,12 @@ public class GlobalVar
                     Array.FindAll(gpoTaskArray, element => element.Status != TaskStatus.RanToCompletion);
                 incompleteTaskCount = incompleteTasks.Length;
             
-                int completeTaskCount = totalGPOTasksCount - incompleteTaskCount;
-                int percentage = (int) Math.Round((double) (100 * completeTaskCount) / totalGPOTasksCount);
+                int completeTaskCount = totalGpoTasksCount - incompleteTaskCount;
+                int percentage = (int) Math.Round((double) (100 * completeTaskCount) / totalGpoTasksCount);
                 string percentageString = percentage.ToString();
                 Console.Error.Write("");
             
-                Console.Error.Write("\r" + completeTaskCount.ToString() + "/" + totalGPOTasksCount.ToString() +
+                Console.Error.Write("\r" + completeTaskCount.ToString() + "/" + totalGpoTasksCount.ToString() +
                               " GPOs processed. " + percentageString + "% complete.");
             }
 
@@ -487,7 +478,7 @@ public class GlobalVar
                 outputDocument.Children.Add(Output.GetG2BannerDocument());
                 foreach (KeyValuePair<string, JToken> gpo in grouper2Output)
                 {
-                    outputDocument.Children.Add(Output.GetAssessedGPOOutput(gpo));
+                    outputDocument.Children.Add(Output.GetAssessedGpoOutput(gpo));
                 }
 
                 if (prettyOutput)
@@ -728,15 +719,15 @@ public class GlobalVar
             return null;
         }
 
-        private static JArray ProcessInf(string Path)
+        private static JArray ProcessInf(string path)
         {
             // find all the GptTmpl.inf files
             List<string> gpttmplInfFiles = new List<string>();
             try
             {
-                gpttmplInfFiles = Directory.GetFiles(Path, "GptTmpl.inf", SearchOption.AllDirectories).ToList();
+                gpttmplInfFiles = Directory.GetFiles(path, "GptTmpl.inf", SearchOption.AllDirectories).ToList();
             }
-            catch (System.IO.DirectoryNotFoundException e)
+            catch (DirectoryNotFoundException e)
             {
                 if (GlobalVar.DebugMode)
                 {
@@ -745,7 +736,7 @@ public class GlobalVar
 
                 return null;
             }
-            catch (System.UnauthorizedAccessException e)
+            catch (UnauthorizedAccessException e)
             {
                 if (GlobalVar.DebugMode)
                 {
@@ -775,16 +766,16 @@ public class GlobalVar
             return processedInfs;
         }
 
-        private static JArray ProcessScriptsIni(string Path)
+        private static JArray ProcessScriptsIni(string path)
         {
             List<string> scriptsIniFiles = new List<string>();
 
             try
             {
-                scriptsIniFiles = Directory.GetFiles(Path, "Scripts.ini", SearchOption.AllDirectories).ToList();
+                scriptsIniFiles = Directory.GetFiles(path, "Scripts.ini", SearchOption.AllDirectories).ToList();
 
             }
-            catch (System.IO.DirectoryNotFoundException)
+            catch (DirectoryNotFoundException)
             {
                 return null;
             }
@@ -809,15 +800,15 @@ public class GlobalVar
             return processedScriptsIniFiles;
         }
 
-        private static JArray ProcessAas(string Path)
+        private static JArray ProcessAas(string path)
         {
             List<string> aasFiles = new List<string>();
 
             try
             {
-                aasFiles = Directory.GetFiles(Path, "*.aas", SearchOption.AllDirectories).ToList();
+                aasFiles = Directory.GetFiles(path, "*.aas", SearchOption.AllDirectories).ToList();
             }
-            catch (System.IO.DirectoryNotFoundException e)
+            catch (DirectoryNotFoundException e)
             {
                 if (GlobalVar.DebugMode)
                 {
@@ -826,7 +817,7 @@ public class GlobalVar
 
                 return null;
             }
-            catch (System.UnauthorizedAccessException e)
+            catch (UnauthorizedAccessException e)
             {
                 if (GlobalVar.DebugMode)
                 {
@@ -838,7 +829,7 @@ public class GlobalVar
             JObject processedAases = new JObject();
             foreach (string aasFile in aasFiles)
             {
-                JObject parsedAasFile = Parsers.ParseAASFile(aasFile);
+                JObject parsedAasFile = Parsers.ParseAasFile(aasFile);
                 JObject assessedAasFile = AasAssess.AssessAasFile(parsedAasFile);
                 if (assessedAasFile != null && assessedAasFile.HasValues)
                 {
@@ -857,15 +848,15 @@ public class GlobalVar
             return null;
         }
 
-        private static JArray ProcessGpXml(string Path)
+        private static JArray ProcessGpXml(string path)
         {
-            if (!Directory.Exists(Path))
+            if (!Directory.Exists(path))
             {
                 return null;
             }
 
             // Group Policy Preferences are all XML so those are handled here.
-            string[] xmlFiles = Directory.GetFiles(Path, "*.xml", SearchOption.AllDirectories);
+            string[] xmlFiles = Directory.GetFiles(path, "*.xml", SearchOption.AllDirectories);
             // create a dict for the stuff we find
             JArray processedGpXml = new JArray();
             // if we find any xml files
@@ -901,12 +892,12 @@ public class GlobalVar
         private readonly int _maxDegreeOfParallelism;
 
         // Indicates whether the scheduler is currently processing work items. 
-        private int _delegatesQueuedOrRunning = 0;
+        private int _delegatesQueuedOrRunning;
 
         // Creates a new instance with the specified degree of parallelism. 
         public LimitedConcurrencyLevelTaskScheduler(int maxDegreeOfParallelism)
         {
-            if (maxDegreeOfParallelism < 1) throw new ArgumentOutOfRangeException("maxDegreeOfParallelism");
+            if (maxDegreeOfParallelism < 1) throw new ArgumentOutOfRangeException(nameof(maxDegreeOfParallelism));
             _maxDegreeOfParallelism = maxDegreeOfParallelism;
         }
 
@@ -956,7 +947,7 @@ public class GlobalVar
                         }
 
                         // Execute the task we pulled out of the queue
-                        base.TryExecuteTask(item);
+                        TryExecuteTask(item);
                     }
                 }
                 // We're done processing items on the current thread
@@ -977,11 +968,11 @@ public class GlobalVar
             if (taskWasPreviouslyQueued)
                 // Try to run the task. 
                 if (TryDequeue(task))
-                    return base.TryExecuteTask(task);
+                    return TryExecuteTask(task);
                 else
                     return false;
             else
-                return base.TryExecuteTask(task);
+                return TryExecuteTask(task);
         }
 
         // Attempt to remove a previously scheduled task from the scheduler. 
@@ -991,10 +982,7 @@ public class GlobalVar
         }
 
         // Gets the maximum concurrency level supported by this scheduler. 
-        public sealed override int MaximumConcurrencyLevel
-        {
-            get { return _maxDegreeOfParallelism; }
-        }
+        public sealed override int MaximumConcurrencyLevel => _maxDegreeOfParallelism;
 
         // Gets an enumerable of the tasks currently scheduled on this scheduler. 
         protected sealed override IEnumerable<Task> GetScheduledTasks()

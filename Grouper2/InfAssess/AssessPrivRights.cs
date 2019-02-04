@@ -1,99 +1,91 @@
 ﻿using System.Security.Principal;
-using Grouper2;
 using Newtonsoft.Json.Linq;
 
-internal static partial class AssessInf
+namespace Grouper2.InfAssess
 {
-    public static JObject AssessPrivRights(JToken privRights)
+    internal static partial class AssessInf
     {
-        JObject jsonData = JankyDb.Instance;
-        JArray intPrivRights = (JArray) jsonData["privRights"];
-
-        // create an object to put the results in
-        JObject assessedPrivRights = new JObject();
-
-        //set an intentionally non-matchy domainSid value unless we doing online checks.
-        string domainSid = "X";
-        if (GlobalVar.OnlineChecks)
+        public static JObject AssessPrivRights(JToken privRights)
         {
-            domainSid = LDAPstuff.GetDomainSid();
-        }
+            JObject jsonData = JankyDb.Instance;
+            JArray intPrivRights = (JArray) jsonData["privRights"];
 
-        //iterate over the entries
-        foreach (JProperty privRight in privRights.Children<JProperty>())
-        {
-            // our interest level always starts at 1. Everything is boring until proven otherwise.
-            int interestLevel = 2;
-            foreach (JToken intPrivRight in intPrivRights)
+            // create an object to put the results in
+            JObject assessedPrivRights = new JObject();
+
+            //set an intentionally non-matchy domainSid value unless we doing online checks.
+            string domainSid = "X";
+            if (GlobalVar.OnlineChecks)
             {
-                // if the priv is interesting
-                if ((string) intPrivRight["privRight"] == privRight.Name)
+                domainSid = LDAPstuff.GetDomainSid();
+            }
+
+            //iterate over the entries
+            foreach (JProperty privRight in privRights.Children<JProperty>())
+            {
+                // our interest level always starts at 1. Everything is boring until proven otherwise.
+                int interestLevel = 2;
+                foreach (JToken intPrivRight in intPrivRights)
                 {
-                    //create a jobj to put the trustees into
-                    JObject trustees = new JObject();
-                    //then for each trustee it's granted to
-                    if (privRight.Value is JArray)
+                    // if the priv is interesting
+                    if ((string) intPrivRight["privRight"] == privRight.Name)
                     {
-                        foreach (JToken trusteeJToken in privRight.Value)
+                        //create a jobj to put the trustees into
+                        JObject trustees = new JObject();
+                        //then for each trustee it's granted to
+                        if (privRight.Value is JArray)
                         {
-                            string trustee = trusteeJToken.ToString();
-                            string trusteeClean = trustee.Trim('*');
-                            if (GlobalVar.OnlineChecks)
+                            foreach (JToken trusteeJToken in privRight.Value)
                             {
-                                trustees.Add(GetTrustee(trusteeClean));
+                                string trustee = trusteeJToken.ToString();
+                                string trusteeClean = trustee.Trim('*');
+                                trustees.Add(GlobalVar.OnlineChecks
+                                    ? GetTrustee(trusteeClean)
+                                    : new JProperty(trusteeClean, "Unable to resolve SID"));
                             }
-                            else
-                            {
-                                trustees.Add(new JProperty(trusteeClean, "Unable to resolve SID"));
-                            }
-                        }
-                    }
-                    else
-                    {
-                        string trusteeClean = privRight.Value.ToString().Trim('*');
-                        if (GlobalVar.OnlineChecks)
-                        {
-                            trustees.Add(GetTrustee(trusteeClean));
                         }
                         else
                         {
-                            trustees.Add(new JProperty(trusteeClean, "Unable to resolve SID"));
+                            string trusteeClean = privRight.Value.ToString().Trim('*');
+                            trustees.Add(GlobalVar.OnlineChecks
+                                ? GetTrustee(trusteeClean)
+                                : new JProperty(trusteeClean, "Unable to resolve SID"));
                         }
-                    }
 
-                    // add the results to our jobj of trustees if they are interesting enough.
-                    if (interestLevel >= GlobalVar.IntLevelToShow)
-                    {
-                        assessedPrivRights.Add(new JProperty(privRight.Name, trustees));
+                        // add the results to our jobj of trustees if they are interesting enough.
+                        if (interestLevel >= GlobalVar.IntLevelToShow)
+                        {
+                            assessedPrivRights.Add(new JProperty(privRight.Name, trustees));
+                        }
                     }
                 }
             }
+
+            return assessedPrivRights;
         }
 
-        return assessedPrivRights;
-    }
-
-    static JProperty GetTrustee(string trustee)
-    {
-        string displayName = "";
-        // clean up the trustee SID
-
-        try
+        static JProperty GetTrustee(string trustee)
         {
-            string resolvedSid = LDAPstuff.GetUserFromSid(trustee);
-            displayName = resolvedSid;
-        }
-        catch (IdentityNotMappedException)
-        {
-            displayName = "Unable to resolve SID.";
-            // check if it's a well known trustee in our JankyDB
-            JToken checkedSid = Utility.CheckSid(trustee);
-            if (checkedSid != null)
+            string displayName = "";
+            // clean up the trustee SID
+
+            try
             {
-                displayName = (string)checkedSid["displayName"];
+                string resolvedSid = LDAPstuff.GetUserFromSid(trustee);
+                displayName = resolvedSid;
             }
-        }
+            catch (IdentityNotMappedException)
+            {
+                displayName = "Unable to resolve SID.";
+                // check if it's a well known trustee in our JankyDB
+                JToken checkedSid = Utility.CheckSid(trustee);
+                if (checkedSid != null)
+                {
+                    displayName = (string)checkedSid["displayName"];
+                }
+            }
 
-        return new JProperty(trustee, displayName);
+            return new JProperty(trustee, displayName);
+        }
     }
 }
