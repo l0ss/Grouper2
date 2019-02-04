@@ -510,8 +510,15 @@ public class GlobalVar
 
                 if (htmlOut)
                 {
-                    ConsoleRenderer.RenderDocument(outputDocument,
-                        new HtmlRenderTarget(File.Create(htmlOutPath), new UTF8Encoding(false)));
+                    try
+                    {
+                        ConsoleRenderer.RenderDocument(outputDocument,
+                            new HtmlRenderTarget(File.Create(htmlOutPath), new UTF8Encoding(false)));
+                    }
+                    catch (UnauthorizedAccessException e)
+                    {
+                        Console.Error.WriteLine("Tried to write html output file but I'm not allowed.");
+                    }
                 }
             }
             else
@@ -911,6 +918,10 @@ public class GlobalVar
                 {
                     // send each one to get mangled into json
                     JObject parsedGppXmlToJson = Parsers.ParseGppXmlToJson(xmlFile);
+                    if (parsedGppXmlToJson == null)
+                    {
+                        continue;
+                    }
                     // then send each one to get assessed for fun things
                     JObject assessedGpp = AssessHandlers.AssessGppJson(parsedGppXmlToJson);
                     if (assessedGpp.HasValues) processedGpXml.Add(assessedGpp);

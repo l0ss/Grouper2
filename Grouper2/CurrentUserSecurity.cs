@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Security.AccessControl;
 using System.Security.Principal;
 
@@ -17,18 +18,45 @@ namespace Grouper2
 
         public bool HasAccess(DirectoryInfo directory, FileSystemRights right)
         {
-            // Get the collection of authorization rules that apply to the directory.
-            AuthorizationRuleCollection acl = directory.GetAccessControl()
-                .GetAccessRules(true, true, typeof(SecurityIdentifier));
-            return HasFileOrDirectoryAccess(right, acl);
+            try
+            {
+                // Get the collection of authorization rules that apply to the directory.
+                AuthorizationRuleCollection acl = directory.GetAccessControl()
+                    .GetAccessRules(true, true, typeof(SecurityIdentifier));
+                return HasFileOrDirectoryAccess(right, acl);
+            }
+
+            catch (UnauthorizedAccessException e)
+            {
+                if (GlobalVar.DebugMode)
+                {
+                    Utility.DebugWrite(e.ToString());
+                }
+            }
+
+            return false;
         }
 
         public bool HasAccess(FileInfo file, FileSystemRights right)
         {
-            // Get the collection of authorization rules that apply to the file.
-            AuthorizationRuleCollection acl = file.GetAccessControl()
-                .GetAccessRules(true, true, typeof(SecurityIdentifier));
-            return HasFileOrDirectoryAccess(right, acl);
+            try
+            {
+                // Get the collection of authorization rules that apply to the file.
+                AuthorizationRuleCollection acl = file.GetAccessControl()
+                    .GetAccessRules(true, true, typeof(SecurityIdentifier));
+
+                return HasFileOrDirectoryAccess(right, acl);
+            }
+
+            catch (UnauthorizedAccessException e)
+            {
+                if (GlobalVar.DebugMode)
+                {
+                    Utility.DebugWrite(e.ToString());
+                }
+            }
+
+            return false;
         }
 
         private bool HasFileOrDirectoryAccess(FileSystemRights right,

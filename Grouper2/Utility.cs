@@ -41,7 +41,7 @@ namespace Grouper2
             JArray interestingWords = (JArray) JankyDb.Instance["interestingWords"];
             
             // get contents of the file and smash case
-            string fileContents;
+            string fileContents = "";
             try
             {
                 fileContents = File.ReadAllText(inPath).ToLower();

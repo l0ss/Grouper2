@@ -217,7 +217,21 @@ namespace Grouper2
         public static JObject ParseGppXmlToJson(string xmlFile)
         {
             //grab the contents of the file path in the argument
-            string rawXmlFileContent = File.ReadAllText(xmlFile);
+            string rawXmlFileContent = "";
+            try
+            {
+                rawXmlFileContent = File.ReadAllText(xmlFile);
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                if (GlobalVar.DebugMode)
+                {
+                    Utility.DebugWrite(e.ToString());
+                }
+
+                return null;
+            }
+
             //create an xml object
             XmlDocument xmlFileContent = new XmlDocument();
             //put the file contents in the object
@@ -236,12 +250,6 @@ namespace Grouper2
         {
             byte[] aasBytes = File.ReadAllBytes(aasFile);
             string aasString = File.ReadAllText(aasFile);
-
-            //Utility.DebugWrite(aasString);
-
-            // guid regex
-            // [{]?[0-9a-fA-F]{8}[-]?([0-9a-fA-F]{4}[-]?){3}[0-9a-fA-F]{12}[}]
-
 
             // regex to find guids in the file
             string guidRegExPattern = @"[{]?[0-9a-fA-F]{8}[-]?([0-9a-fA-F]{4}[-]?){3}[0-9a-fA-F]{12}[}]";

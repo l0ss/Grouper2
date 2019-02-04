@@ -336,6 +336,14 @@ namespace Grouper2
                                        " exists but it doesn't seem to be a valid file path.");
                 }
             }
+            catch (UnauthorizedAccessException)
+            {
+                if (GlobalVar.DebugMode)
+                {
+                    Utility.DebugWrite("Tried to check if file " + inPath +
+                                       " exists but I'm not allowed.");
+                }
+            }
             return fileExists;
         }
 
@@ -428,6 +436,10 @@ namespace Grouper2
                 }
             }
             catch (FileNotFoundException)
+            {
+                return false;
+            }
+            catch (UnauthorizedAccessException)
             {
                 return false;
             }
