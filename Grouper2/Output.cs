@@ -231,6 +231,18 @@ namespace Grouper2
                         }
                         continue;
                     }
+                    if (cat.Key == "NetworkShareSettings")
+                    {
+                        findingsDocument.Children.Add(
+                            new Span("GPP Network Shares") { Color = ConsoleColor.Magenta }, "\n",
+                            new Span("~~~~~~~~~~~~~~~~") { Color = ConsoleColor.Magenta }
+                        );
+                        foreach (JProperty netshareFinding in cat.Value)
+                        {
+                            findingsDocument.Children.Add(JsonToGrid(netshareFinding.Value, 0));
+                        }
+                        continue;
+                    }
                     if (cat.Key == "Printers")
                     {
                         findingsDocument.Children.Add(
