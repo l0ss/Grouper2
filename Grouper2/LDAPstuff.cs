@@ -111,7 +111,8 @@ namespace Grouper2
                 DirectorySearcher gpoSearcher = new DirectorySearcher(root)
                 {
                     Filter = "(objectClass=groupPolicyContainer)",
-                    SecurityMasks = SecurityMasks.Dacl | SecurityMasks.Owner
+                    SecurityMasks = SecurityMasks.Dacl | SecurityMasks.Owner,
+                    PageSize = 1000
                 };
 
                 SearchResultCollection gpoSearchResults = gpoSearcher.FindAll();
