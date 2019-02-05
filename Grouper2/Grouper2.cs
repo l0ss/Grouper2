@@ -633,26 +633,30 @@ public class GlobalVar
                     try
                     {
                         // select the GPO's details from the gpo data we got
-                        JToken domainGpo = GetDomainGpoData.DomainGpoData[gpoUid];
-                        gpoProps = (JObject) JToken.FromObject(domainGpo);
-                        gpoProps.Add("gpoPath", gpoPath);
-                    }
-                    catch (ArgumentNullException e)
-                    {
-                        
-                        if (GlobalVar.DebugMode)
+                        if (GetDomainGpoData.DomainGpoData[gpoUid] != null)
+                        {
+                            JToken domainGpo = GetDomainGpoData.DomainGpoData[gpoUid];
+                            gpoProps = (JObject)JToken.FromObject(domainGpo);
+                            gpoProps.Add("gpoPath", gpoPath);
+                        }
+                        else
                         {
                             Utility.DebugWrite("Couldn't get GPO Properties from the domain for the following GPO: " +
                                                gpoUid);
+                            // if we weren't able to select the GPO's details, do what we can with what we have.
+                            gpoProps = new JObject()
+                            {
+                                {"UID", gpoUid},
+                                {"gpoPath", gpoPath}
+                            };
+                        }
+                    }
+                    catch (ArgumentNullException e)
+                    {
+                        if (GlobalVar.DebugMode)
+                        {
                             Utility.DebugWrite(e.ToString());
                         }
-
-                        // if we weren't able to select the GPO's details, do what we can with what we have.
-                        gpoProps = new JObject()
-                        {
-                            {"UID", gpoUid},
-                            {"gpoPath", gpoPath}
-                        };
                     }
                 }
                 // otherwise do what we can with what we have

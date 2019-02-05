@@ -6,7 +6,7 @@ namespace Grouper2.GPPAssess
     {
         private JObject GetAssessedPrinters(JObject gppCategory)
         {
-            //Utility.DebugWrite(gppCategory.ToString());
+            Utility.DebugWrite(gppCategory.ToString());
             
             JToken portPrinters = gppCategory["PortPrinter"];
             
