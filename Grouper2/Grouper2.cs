@@ -494,31 +494,41 @@ public class GlobalVar
             {
                 // gotta add a line feed to make sure we're clear to write the nice output.
                 Console.Error.WriteLine("\n");
-                Document outputDocument = new Document();
-
                 
-                outputDocument.Children.Add(Output.GetG2BannerDocument());
-                foreach (KeyValuePair<string, JToken> gpo in grouper2Output)
-                {
-                    outputDocument.Children.Add(Output.GetAssessedGpoOutput(gpo));
-                }
-
-                if (prettyOutput)
-                {
-                    ConsoleRenderer.RenderDocument(outputDocument);
-                }
-
                 if (htmlOut)
                 {
                     try
                     {
-                        ConsoleRenderer.RenderDocument(outputDocument,
+                        // gotta add a line feed to make sure we're clear to write the nice output.
+                        
+                        Document htmlDoc = new Document();
+
+                        htmlDoc.Children.Add(Output.GetG2BannerDocument());
+
+                        foreach (KeyValuePair<string, JToken> gpo in grouper2Output)
+                        {
+                            htmlDoc.Children.Add(Output.GetAssessedGpoOutput(gpo));
+                        }
+                        ConsoleRenderer.RenderDocument(htmlDoc,
                             new HtmlRenderTarget(File.Create(htmlOutPath), new UTF8Encoding(false)));
                     }
                     catch (UnauthorizedAccessException e)
                     {
                         Console.Error.WriteLine("Tried to write html output file but I'm not allowed.");
                     }
+                }
+
+                if (prettyOutput)
+                {
+                    Document prettyDoc = new Document();
+
+                    prettyDoc.Children.Add(Output.GetG2BannerDocument());
+
+                    foreach (KeyValuePair<string, JToken> gpo in grouper2Output)
+                    {
+                        prettyDoc.Children.Add(Output.GetAssessedGpoOutput(gpo));
+                    }
+                    ConsoleRenderer.RenderDocument(prettyDoc);
                 }
             }
             else
