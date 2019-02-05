@@ -36,8 +36,15 @@ namespace Grouper2
 
             if (inPath.Length > 1)
             {
-                dirPath = Path.GetDirectoryName(inPath);
-                fileExt = Path.GetExtension(inPath);
+                try {
+                    dirPath = Path.GetDirectoryName(inPath);
+                    fileExt = Path.GetExtension(inPath);
+                }
+                catch (ArgumentException)
+                {
+                    // can happen if "inPath" contains invalid characters (ex. '"') or does not look like a path (ex. "mailto:...")
+                    return new JObject(new JProperty("Not a path?", inPath));
+                }
             }
             else
             {
