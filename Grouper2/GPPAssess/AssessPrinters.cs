@@ -6,7 +6,6 @@ namespace Grouper2.GPPAssess
     {
         private JObject GetAssessedPrinters(JObject gppCategory)
         {
-            
             JToken portPrinters = gppCategory["PortPrinter"];
             
             JToken sharedPrinters = gppCategory["SharedPrinters"];

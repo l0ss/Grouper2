@@ -86,14 +86,16 @@ public class GlobalVar
             
             CommandLineParser.CommandLineParser parser = new CommandLineParser.CommandLineParser();
             ValueArgument<string> htmlArg = new ValueArgument<string>('f', "html", "Path for html output file.");
-            SwitchArgument debugArg = new SwitchArgument('v', "verbose", "Enables verbose debug mode. Will also show you the names of any categories of policies that Grouper saw but didn't have any means of processing. I eagerly await your pull request.", false);
+            SwitchArgument debugArg = new SwitchArgument('v', "verbose", "Enables debug mode. Probably quite noisy and rarely necessary. Will also show you the names of any categories of policies"+
+            " that Grouper saw but didn't have any means of processing. I eagerly await your pull request.", false);
             SwitchArgument offlineArg = new SwitchArgument('o', "offline",
-                "Disables checks that require LDAP comms with a DC or SMB comms with file shares found in policy settings. Requires that you define a value for --sysvol.",
+                "Disables checks that require LDAP comms with a DC or SMB comms with file shares found in policy settings. Requires that you define a value for -s.",
                 false);
             ValueArgument<string> sysvolArg =
                 new ValueArgument<string>('s', "sysvol", "Set the path to a domain SYSVOL directory.");
             ValueArgument<int> intlevArg = new ValueArgument<int>('i', "interestlevel",
-                "The minimum interest level to display. i.e. findings with an interest level lower than x will not be seen in output. Defaults to 1, i.e. show everything except some extremely dull defaults. If you want to see those too, do -i 0.");
+                "The minimum interest level to display. i.e. findings with an interest level lower than x will not be seen in output. Defaults to 1, i.e. show " +
+                "everything except some extremely dull defaults. If you want to see those too, do -i 0.");
             ValueArgument<int> threadsArg = new ValueArgument<int>('t',"threads", "Max number of threads. Defaults to 10.");
             ValueArgument<string> domainArg =
                 new ValueArgument<string>('d', "domain", "Domain to query for Group Policy Goodies.");
@@ -103,7 +105,8 @@ public class GlobalVar
             SwitchArgument helpArg = new SwitchArgument('h', "help", "Displays this help.", false);
             SwitchArgument prettyArg = new SwitchArgument('g', "pretty", "Switches output from the raw Json to a prettier format.", false);
             SwitchArgument noMessArg = new SwitchArgument('m', "nomess", "Avoids file writes at all costs. May find less stuff.", false);
-            SwitchArgument currentPolOnlyArg = new SwitchArgument('c', "currentonly", "Only checks current policies, ignoring stuff in those Policies_NTFRS_* directories that result from replication failures.", false);
+            SwitchArgument currentPolOnlyArg = new SwitchArgument('c', "currentonly", "Only checks current policies, ignoring stuff in those " +
+                                                                                      "Policies_NTFRS_* directories that result from replication failures.", false);
             SwitchArgument noGrepScriptsArg = new SwitchArgument('n', "nogrepscripts", "Don't grep through the files in the \"Scripts\" subdirectory", false);
         
             parser.Arguments.Add(usernameArg);
