@@ -37,15 +37,29 @@ namespace Grouper2.GPPAssess
             int interestLevel = 3;
             JObject assessedShortcut = new JObject();
             JToken gppShortcutProps = gppShortcut["Properties"];
-            assessedShortcut.Add("Name", gppShortcut["@name"].ToString());
-            assessedShortcut.Add("Status", gppShortcut["@status"].ToString());
-            assessedShortcut.Add("Changed", gppShortcut["@changed"].ToString());
+            assessedShortcut.Add("Name", Utility.GetSafeString(gppShortcut, "@name"));
+            assessedShortcut.Add("Status", Utility.GetSafeString(gppShortcut, "@status"));
+            assessedShortcut.Add("Changed", Utility.GetSafeString(gppShortcut, "@changed"));
             string gppShortcutAction = Utility.GetActionString(gppShortcutProps["@action"].ToString());
             assessedShortcut.Add("Action", gppShortcutAction);
-            assessedShortcut.Add("Target Type", gppShortcutProps["@targetType"]);
-            string arguments = gppShortcutProps["@arguments"].ToString();
-            assessedShortcut.Add("Arguments", arguments);
-            JObject investigatedIconPath = FileSystem.InvestigatePath(gppShortcutProps["@iconPath"].ToString());
+            assessedShortcut.Add("Target Type", Utility.GetSafeString(gppShortcutProps, "@targetType"));
+            string arguments = Utility.GetSafeString(gppShortcutProps, "@arguments");
+            if (arguments != null)
+            {
+                JToken investigatedArguments = Utility.InvestigateString(arguments);
+                assessedShortcut.Add("Arguments", arguments);
+                if (investigatedArguments["InterestLevel"] != null)
+                {
+                    if ((int)investigatedArguments["InterestLevel"] > interestLevel)
+                    {
+                        interestLevel = (int)investigatedArguments["InterestLevel"];
+                    }
+                }
+            }
+
+            string iconPath = Utility.GetSafeString(gppShortcutProps, "@iconPath");
+            
+            JObject investigatedIconPath = FileSystem.InvestigatePath(iconPath);
             if (investigatedIconPath["InterestLevel"] != null)
             {
                 if ((int)investigatedIconPath["InterestLevel"] > interestLevel)
@@ -55,11 +69,22 @@ namespace Grouper2.GPPAssess
             }
             
             assessedShortcut.Add("Icon Path", investigatedIconPath);
-            assessedShortcut.Add("Icon Index", gppShortcutProps["@iconIndex"]);
-            assessedShortcut.Add("Working Directory", gppShortcutProps["@startIn"]);
-            assessedShortcut.Add("Comment", gppShortcutProps["@comment"]);
+            assessedShortcut.Add("Icon Index", Utility.GetSafeString(gppShortcutProps, "@iconIndex"));
+ 
+            string workingDir = Utility.GetSafeString(gppShortcutProps, "@startIn");
+            if (workingDir != null)
+            {
+                JToken assessedWorkingDir = FileSystem.InvestigatePath(workingDir);
+                if (assessedWorkingDir != null)
+                {
+                    assessedShortcut.Add("Working Directory", assessedWorkingDir);
+                }
+            }
+            
+            assessedShortcut.Add("Comment", Utility.GetSafeString(gppShortcutProps, "@comment"));
 
-            JObject investigatedShortcutPath = FileSystem.InvestigatePath(gppShortcutProps["@shortcutPath"].ToString());
+            string shortcutPath = Utility.GetSafeString(gppShortcutProps, "@shortcutPath");
+            JObject investigatedShortcutPath = FileSystem.InvestigatePath(shortcutPath);
             if (investigatedShortcutPath["InterestLevel"] != null)
             {
                 if ((int) investigatedShortcutPath["InterestLevel"] > interestLevel)
@@ -68,7 +93,8 @@ namespace Grouper2.GPPAssess
                 }
             }
 
-            JObject investigatedTargetPath = FileSystem.InvestigatePath(gppShortcutProps["@shortcutPath"].ToString());
+            string targetPath = Utility.GetSafeString(gppShortcutProps, "@targetPath");
+            JObject investigatedTargetPath = FileSystem.InvestigatePath(targetPath);
             if (investigatedTargetPath["InterestLevel"] != null)
             {
                 if ((int) investigatedTargetPath["InterestLevel"] > interestLevel)

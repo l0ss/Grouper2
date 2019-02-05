@@ -512,7 +512,7 @@ public class GlobalVar
                         ConsoleRenderer.RenderDocument(htmlDoc,
                             new HtmlRenderTarget(File.Create(htmlOutPath), new UTF8Encoding(false)));
                     }
-                    catch (UnauthorizedAccessException e)
+                    catch (UnauthorizedAccessException)
                     {
                         Console.Error.WriteLine("Tried to write html output file but I'm not allowed.");
                     }
