@@ -96,18 +96,18 @@ namespace Grouper2.GPPAssess
 
             // get the username and a bunch of other details:
             assessedUser.Add("Name", gppUser["@name"].ToString());
-            assessedUser.Add("User Name", gppUserProps["@userName"].ToString());
-            assessedUser.Add("DateTime Changed", gppUser["@changed"].ToString());
-            assessedUser.Add("Account Disabled", gppUserProps["@acctDisabled"].ToString());
-            assessedUser.Add("Password Never Expires", gppUserProps["@neverExpires"].ToString());
-            assessedUser.Add("Description", gppUserProps["@description"].ToString());
-            assessedUser.Add("Full Name", gppUserProps["@fullName"].ToString());
-            assessedUser.Add("New Name", gppUserProps["@newName"].ToString());
+            assessedUser.Add("User Name", gppUserProps["@userName"]?.ToString());
+            assessedUser.Add("DateTime Changed", gppUser["@changed"]?.ToString());
+            assessedUser.Add("Account Disabled", gppUserProps["@acctDisabled"]?.ToString());
+            assessedUser.Add("Password Never Expires", gppUserProps["@neverExpires"]?.ToString());
+            assessedUser.Add("Description", gppUserProps["@description"]?.ToString());
+            assessedUser.Add("Full Name", gppUserProps["@fullName"]?.ToString());
+            assessedUser.Add("New Name", gppUserProps["@newName"]?.ToString());
             assessedUser.Add("Action", userAction);
 
             // check for cpasswords
-            string cpassword = gppUserProps["@cpassword"].ToString();
-            if (cpassword.Length > 0)
+            string cpassword = gppUserProps["@cpassword"]?.ToString();
+            if (cpassword != null && cpassword.Length > 0)
             {
                 string decryptedCpassword = "";
                 decryptedCpassword = Utility.DecryptCpassword(cpassword);
