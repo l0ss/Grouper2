@@ -66,9 +66,9 @@ namespace Grouper2
                 }
             }
             if ((err != 0) && GlobalVar.DebugMode)
-                Utility.DebugWrite(@"Error : " + err);
+                Utility.DebugWrite(@"Error in SID Lookup : " + err + " resolving SID " + sidString);
 
-            string lookupResult = "";
+            string lookupResult = "SID Resolution Failed";
             if (referencedDomainName.ToString().Length > 0)
             {
                 lookupResult = referencedDomainName.ToString() + "\\" + name.ToString();

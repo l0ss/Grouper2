@@ -39,7 +39,7 @@ namespace Grouper2.GPPAssess
 
         private JProperty GetAssessedNetworkShare(JToken netShare)
         {
-            int interestLevel = 1;
+            int interestLevel = 2;
 
             JObject assessedGppNetShare = new JObject
             {
@@ -47,21 +47,13 @@ namespace Grouper2.GPPAssess
                 {"Changed", Utility.GetSafeString(netShare, "@changed")},
                 {"Action", Utility.GetActionString(netShare["Properties"]["@action"].ToString())}
             };
-
-            if (netShare["Properties"]["@path"] != null)
-            {
-                assessedGppNetShare.Add("Path", FileSystem.InvestigatePath(netShare["Properties"]["@path"].ToString()));
-            }
+            
+            assessedGppNetShare.Add("Path", Utility.GetSafeString(netShare["Properties"], "@path"));
             assessedGppNetShare.Add("Comment", Utility.GetSafeString(netShare["Properties"], "@comment"));
-
-
-            if (assessedGppNetShare["Path"]["InterestLevel"] != null)
+            // removed InvestigatePath because it's a network share, it's literally always going to be local and therefore not super interesting.
+            if (interestLevel >= GlobalVar.IntLevelToShow)
             {
-                interestLevel = interestLevel + int.Parse(assessedGppNetShare["Path"]["InterestLevel"].ToString());
-                if (interestLevel >= GlobalVar.IntLevelToShow)
-                {
-                    return new JProperty(netShare["@uid"].ToString(), assessedGppNetShare);
-                }
+                return new JProperty(netShare["@uid"].ToString(), assessedGppNetShare);
             }
 
             return null;

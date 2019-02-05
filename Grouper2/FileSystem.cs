@@ -59,6 +59,11 @@ namespace Grouper2
                 return new JObject(new JProperty("Env var found in path", inPath));
             }
 
+            if (inPath.StartsWith("C:") || inPath.StartsWith("D:"))
+            {
+                return new JObject(new JProperty("Local Drive?", inPath));
+            }
+
             // if it doesn't seem to have any path separators it's probably a single file on sysvol.
             if (!inPath.Contains('\\') && !inPath.Contains('/'))
             {
@@ -179,7 +184,7 @@ namespace Grouper2
                     }
 
                     // iterate until the path root 
-                    while (dirPathParent != null)
+                    while ((dirPathParent != null) && (dirPathParent != "\\\\") && (dirPathParent != "\\"))
                     {
                         // check if the parent dir exists
                         parentDirExists = DoesDirExist(dirPathParent);
@@ -231,7 +236,10 @@ namespace Grouper2
                     }
                     filePathAssessment.Add("File writable", fileWritable);
                     if (fileWritable) interestLevel = interestLevel + 10;
-                    filePathAssessment.Add("File DACLs", fileDacls);
+                    if ((fileDacls != null) && fileDacls.HasValues)
+                    {
+                        filePathAssessment.Add("File DACLs", fileDacls);
+                    }
                 }
                 else
                 {
@@ -244,7 +252,11 @@ namespace Grouper2
                         {
                             if (dirWritable) interestLevel = interestLevel + 10;
                         }
-                        filePathAssessment.Add("Directory DACL", dirDacls);
+
+                        if ((dirDacls != null) && dirDacls.HasValues)
+                        {
+                            filePathAssessment.Add("Directory DACL", dirDacls);
+                        }
                     }
                     else if (parentDirExists)
                     {
@@ -294,6 +306,7 @@ namespace Grouper2
                     else
                     {
                         filePathAssessment.Add("Extant parent dir", extantParentDir);
+                        filePathAssessment.Add("Parent dir DACLs", parentDirDacls);
                     }
                 }
             }

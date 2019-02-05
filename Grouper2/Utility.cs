@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
@@ -180,19 +181,29 @@ namespace Grouper2
 
         public static JObject GetFileDaclJObject(string filePathString)
         {
+            int inc = 0;
+
+            string[] interestingTrustees = new string[] {"Everyone", "BUILTIN\\Users", "Authenticated Users", "Domain Users", "INTERACTIVE", };
+            string[] boringTrustees = new string[] {"TrustedInstaller", "Administrators", "NT AUTHORITY\\SYSTEM", "Domain Admins", "Enterprise Admins", "Domain Controllers"};
+            string[] interestingRights = new string[] {"FullControl", "Modify", "Write", "AppendData", "TakeOwnership"};
+            string[] boringRights = new string[] {"Synchronize", "ReadAndExecute" };
+
             if (!GlobalVar.OnlineChecks)
             {
-                return new JObject();
+                return null;
             }
+            // object for result
             JObject fileDaclsJObject = new JObject();
+
             FileSecurity filePathSecObj;
             try
             {
                 filePathSecObj = File.GetAccessControl(filePathString);
             }
-            catch (ArgumentException)
+            catch (ArgumentException e)
             {
-                Console.WriteLine("Tried to check file permissions on invalid path: " + filePathString);
+                DebugWrite("Tried to check file permissions on invalid path: " + filePathString);
+                DebugWrite(e.ToString());
                 return null;
             }
             catch (UnauthorizedAccessException e)
@@ -216,76 +227,127 @@ namespace Grouper2
                 if (fileAccessRule.AccessControlType == AccessControlType.Deny) accessControlTypeString = "Deny";
 
                 // get the user's SID
-                string identityReferenceString = fileAccessRule.IdentityReference.ToString();
-                string displayNameString = LDAPstuff.GetUserFromSid(identityReferenceString);
+                string sid = fileAccessRule.IdentityReference.ToString();
+                string displayNameString = LDAPstuff.GetUserFromSid(sid);
+                // do some interest level analysis
+                bool trusteeBoring = false;
+                bool trusteeInteresting = false;
+                // check if our trustee is boring
+                foreach (string boringTrustee in boringTrustees)
+                {
+                    // if we're showing everything that's fine, keep going
+                    if (GlobalVar.IntLevelToShow == 0)
+                    {
+                        break;
+                    }
+                    // otherwise if the trustee is boring, set the interest level to 0
+                    if (displayNameString.ToLower().EndsWith(boringTrustee.ToLower()))
+                    {
+                        trusteeBoring = true;
+                        // and don't bother comparing rest of array
+                        break;
+                    }
+                }
+                // skip rest of access rule if trustee is boring and we're not showing int level 0
+                if ((GlobalVar.IntLevelToShow != 0) && trusteeBoring)
+                {
+                    continue;
+                }
+                // see if the trustee is interesting
+                foreach (string interestingTrustee in interestingTrustees)
+                {
+                    if (displayNameString.ToLower().EndsWith(interestingTrustee.ToLower()))
+                    {
+                        trusteeInteresting = true;
+                        break;
+                    }
+                }
                 // get the rights
                 string fileSystemRightsString = fileAccessRule.FileSystemRights.ToString();
                 // strip spaces
                 fileSystemRightsString = fileSystemRightsString.Replace(" ", "");
                 // turn them into an array
                 string[] fileSystemRightsArray = fileSystemRightsString.Split(',');
-                // then into a JArray
+                // then do some 'interest level' analysis
+                // JArray for output
                 JArray fileSystemRightsJArray = new JArray();
-                foreach (string x in fileSystemRightsArray)
+                foreach (string right in fileSystemRightsArray)
                 {
-                    fileSystemRightsJArray.Add(x);
-                }
+                    bool rightInteresting = false;
+                    bool rightBoring = false;
 
-                JObject fileDaclJObject = new JObject
-                {
-                    {accessControlTypeString, displayNameString},
-                    {"Inherited?", isInheritedString},
-                    {"Rights", fileSystemRightsJArray}
-                };
-                try
-                {
-                    fileDaclsJObject.Merge(fileDaclJObject, new JsonMergeSettings
+                    foreach (string boringRight in boringRights)
                     {
-                        // union array values together to avoid duplicates
-                        MergeArrayHandling = MergeArrayHandling.Union
-                    });
-                    //fileDaclsJObject.Add((identityReferenceString + " - " + accessControlTypeString), fileDaclJObject);
-                }
-                catch (ArgumentException e)
-                {
-                    if (GlobalVar.DebugMode)
-                    {
-                        DebugWrite(e.ToString());
-                        DebugWrite("\n" + "Trying to Add:");
-                        DebugWrite(fileDaclJObject.ToString());
-                        DebugWrite("\n" + "To:");
-                        DebugWrite(fileDaclsJObject.ToString());
+                        if (right.ToLower() == boringRight.ToLower())
+                        {
+                            rightBoring = true;
+                            break;
+                        }
                     }
-                } 
-            }
 
+                    foreach (string interestingRight in interestingRights)
+                    {
+                        if (right.ToLower() == interestingRight.ToLower())
+                        {
+                            rightInteresting = true;
+                            break;
+                        }
+                    }
+
+                    // if we're showing defaults, just add it to the result and move on
+                    if (GlobalVar.IntLevelToShow == 0)
+                    {
+                        fileSystemRightsJArray.Add(right);
+                        continue;
+                    }
+                    // if we aren't, and it's boring, skip it and move on.
+                    if (rightBoring)
+                    {
+                        continue;
+                    }
+                    // if it's interesting, add it and move on.
+                    if (rightInteresting)
+                    {
+                        fileSystemRightsJArray.Add(right);
+                        continue;
+                    }
+                    // if it's neither boring nor interesting, add it if the 'interestlevel to show' value is low enough
+                    else if (GlobalVar.IntLevelToShow < 3)
+                    {
+                        Utility.DebugWrite(right + " was not labelled as boring or interesting.");
+                        fileSystemRightsJArray.Add(right);
+                    }
+                    else
+                    {
+                        Utility.DebugWrite("Shouldn't hit here, label FS right as boring or interesting." + right);
+                    }
+                }
+
+                // no point continuing if no rights to show
+                if (fileSystemRightsJArray.HasValues)
+                {
+                    // if the trustee isn't interesting and we're excluding low-level findings, bail out
+                    if ((!trusteeInteresting) && (GlobalVar.IntLevelToShow > 4))
+                    {
+                        return null;
+                    }
+                    // build the object
+                    JObject fileDaclJObject = new JObject
+                    {
+                        {accessControlTypeString, displayNameString},
+                        {"Inherited?", isInheritedString},
+                        {"Rights", fileSystemRightsJArray.ToString()}
+                    };
+                    // add the object to the array.
+                    fileDaclsJObject.Add(inc.ToString(), fileDaclJObject);
+
+                    inc++;
+                }
+            }
+            //DebugWrite(fileDaclsJObject.ToString());
             return fileDaclsJObject;
         }
-
-        public static string SidPrivHighOrLow(string sid)
-        // checks if a Sid belongs to a user who is canonically 'high' or 'low' priv.
-        // by canonically, I mean 'I Reckon'.
-        {
-            string highOrLow = null;
-            JToken checkedSid = CheckSid(sid);
-            if (checkedSid != null)
-            {
-                string highPriv = checkedSid["highPriv"].ToString();
-                string lowPriv = checkedSid["lowPriv"].ToString();
-                if (highPriv == "True")
-                {
-                    highOrLow = "High";
-                }
-
-                if (lowPriv == "True")
-                {
-                    highOrLow = "Low";
-                }
-            }
-            
-            return highOrLow;
-        }
-
+        
     public static string DecryptCpassword(string cpassword)
         {
             // reimplemented based on @obscuresec's Get-GPPPassword PowerShell
@@ -367,10 +429,13 @@ namespace Grouper2
 
         public static void DebugWrite(string textToWrite)
         {
-            Console.BackgroundColor = ConsoleColor.Yellow;
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("\n" + textToWrite);
-            Console.ResetColor();
+            if (GlobalVar.DebugMode)
+            {
+                Console.BackgroundColor = ConsoleColor.Yellow;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\n" + textToWrite + "\n");
+                Console.ResetColor();
+            }
         }
 
         public static void WriteColor(string textToWrite, ConsoleColor fgColor)

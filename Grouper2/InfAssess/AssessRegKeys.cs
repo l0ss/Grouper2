@@ -116,7 +116,7 @@ namespace Grouper2.InfAssess
                             }
                         }
 
-                        if (assessedDacl.HasValues)
+                        if ((assessedDacl != null) && assessedDacl.HasValues)
                         {
                             assessedSddl.Add("DACL", assessedDacl);
                         }
