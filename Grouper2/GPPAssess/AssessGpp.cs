@@ -41,7 +41,7 @@ namespace Grouper2.GPPAssess
                 {
                     if (GlobalVar.DebugMode)
                     {
-                        Utility.DebugWrite("Failed to find method: GetAssessed" + assessName);
+                        Utility.DebugWrite("Failed to find method: GetAssessed" + assessName + ". This probably just means I never wrote one. If you think that Group Policy Preferences " + assessName + " are likely to have useful stuff in there, let me know on GitHub?");
                     }
                     return null;
                 }
