@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.DirectoryServices;
 using Grouper2.SddlParser;
 using Newtonsoft.Json.Linq;
 
@@ -42,20 +43,19 @@ namespace Grouper2.InfAssess
                 {
                     JObject parsedSddl = ParseSddl.ParseSddlString(sddl, SecurableObjectType.WindowsService);
 
-
                     // then assess the results based on interestLevel
                     JObject assessedSddl = new JObject();
 
                     if (parsedSddl["Owner"] != null)
                     {
                         assessedSddl.Add("Owner", parsedSddl["Owner"].ToString());
-                        interestLevel = 4;
+                        interestLevel = 2;
                     }
 
                     if (parsedSddl["Group"] != null)
                     {
                         assessedSddl.Add("Group", parsedSddl["Group"].ToString());
-                        interestLevel = 4;
+                        interestLevel = 2;
                     }
 
                     if (parsedSddl["DACL"] != null)
@@ -66,6 +66,7 @@ namespace Grouper2.InfAssess
                             {"-3-0", "-5-9", "5-18", "-512", "-519", "SY", "BA", "DA", "CO", "ED", "PA", "CG", "DD", "EA", "LA",};
                         string[] interestingSidEndings = new string[]
                             {"DU", "WD", "IU", "BU", "AN", "AU", "BG", "DC", "DG", "LG"};
+                        string[] interestingRights = new string[] {"WRITE_PROPERTY", "WRITE_DAC", "WRITE_OWNER"};
 
                         foreach (JProperty ace in parsedSddl["DACL"].Children())
                         {
@@ -73,6 +74,22 @@ namespace Grouper2.InfAssess
                             string trusteeSid = ace.Value["SID"].ToString();
 
                             bool boringUserPresent = false;
+
+                            bool interestingRightPresent = false;
+                            
+                            foreach (string interestingRight in interestingRights)
+                            {
+                                foreach (JToken right in ace.Value["Rights"])
+                                {
+                                    if (interestingRight == right.ToString())
+                                    {
+                                        interestingRightPresent = true;
+                                        break;
+                                    }
+                                    if (interestingRightPresent) break;
+                                }
+                            }
+
                             foreach (string boringSidEnding in boringSidEndings)
                             {
                                 if (trusteeSid.EndsWith(boringSidEnding))
@@ -92,13 +109,25 @@ namespace Grouper2.InfAssess
                                 }
                             }
 
-                            if (interestingUserPresent/* && interestingRightPresent*/)
+                            // first look if both match
+                            if (interestingUserPresent && interestingRightPresent)
                             {
                                 aceInterestLevel = 10;
                             }
-                            else if (boringUserPresent)
+                            // then skip if they're dumb defaults
+                            else if (interestingRightPresent && boringUserPresent)
                             {
                                 aceInterestLevel = 0;
+                            }
+                            // then catch all the non-default but high-privs
+                            else if (interestingRightPresent && !interestingUserPresent)
+                            {
+                                aceInterestLevel = 7;
+                            }
+                            // then give them a nudge if they're non-default
+                            else if (interestingUserPresent && !interestingRightPresent)
+                            {
+                                aceInterestLevel = 1;
                             }
 
                             if (aceInterestLevel >= GlobalVar.IntLevelToShow)
