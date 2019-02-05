@@ -833,6 +833,10 @@ public class GlobalVar
             {
                 return null;
             }
+            catch (UnauthorizedAccessException)
+            {
+                return null;
+            }
 
             JArray processedScriptsIniFiles = new JArray();
 
