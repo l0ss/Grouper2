@@ -625,6 +625,13 @@ public class GlobalVar
                 string[] splitPath = gpoPath.Split(Path.DirectorySeparatorChar);
                 string gpoUid = splitPath[splitPath.Length - 1];
 
+                // ignore SYSVOL folders whose name is not a valid GUID (ex. "PolicyDefinitions")
+                if (!Guid.TryParse(gpoUid, out Guid guidOutput))
+                {
+                    Utility.DebugWrite("Ignored GPO because '" + gpoUid + "' is not a valid GUID");
+                    return null;
+                }
+                
                 // Make a JObject for GPO metadata
                 JObject gpoProps = new JObject();
                 // If we're online and talking to the domain, just use that data
