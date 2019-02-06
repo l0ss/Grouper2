@@ -2,6 +2,8 @@
 
 C# rewrite of Grouper - way better than the original.
 
+[![Build Status](https://dev.azure.com/l0ss/Grouper2/_apis/build/status/l0ss.Grouper2?branchName=master)](https://dev.azure.com/l0ss/Grouper2/_build/latest?definitionId=1&branchName=master)
+
 ## What is it for? 
 
 Grouper2 is a tool for *pentesters* to help find security-related misconfigurations in Active Directory Group Policy.
