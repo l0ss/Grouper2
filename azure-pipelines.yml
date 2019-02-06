@@ -40,8 +40,7 @@ steps:
     repositoryName: 'l0ss/Grouper2'
     action: 'create'
     target: '$(Build.SourceVersion)'
-    tagSource: 'manual'
-    tag: 'ih84zur3'
+    tagSource: 'auto'
     releaseTitle: 'Azure Autorelease'
     assets: '$(Build.ArtifactStagingDirectory)/Grouper2.exe'
     isPreRelease: true # Optional
