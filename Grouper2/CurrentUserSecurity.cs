@@ -68,7 +68,7 @@ namespace Grouper2
 
             for (int i = 0; i < acl.Count; i++)
             {
-                var currentRule = (FileSystemAccessRule)acl[i];
+                FileSystemAccessRule currentRule = (FileSystemAccessRule)acl[i];
                 // If the current rule applies to the current user.
                 if (_currentUser.User.Equals(currentRule.IdentityReference) ||
                     _currentPrincipal.IsInRole(

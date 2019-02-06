@@ -126,7 +126,7 @@ namespace Grouper2
             if (slippedThrough.Any() && GlobalVar.DebugMode)
             {
                 Console.WriteLine("We didn't parse any of these sections:");
-                foreach (var unparsedHeader in slippedThrough)
+                foreach (string unparsedHeader in slippedThrough)
                 {
                     Console.WriteLine(unparsedHeader);
                 }

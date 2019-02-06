@@ -19,8 +19,8 @@ namespace Grouper2.SddlParser
             int begin = acl.IndexOf(Ace.BeginToken);
 
             // Flags
-            var flags = begin == -1 ? acl : acl.Substring(0, begin);
-            var flagsLabels = Match.ManyByPrefix(flags, SdControlsDict, out var reminder);
+            string flags = begin == -1 ? acl : acl.Substring(0, begin);
+            LinkedList<string> flagsLabels = Match.ManyByPrefix(flags, SdControlsDict, out string reminder);
 
             if (reminder != null)
                 // ERROR Flags part can not be fully parsed.

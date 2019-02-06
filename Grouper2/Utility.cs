@@ -16,7 +16,7 @@ namespace Grouper2
         public static List<string> DedupeList(List<string> listStrings)
         {
             List<string> result = new List<string>();
-            foreach (var t in listStrings)
+            foreach (string t in listStrings)
             {
                 if (!result.Contains(t))
                     result.Add(t);

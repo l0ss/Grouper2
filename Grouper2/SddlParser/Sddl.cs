@@ -39,25 +39,25 @@ namespace Grouper2.SddlParser
                 idx = i;
             }
 
-            if (components.TryGetValue(OwnerToken, out var owner))
+            if (components.TryGetValue(OwnerToken, out string owner))
             {
                 Owner = new Sid(owner);
                 components.Remove(OwnerToken);
             }
 
-            if (components.TryGetValue(GroupToken, out var group))
+            if (components.TryGetValue(GroupToken, out string group))
             {
                 Group = new Sid(group);
                 components.Remove(GroupToken);
             }
 
-            if (components.TryGetValue(DaclToken, out var dacl))
+            if (components.TryGetValue(DaclToken, out string dacl))
             {
                 Dacl = new Acl(dacl, type);
                 components.Remove(DaclToken);
             }
 
-            if (components.TryGetValue(SaclToken, out var sacl))
+            if (components.TryGetValue(SaclToken, out string sacl))
             {
                 Sacl = new Acl(sacl, type);
                 components.Remove(SaclToken);

@@ -14,7 +14,7 @@ namespace Grouper2.SddlParser
 
             string alias =
                 Match.OneByRegex(sid, KnownSidsDict) ??
-                Match.OneByPrefix(sid, KnownAliasesDict, out var _);
+                Match.OneByPrefix(sid, KnownAliasesDict, out _);
 
             if (alias == null)
             {

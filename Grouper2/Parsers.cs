@@ -83,7 +83,7 @@ namespace Grouper2
                 return null;
             }
 
-            var headingLines = new List<int>();
+            List<int> headingLines = new List<int>();
 
             //find all the lines that look like a heading and put the line numbers in an array.
             int i = 0;

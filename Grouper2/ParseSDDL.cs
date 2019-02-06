@@ -8,7 +8,7 @@ namespace Grouper2
     {
         public static JObject ParseSddlString(string rawSddl, SecurableObjectType type)
         {
-            var sddl = new Sddl(rawSddl, type);
+            Sddl sddl = new Sddl(rawSddl, type);
             return sddl.ToJObject();
             //return new JObject();
         }

@@ -18,7 +18,7 @@ namespace Grouper2.SddlParser
 
         public Ace(string ace, SecurableObjectType type = SecurableObjectType.Unknown)
         {
-            var parts = ace.Split(SeparatorToken);
+            string[] parts = ace.Split(SeparatorToken);
 
             if (parts.Length < 6)
             {
@@ -33,7 +33,7 @@ namespace Grouper2.SddlParser
             // ace_type
             if (parts.Length > 0 && parts[0].Length > 0)
             {
-                string aceType = Match.OneByPrefix(parts[0], AceTypesDict, out var reminder);
+                string aceType = Match.OneByPrefix(parts[0], AceTypesDict, out string reminder);
                 
                 if (aceType == null || !string.IsNullOrEmpty(reminder))
                     aceType = Format.Unknown(parts[0]);
@@ -44,7 +44,7 @@ namespace Grouper2.SddlParser
             // ace_flags
             if (parts.Length > 1 && parts[1].Length > 0)
             {
-                var flags = Match.ManyByPrefix(parts[1], AceFlagsDict, out var reminder);
+                LinkedList<string> flags = Match.ManyByPrefix(parts[1], AceFlagsDict, out string reminder);
                 
                 if (!string.IsNullOrEmpty(reminder))
                     flags.AddLast(Format.Unknown(reminder));
@@ -59,7 +59,7 @@ namespace Grouper2.SddlParser
                 {
                     IEnumerable<string> rights = Enumerable.Empty<string>();
 
-                    if (AceUintSpecificRightsDict.TryGetValue(type, out var aceUintSpecificRightsForType))
+                    if (AceUintSpecificRightsDict.TryGetValue(type, out Dictionary<uint, string> aceUintSpecificRightsForType))
                         rights = rights.Concat(Match.ManyByUint(accessMask, aceUintSpecificRightsForType, out accessMask));
 
                     rights = rights.Concat(Match.ManyByUint(accessMask, AceUintRightsDict, out accessMask));
@@ -71,7 +71,7 @@ namespace Grouper2.SddlParser
                 }
                 else
                 {
-                    var rights = Match.ManyByPrefix(parts[2], AceAliasRightsDict, out var reminder);
+                    LinkedList<string> rights = Match.ManyByPrefix(parts[2], AceAliasRightsDict, out string reminder);
                     
                     if (!string.IsNullOrEmpty(reminder))
                         rights.AddLast(Format.Unknown(reminder));
@@ -400,7 +400,7 @@ namespace Grouper2.SddlParser
             if (Rights != null && Rights.Any())
             {
                 sb.AppendLineEnv($"{nameof(Rights)}:");
-                foreach (var t in Rights)
+                foreach (string t in Rights)
                     sb.AppendIndentEnv(t);
             }
 

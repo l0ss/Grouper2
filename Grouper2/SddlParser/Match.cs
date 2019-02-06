@@ -7,7 +7,7 @@ namespace Grouper2.SddlParser
     {
         public static LinkedList<string> ManyByPrefix(string input, IDictionary<string, string> tokensToLabels, out string reminder)
         {
-            var labels = new LinkedList<string>();
+            LinkedList<string> labels = new LinkedList<string>();
 
             reminder = SubstituteEmptyWithNull(input);
             while (reminder != null)
@@ -25,7 +25,7 @@ namespace Grouper2.SddlParser
 
         public static LinkedList<string> ManyByUint(uint mask, IDictionary<uint, string> tokensToLabels, out uint reminder)
         {
-            var labels = new LinkedList<string>();
+            LinkedList<string> labels = new LinkedList<string>();
 
             reminder = mask;
             while (reminder > 0)
@@ -43,7 +43,7 @@ namespace Grouper2.SddlParser
 
         public static string OneByPrefix(string input, IDictionary<string, string> tokensToLabels, out string reminder)
         {
-            foreach (var kv in tokensToLabels)
+            foreach (KeyValuePair<string, string> kv in tokensToLabels)
             {
                 if (input.StartsWith(kv.Key))
                 {
@@ -58,7 +58,7 @@ namespace Grouper2.SddlParser
 
         public static string OneByUint(uint mask, IDictionary<uint, string> tokensToLabels, out uint reminder)
         {
-            foreach (var kv in tokensToLabels)
+            foreach (KeyValuePair<uint, string> kv in tokensToLabels)
             {
                 if ((mask & kv.Key) == kv.Key)
                 {
@@ -73,7 +73,7 @@ namespace Grouper2.SddlParser
 
         public static string OneByRegex(string input, IDictionary<string, string> tokensToLabels)
         {
-            foreach (var kv in tokensToLabels)
+            foreach (KeyValuePair<string, string> kv in tokensToLabels)
             {
                 if (Regex.IsMatch(input, kv.Key))
                 {

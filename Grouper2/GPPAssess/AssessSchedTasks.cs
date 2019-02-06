@@ -148,7 +148,7 @@ namespace Grouper2.GPPAssess
                     if (scheduledTask["Properties"]["Task"]["Actions"]["Exec"].Type == JTokenType.Array)
                     {
                         int i = 1;
-                        foreach (var item in scheduledTask["Properties"]["Task"]["Actions"]["Exec"])
+                        foreach (JToken item in scheduledTask["Properties"]["Task"]["Actions"]["Exec"])
                         {
                             assessedScheduledTask.Add(ExtractCommandFromScheduledTask(item, ref interestLevel, i));
                             i++;

@@ -945,7 +945,7 @@ public class GlobalVar
             JArray processedGpXml = new JArray();
             // if we find any xml files
             if (xmlFiles.Length >= 1)
-                foreach (var xmlFile in xmlFiles)
+                foreach (string xmlFile in xmlFiles)
                 {
                     // send each one to get mangled into json
                     JObject parsedGppXmlToJson = Parsers.ParseGppXmlToJson(xmlFile);
