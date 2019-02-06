@@ -16,7 +16,14 @@ namespace Grouper2.GPPAssess
                     JProperty assessedGppDrive = AssessGppDrive(gppDrive);
                     if (assessedGppDrive != null)
                     {
-                        assessedGppDrives.Add(assessedGppDrive);
+                        try
+                        {
+                            assessedGppDrives.Add(assessedGppDrive);
+                        }
+                        catch (System.ArgumentException)
+                        {
+                            // in some rare cases we can have duplicated drive UIDs in the same file, just ignore it
+                        }
                     }
                 }
             }
