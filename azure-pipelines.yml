@@ -36,8 +36,8 @@ steps:
 # Create, edit, or delete a GitHub release.
 - task: GitHubRelease@0
   inputs:
-    gitHubConnection: l0ss
-    repositoryName: Grouper2
+    gitHubConnection: 'l0ss'
+    repositoryName: 'l0ss/Grouper2'
     action: 'create'
     target: '$(Build.SourceVersion)'
     tagSource: 'manual'
