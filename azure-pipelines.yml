@@ -42,6 +42,7 @@ steps:
     target: '$(Build.SourceVersion)'
     tagSource: 'manual'
     tag: 'ih84zur3'
-    assets: '$(Build.ArtifactStagingDirectory)/Grouper2'
+    releaseTitle: 'Azure Autorelease'
+    assets: '$(Build.ArtifactStagingDirectory)/Grouper2.exe'
     isPreRelease: true # Optional
     addChangeLog: true # Optional
