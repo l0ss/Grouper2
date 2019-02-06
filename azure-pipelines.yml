@@ -27,23 +27,7 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
-#- task: VSTest@2
-#  inputs:
-#    platform: '$(buildPlatform)'
-#    configuration: '$(buildConfiguration)'
-
-# GitHub Release
-# Create, edit, or delete a GitHub release.
-- task: GitHubRelease@0
+- task: VSTest@2
   inputs:
-    gitHubConnection: l0ss
-    repositoryName: Grouper2
-    action: 'create'
-    target: '$(Build.SourceVersion)'
-    tagSource: 'User specified tag'
-    tag: '$(Build.SourceVersion)'
-    releaseTitle: 'Automated release via Azure'
-    releaseNotes: 'Automated release via Azure'
-    assets: '$(Build.ArtifactStagingDirectory)/Grouper2.exe'
-    isPreRelease: true
-    addChangeLog: true
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
