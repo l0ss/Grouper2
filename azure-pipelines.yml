@@ -43,7 +43,7 @@ steps:
     tagSource: 'manual'
     tag: '0.9.4'
     releaseTitle: 'sobbing and throwing fists against azure while screaming WORK'
-    releaseNotes: 'die'
+    releaseNotes: 'die2'
     assets: '$(Build.ArtifactStagingDirectory)\Grouper2.exe'
     #isPreRelease: true # Optional
     #addChangeLog: true # Optional
