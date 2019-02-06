@@ -39,7 +39,7 @@ steps:
     gitHubConnection: l0ss
     repositoryName: Grouper2
     action: 'create'
-    target: 'master'
+    target: '$(Build.SourceVersion)'
     tagSource: 'auto'
     assets: '$(Build.ArtifactStagingDirectory)/Grouper2'
     isPreRelease: true # Optional
