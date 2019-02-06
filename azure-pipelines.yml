@@ -44,5 +44,5 @@ steps:
     tag: '$(Build.SourceVersion)'
     releaseTitle: 'sobbing and throwing fists against azure while screaming WORK'
     assets: '$(Build.ArtifactStagingDirectory)/Grouper2.exe'
-    isPreRelease: true # Optional
-    addChangeLog: true # Optional
+    #isPreRelease: true # Optional
+    #addChangeLog: true # Optional
