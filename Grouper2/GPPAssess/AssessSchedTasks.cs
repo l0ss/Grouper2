@@ -57,7 +57,6 @@ namespace Grouper2.GPPAssess
             JObject command = new JObject(new JProperty("Command", commandString));
             JObject arguments = new JObject(new JProperty("Arguments", argumentsString));
 
-
             command = FileSystem.InvestigatePath(commandString);
             arguments = Utility.InvestigateString(argumentsString);
             if ((arguments != null) && (arguments["InterestLevel"] != null))
@@ -234,8 +233,13 @@ namespace Grouper2.GPPAssess
                     Utility.GetActionString(scheduledTask["Properties"]["@action"].ToString()));
                 assessedScheduledTask.Add("Command", command);
                 assessedScheduledTask.Add("Args", arguments);
-                assessedScheduledTask.Add("Start In", Utility.GetSafeString(scheduledTask["Properties"], "@startIn"));
-
+                JObject assessedWorkingDir =
+                    FileSystem.InvestigatePath(Utility.GetSafeString(scheduledTask["Properties"], "@startIn"));
+                if ((assessedWorkingDir != null) && assessedWorkingDir.HasValues)
+                {
+                    assessedScheduledTask.Add("Working Dir", assessedWorkingDir);
+                }
+                
                 if (scheduledTask["Properties"]["Triggers"] != null)
                 {
                     assessedScheduledTask.Add("Triggers", scheduledTask["Properties"]["Triggers"]);
@@ -268,8 +272,14 @@ namespace Grouper2.GPPAssess
 
                 assessedScheduledTask.Add("Command", command);
                 assessedScheduledTask.Add("Arguments", arguments);
-                //TODO 
-                assessedScheduledTask.Add("Start In", Utility.GetSafeString(scheduledTask["Properties"], "@startIn"));
+
+                JObject assessedWorkingDir =
+                    FileSystem.InvestigatePath(Utility.GetSafeString(scheduledTask["Properties"], "@startIn"));
+                if ((assessedWorkingDir != null) && assessedWorkingDir.HasValues)
+                {
+                    assessedScheduledTask.Add("Working Dir", assessedWorkingDir);
+                }
+
                 assessedScheduledTask.Add("Comment", Utility.GetSafeString(scheduledTask["Properties"], "@comment"));
             }
 
