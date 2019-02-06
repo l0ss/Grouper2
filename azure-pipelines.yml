@@ -40,7 +40,8 @@ steps:
     repositoryName: Grouper2
     action: 'create'
     target: '$(Build.SourceVersion)'
-    tagSource: 'auto'
+    tagSource: 'manual'
+	tag: 'ih84zur3'
     assets: '$(Build.ArtifactStagingDirectory)/Grouper2'
     isPreRelease: true # Optional
     addChangeLog: true # Optional
