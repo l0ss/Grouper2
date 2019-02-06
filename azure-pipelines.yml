@@ -39,9 +39,10 @@ steps:
     gitHubConnection: 'l0ss'
     repositoryName: 'l0ss/Grouper2'
     action: 'create'
-    target: 'master'
-    tagSource: 'auto'
-    releaseTitle: 'Azure AutoSomething'
+    target: '$(Build.SourceVersion)'
+    tagSource: 'manual'
+	tag: '$(Build.SourceVersion)'
+    releaseTitle: 'sobbing and throwing fists against azure while screaming WORK'
     assets: '$(Build.ArtifactStagingDirectory)/Grouper2.exe'
     isPreRelease: true # Optional
     addChangeLog: true # Optional
