@@ -8,7 +8,7 @@ namespace Grouper2
 {
     class FileSystem
     {
-        public static JObject InvestigatePath(string inPath)
+        public static JObject InvestigatePath(string pathToInvestigate)
         {
             // general purpose method for returning some information about why a path might be interesting.
             
@@ -33,11 +33,22 @@ namespace Grouper2
             JObject dirDacls = new JObject();
             JArray interestingWordsFromFile = new JArray();
             string dirPath = "";
+            // remove quotes
+            string inPath = pathToInvestigate.Trim("'","\"");
+            // and whitespace
+            inPath = inPath.Trim();
 
             if (inPath.Length > 1)
             {
-                dirPath = Path.GetDirectoryName(inPath);
-                fileExt = Path.GetExtension(inPath);
+                try {
+                    dirPath = Path.GetDirectoryName(inPath);
+                    fileExt = Path.GetExtension(inPath);
+                }
+                catch (ArgumentException)
+                {
+                    // can happen if "inPath" contains invalid characters (ex. '"') or does not look like a path (ex. "mailto:...")
+                    return new JObject(new JProperty("Not a path?", inPath));
+                }
             }
             else
             {
