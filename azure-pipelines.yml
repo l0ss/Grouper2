@@ -31,3 +31,17 @@ steps:
   inputs:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+
+# GitHub Release
+# Create, edit, or delete a GitHub release.
+- task: GitHubRelease@0
+  inputs:
+    gitHubConnection: l0ss
+    repositoryName: Grouper2
+    action: 'create'
+    target: '$(Build.SourceVersion)'
+    tagSource: 'auto'
+    releaseNotes: 'Automated release via Azure'
+    assets: '$(Build.ArtifactStagingDirectory)/Grouper2.exe'
+    isPreRelease: true
+    addChangeLog: true
