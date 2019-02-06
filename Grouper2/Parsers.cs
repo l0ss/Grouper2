@@ -224,11 +224,7 @@ namespace Grouper2
             }
             catch (UnauthorizedAccessException e)
             {
-                if (GlobalVar.DebugMode)
-                {
-                    Utility.DebugWrite(e.ToString());
-                }
-
+                Utility.DebugWrite(e.ToString());
                 return null;
             }
 

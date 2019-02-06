@@ -116,39 +116,6 @@ namespace Grouper2
                 };
 
                 SearchResultCollection gpoSearchResults = gpoSearcher.FindAll();
-                /*
-            // stolen from prashant - grabbing guids for extended rights
-            Dictionary<string, string> guidDict = new Dictionary<string, string>
-            {
-                {"00000000-0000-0000-0000-000000000000", "All"}
-            };
-
-            // and again where we grab all the Extended Rights
-            DirectorySearcher rightsSearcher = new DirectorySearcher(rootExtRightsContext)
-            {
-                Filter = "(objectClass=controlAccessRight)",
-                PropertiesToLoad = {"name", "rightsGUID"}
-            };
-
-            SearchResultCollection extRightsResultCollection = rightsSearcher.FindAll();
-
-            foreach (SearchResult extRightsResult in extRightsResultCollection)
-            {
-                string extRightGuidString = extRightsResult.Properties["rightsguid"][0].ToString();
-                string extRightNameString = extRightsResult.Properties["name"][0].ToString();
-                // for some reason we hit a single duplicate in this lot. nfi what that's about. TODO - figure that out.
-                try
-                {
-                    guidDict.Add(extRightGuidString, extRightNameString);
-                }
-                catch (System.ArgumentException)
-                {
-                    if (GlobalVar.DebugMode)
-                    {
-                        Utility.DebugWrite("Hit a duplicate GUID in extRightsResult");
-                    }
-                }
-            }*/
 
                 // new dictionary for data from each GPO to go into
                 JObject gposData = new JObject();

@@ -34,10 +34,7 @@ namespace Grouper2.ScriptsIniAssess
                     }
                     catch (System.NullReferenceException e)
                     {
-                        if (GlobalVar.DebugMode)
-                        {
-                            Utility.DebugWrite(e.ToString());
-                        }
+                        Utility.DebugWrite(e.ToString());
                     }
 
                     // add cmdLine to result

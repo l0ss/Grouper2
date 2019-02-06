@@ -168,10 +168,8 @@ namespace Grouper2
                     }
                     catch (ArgumentException e)
                     {
-                        if (GlobalVar.DebugMode)
-                        {
-                            Utility.DebugWrite(e.ToString());
-                        }
+                        Utility.DebugWrite(e.ToString());
+                        
                         return new JObject(new JProperty("Not a path?", inPath));
                     }
 
@@ -187,10 +185,8 @@ namespace Grouper2
                     }
                     catch (ArgumentException e)
                     {
-                        if (GlobalVar.DebugMode)
-                        {
-                            Utility.DebugWrite(e.ToString());
-                        }
+                        Utility.DebugWrite(e.ToString());
+                        
                         return new JObject(new JProperty("Not a path?", inPath));
                     }
 
@@ -354,19 +350,13 @@ namespace Grouper2
             }
             catch (ArgumentException)
             {
-                if (GlobalVar.DebugMode)
-                {
-                    Utility.DebugWrite("Checked if file " + inPath +
+                Utility.DebugWrite("Checked if file " + inPath +
                                        " exists but it doesn't seem to be a valid file path.");
-                }
             }
             catch (UnauthorizedAccessException)
             {
-                if (GlobalVar.DebugMode)
-                {
-                    Utility.DebugWrite("Tried to check if file " + inPath +
+                Utility.DebugWrite("Tried to check if file " + inPath +
                                        " exists but I'm not allowed.");
-                }
             }
             return fileExists;
         }
@@ -404,24 +394,15 @@ namespace Grouper2
             }
             catch (UnauthorizedAccessException)
             {
-                if (GlobalVar.DebugMode)
-                {
-                    Utility.DebugWrite("Tested read perms for " + inPath + " and couldn't read.");
-                }
+                Utility.DebugWrite("Tested read perms for " + inPath + " and couldn't read.");
             }
             catch (ArgumentException)
             {
-                if (GlobalVar.DebugMode)
-                {
-                    Utility.DebugWrite("Tested read perms for " + inPath + " but it doesn't seem to be a valid file path.");
-                }
+                Utility.DebugWrite("Tested read perms for " + inPath + " but it doesn't seem to be a valid file path.");
             }
             catch (Exception e)
             {
-                if (GlobalVar.DebugMode)
-                {
-                    Utility.DebugWrite(e.ToString());
-                }
+                Utility.DebugWrite(e.ToString());
             }
             return canRead;
         }
@@ -469,51 +450,6 @@ namespace Grouper2
             }
             return false;
         }
-        
-        /*
-        // this approach works but has the problem of creating messy files
-        public static bool CanIWrite(string inPath)
-        {
-            bool canWrite = false;
-            try
-            {
-                if (GlobalVar.NoMess || !GlobalVar.OnlineChecks)
-                {
-                    return false;
-                }
-                else
-                {
-                    GlobalVar.CleanupList.Add(inPath);
-                    FileStream stream = File.OpenWrite(inPath);
-                    canWrite = stream.CanWrite;
-                    stream.Close();
-                }
-            }
-            catch (System.UnauthorizedAccessException)
-            {
-                if (GlobalVar.DebugMode)
-                {
-                    Utility.DebugWrite("Tested write perms for " + inPath + " and couldn't write.");
-                }
-            }
-            catch (System.ArgumentException)
-            {
-                if (GlobalVar.DebugMode)
-                {
-                    Utility.DebugWrite("Tested write perms for " + inPath +
-                                       " but it doesn't seem to be a valid file path.");
-                }
-            }
-            catch (Exception e)
-            {
-                if (GlobalVar.DebugMode)
-                {
-                    Utility.DebugWrite(e.ToString());
-                }
-            }
-            return canWrite;
-        }
-        */
 
         public static JObject InvestigateFileContents(string inString)
         {
@@ -528,10 +464,7 @@ namespace Grouper2
             }
             catch (UnauthorizedAccessException e)
             {
-                if (GlobalVar.DebugMode)
-                {
-                    Utility.DebugWrite(e.ToString());
-                }
+                Utility.DebugWrite(e.ToString());
             }
             
             if (investigatedFileContents["InterestLevel"] != null)

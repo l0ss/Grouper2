@@ -292,10 +292,7 @@ public class GlobalVar
                     catch (ActiveDirectoryOperationException e)
                     {
                         Console.WriteLine("\nCouldn't talk to the domain properly. If you're trying to run offline you should use the -o switch. Failing that, try rerunning with -d to specify a domain or -v to get more information about the error.");
-                        if (GlobalVar.DebugMode)
-                        {
-                            Utility.DebugWrite(e.ToString());
-                        }
+                        Utility.DebugWrite(e.ToString());
 
                         Environment.Exit(1);
                     }
@@ -381,10 +378,7 @@ public class GlobalVar
                 {
                     Console.Error.WriteLine("I had a problem with " + policyPath +
                                             ". I guess you could try to fix it?");
-                    if (GlobalVar.DebugMode)
-                    {
-                        Utility.DebugWrite(e.ToString());
-                    }
+                    Utility.DebugWrite(e.ToString());
                 }
             }
 
@@ -486,11 +480,8 @@ public class GlobalVar
                 }
             }
 
-            if (GlobalVar.DebugMode)
-            {
-                Console.Error.WriteLine("Errors in processing GPOs:");
-                Console.Error.WriteLine(taskErrors.ToString());
-            }
+            Console.Error.WriteLine("Errors in processing GPOs:");
+            Console.Error.WriteLine(taskErrors.ToString());
 
             // Final output is finally happening finally here:
 
@@ -657,10 +648,7 @@ public class GlobalVar
                     }
                     catch (ArgumentNullException e)
                     {
-                        if (GlobalVar.DebugMode)
-                        {
-                            Utility.DebugWrite(e.ToString());
-                        }
+                        Utility.DebugWrite(e.ToString());
                     }
                 }
                 // otherwise do what we can with what we have
@@ -776,19 +764,13 @@ public class GlobalVar
             }
             catch (DirectoryNotFoundException e)
             {
-                if (GlobalVar.DebugMode)
-                {
-                    Utility.DebugWrite(e.ToString());
-                }
+                Utility.DebugWrite(e.ToString());
 
                 return null;
             }
             catch (UnauthorizedAccessException e)
             {
-                if (GlobalVar.DebugMode)
-                {
-                    Utility.DebugWrite(e.ToString());
-                }
+                Utility.DebugWrite(e.ToString());
 
                 return null;
             }
@@ -806,10 +788,7 @@ public class GlobalVar
                 }
                 catch (UnauthorizedAccessException e)
                 {
-                    if (GlobalVar.DebugMode)
-                    {
-                        Utility.DebugWrite(e.ToString());
-                    }
+                    Utility.DebugWrite(e.ToString());
                 }
                 //send the inf file to be assessed
                 JObject assessedGpTmpl = AssessHandlers.AssessGptmpl(parsedInfFile);
@@ -872,19 +851,13 @@ public class GlobalVar
             }
             catch (DirectoryNotFoundException e)
             {
-                if (GlobalVar.DebugMode)
-                {
-                    Utility.DebugWrite(e.ToString());
-                }
+                Utility.DebugWrite(e.ToString());
 
                 return null;
             }
             catch (UnauthorizedAccessException e)
             {
-                if (GlobalVar.DebugMode)
-                {
-                    Utility.DebugWrite(e.ToString());
-                }
+                Utility.DebugWrite(e.ToString());
 
                 return null;
             }
@@ -901,10 +874,7 @@ public class GlobalVar
                     }
                     catch (UnauthorizedAccessException e)
                     {
-                        if (GlobalVar.DebugMode)
-                        {
-                            Utility.DebugWrite(e.ToString());
-                        }
+                        Utility.DebugWrite(e.ToString());
                         continue;
                     }
 

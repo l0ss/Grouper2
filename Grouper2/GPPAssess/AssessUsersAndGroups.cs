@@ -167,13 +167,10 @@ namespace Grouper2.GPPAssess
                 }
                 else
                 {
-                    if (GlobalVar.DebugMode)
-                    {
                         Utility.DebugWrite("Something went squirrely with Group Memberships");
                         Utility.DebugWrite(members.Type.ToString());
                         Utility.DebugWrite(" " + membersType + " ");
                         Utility.DebugWrite(members.ToString());
-                    }
                 }
             }
 

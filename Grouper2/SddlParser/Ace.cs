@@ -8,7 +8,6 @@ namespace Grouper2.SddlParser
     public class Ace
     {
         public string Raw { get; }
-
         public string AceType { get; }
         public string[] AceFlags { get; }
         public string[] Rights { get; }
@@ -22,11 +21,8 @@ namespace Grouper2.SddlParser
 
             if (parts.Length < 6)
             {
-                if (GlobalVar.DebugMode)
-                {
-                    Utility.DebugWrite("Incorrect ACE format?");
-                    Utility.DebugWrite(ace.ToString());
-                }
+                Utility.DebugWrite("Incorrect ACE format?");
+                Utility.DebugWrite(ace.ToString());
                 // ERROR Ace have incorrect format - less parts than 6.
             }
 

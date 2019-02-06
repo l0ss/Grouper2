@@ -30,19 +30,15 @@ namespace Grouper2.GPPAssess
                     }
                     else
                     {
-                        if (GlobalVar.DebugMode)
-                        {
-                            Utility.DebugWrite("GetAssessed" + assessName + " didn't return anything. This isn't a problem in itself, it just means that nothing met the interest level criteria. This message is only for debugging.");
-                        }
+                        Utility.DebugWrite("GetAssessed" + assessName + " didn't return anything. This isn't a problem in itself, it just means that nothing met the interest level criteria. This message is only for debugging.");
+                        
                         return null;
                     }
                 }
                 else
                 {
-                    if (GlobalVar.DebugMode)
-                    {
-                        Utility.DebugWrite("Failed to find method: GetAssessed" + assessName + ". This probably just means I never wrote one. If you think that Group Policy Preferences " + assessName + " are likely to have useful stuff in there, let me know on GitHub?");
-                    }
+                    Utility.DebugWrite("Failed to find method: GetAssessed" + assessName + ". This probably just means I never wrote one. If you think that Group Policy Preferences " + assessName + " are likely to have useful stuff in there, let me know on GitHub?");
+                    
                     return null;
                 }
             }

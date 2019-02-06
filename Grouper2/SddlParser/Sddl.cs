@@ -65,12 +65,8 @@ namespace Grouper2.SddlParser
 
             if (components.Any())
             {
-                if (GlobalVar.DebugMode)
-                {
-                    Utility.DebugWrite("encountered some weird extra data in Sddl.Parse");
-                    Utility.DebugWrite(components.ToString());
-                    // ERROR Unknown components encountered.
-                }
+                Utility.DebugWrite("encountered some weird extra data in Sddl.Parse");
+                Utility.DebugWrite(components.ToString());
             }
         }
 

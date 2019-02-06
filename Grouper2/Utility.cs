@@ -49,10 +49,7 @@ namespace Grouper2
             }
             catch (UnauthorizedAccessException e)
             {
-                if (GlobalVar.DebugMode)
-                {
-                    Utility.DebugWrite(e.ToString());
-                }
+                Utility.DebugWrite(e.ToString());
             }
 
             // set up output object
@@ -209,10 +206,8 @@ namespace Grouper2
             }
             catch (UnauthorizedAccessException e)
             {
-                if (GlobalVar.DebugMode)
-                {
-                    DebugWrite(e.ToString());
-                }
+                DebugWrite(e.ToString());
+                
                 return null;
             }
 
