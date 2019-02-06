@@ -75,12 +75,15 @@ namespace Grouper2.GPPAssess
 
             string gppDriveLabel = Utility.GetSafeString(gppDrive["Properties"], "@label");
             JObject gppDrivePath = FileSystem.InvestigatePath(gppDrive["Properties"]["@path"].ToString());
-            if (gppDrivePath["InterestLevel"] != null)
+            if (gppDrivePath != null)
             {
-                int pathInterestLevel = int.Parse(gppDrivePath["InterestLevel"].ToString());
-                if (pathInterestLevel > interestLevel)
+                if (gppDrivePath["InterestLevel"] != null)
                 {
-                    interestLevel = pathInterestLevel;
+                    int pathInterestLevel = int.Parse(gppDrivePath["InterestLevel"].ToString());
+                    if (pathInterestLevel > interestLevel)
+                    {
+                        interestLevel = pathInterestLevel;
+                    }
                 }
             }
 
@@ -91,7 +94,6 @@ namespace Grouper2.GPPAssess
                     {"Name", gppDriveName},
                     {"Action", gppDriveAction},
                     {"Changed", gppDriveChanged},
-                    {"Path", gppDrivePath},
                     {"Drive Letter", gppDriveLetter},
                     {"Label", gppDriveLabel}
                 };
@@ -100,6 +102,11 @@ namespace Grouper2.GPPAssess
                     assessedGppDrive.Add("Username", gppDriveUserName);
                     assessedGppDrive.Add("cPassword", gppDrivecPassword);
                     assessedGppDrive.Add("Decrypted Password", gppDrivePassword);
+                }
+
+                if (gppDrivePath != null)
+                {
+                    assessedGppDrive.Add("Path", gppDrivePath);
                 }
                 return new JProperty(gppDriveUid, assessedGppDrive);
             }

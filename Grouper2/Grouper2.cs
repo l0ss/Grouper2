@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.DirectoryServices.ActiveDirectory;
 using System.IO;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using CommandLineParser.Arguments;
 using CommandLineParser.Exceptions;
@@ -887,29 +888,38 @@ public class GlobalVar
 
                 return null;
             }
-            JObject processedAases = new JObject();
-            foreach (string aasFile in aasFiles)
-            {
-                JObject parsedAasFile = new JObject();
-                try
-                {
-                    parsedAasFile = Parsers.ParseAasFile(aasFile);
-                }
-                catch (UnauthorizedAccessException e)
-                {
-                    if (GlobalVar.DebugMode)
-                    {
-                        Utility.DebugWrite(e.ToString());
-                    }
-                    continue;
-                }
 
-                JObject assessedAasFile = AasAssess.AssessAasFile(parsedAasFile);
-                if (assessedAasFile != null && assessedAasFile.HasValues)
+            JObject processedAases = new JObject();
+            if (aasFiles != null)
+            {
+                foreach (string aasFile in aasFiles)
                 {
-                    processedAases.Add(aasFile, assessedAasFile);
+                    JObject parsedAasFile = new JObject();
+                    try
+                    {
+                        parsedAasFile = Parsers.ParseAasFile(aasFile);
+                    }
+                    catch (UnauthorizedAccessException e)
+                    {
+                        if (GlobalVar.DebugMode)
+                        {
+                            Utility.DebugWrite(e.ToString());
+                        }
+                        continue;
+                    }
+
+                    JObject assessedAasFile = AasAssess.AssessAasFile(parsedAasFile);
+                    if (assessedAasFile != null && assessedAasFile.HasValues)
+                    {
+                        processedAases.Add(aasFile, assessedAasFile);
+                    }
                 }
             }
+            else
+            {
+                return null;
+            }
+            
             
             JArray aasResult = new JArray();
 

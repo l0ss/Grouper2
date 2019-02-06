@@ -67,7 +67,7 @@ namespace Grouper2.GPPAssess
 
             
             
-            if (gppNtServiceProgram["InterestLevel"] != null)
+            if ((gppNtServiceProgram != null) && (gppNtServiceProgram["InterestLevel"] != null))
             {
                 int progInterestLevelInt = int.Parse(gppNtServiceProgram["InterestLevel"].ToString());
                 if (progInterestLevelInt > interestLevel)

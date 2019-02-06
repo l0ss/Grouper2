@@ -57,7 +57,7 @@ namespace Grouper2.GPPAssess
             JToken[] valuesWithInterest = {gppIniPath, gppIniSection, gppIniValue, gppIniProperty};
             foreach (JToken val in valuesWithInterest)
             {
-                if (val["InterestLevel"] != null)
+                if ((val != null) && (val["InterestLevel"] != null))
                 {
                     int valInterestLevel = int.Parse(val["InterestLevel"].ToString());
                     if (valInterestLevel > interestLevel)

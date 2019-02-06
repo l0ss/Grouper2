@@ -20,7 +20,7 @@ namespace Grouper2.ScriptsIniAssess
                 // iterate over individual scripts
                 foreach (KeyValuePair<string, JToken> parsedScript in parsedScriptIniTypeJObject)
                 {
-                    int interestLevel = 5;
+                    int interestLevel = 4;
                     // set up script results object
                     JObject assessedScriptIni = new JObject();
                     // get the unique ID of this script
@@ -43,7 +43,11 @@ namespace Grouper2.ScriptsIniAssess
                     // add cmdLine to result
                     if (cmdLine.Length > 0)
                     {
-                        assessedScriptIni.Add("Command Line", FileSystem.InvestigatePath(cmdLine));
+                        JObject investigatedCommand = FileSystem.InvestigatePath(cmdLine);
+                        if (investigatedCommand != null)
+                        {
+                            assessedScriptIni.Add("Command Line", investigatedCommand);
+                        }
                     }
 
                     if (parameters.Length > 0)

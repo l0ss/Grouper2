@@ -60,13 +60,13 @@ namespace Grouper2.GPPAssess
 
             command = FileSystem.InvestigatePath(commandString);
             arguments = Utility.InvestigateString(argumentsString);
-            if (arguments["InterestLevel"] != null)
+            if ((arguments != null) && (arguments["InterestLevel"] != null))
             {
                 int argumentInterest = (int)arguments["InterestLevel"];
                 interestLevel = interestLevel + argumentInterest;
             }
 
-            if (command["InterestLevel"] != null)
+            if ((command != null) && (command["InterestLevel"] != null))
             {
                 int commandInterest = (int)command["InterestLevel"];
                 interestLevel = interestLevel + commandInterest;
@@ -213,24 +213,22 @@ namespace Grouper2.GPPAssess
                 string argumentsString = Utility.GetSafeString(scheduledTask["Properties"], "@args");
                 JObject command = new JObject(new JProperty("Command", commandString));
                 JObject arguments = new JObject(new JProperty("Arguments", argumentsString));
+                
+                command = FileSystem.InvestigatePath(commandString);
+                arguments = Utility.InvestigateString(argumentsString);
 
-                if (GlobalVar.OnlineChecks)
+                if ((arguments != null) && (arguments["InterestLevel"] != null))
                 {
-                    command = FileSystem.InvestigatePath(commandString);
-                    arguments = Utility.InvestigateString(argumentsString);
-
-                    if (arguments["InterestLevel"] != null)
-                    {
-                        int argumentInterest = (int) arguments["InterestLevel"];
-                        interestLevel = interestLevel + argumentInterest;
-                    }
-
-                    if (command["InterestLevel"] != null)
-                    {
-                        int commandInterest = (int) command["InterestLevel"];
-                        interestLevel = interestLevel + commandInterest;
-                    }
+                    int argumentInterest = (int) arguments["InterestLevel"];
+                    interestLevel = interestLevel + argumentInterest;
                 }
+
+                if ((command != null) && (command["InterestLevel"] != null))
+                {
+                    int commandInterest = (int) command["InterestLevel"];
+                    interestLevel = interestLevel + commandInterest;
+                }
+                
 
                 assessedScheduledTask.Add("Action",
                     Utility.GetActionString(scheduledTask["Properties"]["@action"].ToString()));
@@ -251,26 +249,26 @@ namespace Grouper2.GPPAssess
                 JObject command = new JObject(new JProperty("Command", commandString));
                 JObject arguments = new JObject(new JProperty("Arguments", argumentsString));
 
-                if (GlobalVar.OnlineChecks)
+                
+                command = FileSystem.InvestigatePath(commandString);
+                arguments = Utility.InvestigateString(argumentsString);
+
+                if ((arguments != null) && (arguments["InterestLevel"] != null))
                 {
-                    command = FileSystem.InvestigatePath(commandString);
-                    arguments = Utility.InvestigateString(argumentsString);
-
-                    if (arguments["InterestLevel"] != null)
-                    {
-                        int argumentInterest = (int) arguments["InterestLevel"];
-                        interestLevel = interestLevel + argumentInterest;
-                    }
-
-                    if (command["InterestLevel"] != null)
-                    {
-                        int commandInterest = (int) command["InterestLevel"];
-                        interestLevel = interestLevel + commandInterest;
-                    }
+                    int argumentInterest = (int) arguments["InterestLevel"];
+                    interestLevel = interestLevel + argumentInterest;
                 }
+
+                if ((command != null) && (command["InterestLevel"] != null))
+                {
+                    int commandInterest = (int) command["InterestLevel"];
+                    interestLevel = interestLevel + commandInterest;
+                }
+                
 
                 assessedScheduledTask.Add("Command", command);
                 assessedScheduledTask.Add("Arguments", arguments);
+                //TODO 
                 assessedScheduledTask.Add("Start In", Utility.GetSafeString(scheduledTask["Properties"], "@startIn"));
                 assessedScheduledTask.Add("Comment", Utility.GetSafeString(scheduledTask["Properties"], "@comment"));
             }

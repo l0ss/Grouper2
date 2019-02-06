@@ -70,7 +70,7 @@ namespace Grouper2.GPPAssess
             JToken[] valuesWithInterest = { gppPrinterPath, gppPrinterComment, gppPrinterLocation,};
             foreach (JToken val in valuesWithInterest)
             {
-                if (val["InterestLevel"] != null)
+                if ((val != null) && (val["InterestLevel"] != null))
                 {
                     int valInterestLevel = int.Parse(val["InterestLevel"].ToString());
                     if (valInterestLevel > interestLevel)
@@ -86,11 +86,11 @@ namespace Grouper2.GPPAssess
                 {
                     {"Name", gppPrinterName},
                     {"Changed", gppPrinterChanged},
-                    {"Action", gppPrinterAction},
-                    {"Username", gppPrinterUsername}
+                    {"Action", gppPrinterAction}
                 };
                 if (gppPrintercPassword.Length > 0)
                 {
+                    assessedGppPrinter.Add("Username", gppPrinterUsername);
                     assessedGppPrinter.Add("cPassword", gppPrintercPassword);
                     assessedGppPrinter.Add("Decrypted Password", gppPrinterPassword);
                 }

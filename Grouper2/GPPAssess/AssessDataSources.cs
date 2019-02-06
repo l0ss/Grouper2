@@ -76,8 +76,11 @@ namespace Grouper2.GPPAssess
                 assessedGppDataSource.Add("DSN", gppDataSourceDsn);
                 assessedGppDataSource.Add("Driver", gppDataSourceDriver);
                 assessedGppDataSource.Add("Description", gppDataSourceDescription);
-                assessedGppDataSource.Add("Attributes", gppDataSourceAttributes);
-               
+                if ((gppDataSourceAttributes != null) && (gppDataSourceAttributes.HasValues))
+                {
+                    assessedGppDataSource.Add("Attributes", gppDataSourceAttributes);
+                }
+
                 return new JProperty(gppDataSourceUid, assessedGppDataSource);
             }
 

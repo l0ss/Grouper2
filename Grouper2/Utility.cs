@@ -156,9 +156,12 @@ namespace Grouper2
             {
                 JObject investigatedPath = FileSystem.InvestigatePath(foundFilePath);
 
-                if (investigatedPath["InterestLevel"] != null && int.Parse(investigatedPath["InterestLevel"].ToString()) >= GlobalVar.IntLevelToShow)
+                if (investigatedPath != null)
                 {
-                    investigatedPaths.Add(investigatedPath);
+                    if (investigatedPath["InterestLevel"] != null && int.Parse(investigatedPath["InterestLevel"].ToString()) >= GlobalVar.IntLevelToShow)
+                    {
+                        investigatedPaths.Add(investigatedPath);
+                    }
                 }
             }
 

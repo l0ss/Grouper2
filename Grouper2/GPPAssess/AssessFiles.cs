@@ -57,11 +57,14 @@ namespace Grouper2.GPPAssess
                 if (fromPath.Length > 0)
                 {
                     JObject assessedPath = FileSystem.InvestigatePath(gppFileProps["@fromPath"].ToString());
-                    assessedFile.Add("From Path", assessedPath);
-                    if (assessedPath["InterestLevel"] != null)
+                    if (assessedPath != null)
                     {
-                        int pathInterest = (int) assessedPath["InterestLevel"];
-                        interestLevel = interestLevel + pathInterest;
+                        assessedFile.Add("From Path", assessedPath);
+                        if (assessedPath["InterestLevel"] != null)
+                        {
+                            int pathInterest = (int)assessedPath["InterestLevel"];
+                            interestLevel = interestLevel + pathInterest;
+                        }
                     }
                 }
                 else

@@ -32,7 +32,7 @@ namespace Grouper2.GPPAssess
                     {
                         if (GlobalVar.DebugMode)
                         {
-                            Utility.DebugWrite("GetAssessed" + assessName + "didn't return anything.");
+                            Utility.DebugWrite("GetAssessed" + assessName + " didn't return anything. This isn't a problem in itself, it just means that nothing met the interest level criteria. This message is only for debugging.");
                         }
                         return null;
                     }

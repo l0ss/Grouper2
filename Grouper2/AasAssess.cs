@@ -11,19 +11,26 @@ namespace Grouper2
             {
                 string msiPath = parsedAasFile["MSI Path"].ToString();
                 JObject assessedMsiPath = FileSystem.InvestigatePath(msiPath);
-                if (assessedMsiPath.HasValues)
+                if ((assessedMsiPath != null) && (assessedMsiPath.HasValues))
                 {
                     parsedAasFile["MSI Path"] = assessedMsiPath;
-                    if ((int) assessedMsiPath["InterestLevel"] > interestLevel)
+                    if (assessedMsiPath["InterestLevel"] != null)
                     {
-                        interestLevel = (int) assessedMsiPath["InterestLevel"];
+                        if ((int)assessedMsiPath["InterestLevel"] > interestLevel)
+                        {
+                            interestLevel = (int)assessedMsiPath["InterestLevel"];
+                        }
                     }
                 }
-            }
 
-            if (interestLevel >= GlobalVar.IntLevelToShow)
-            {
-                return parsedAasFile;
+                if (interestLevel >= GlobalVar.IntLevelToShow)
+                {
+                    return parsedAasFile;
+                }
+                else
+                {
+                    return null;
+                }
             }
             else
             {

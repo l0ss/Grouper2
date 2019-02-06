@@ -60,7 +60,7 @@ namespace Grouper2.GPPAssess
             string iconPath = Utility.GetSafeString(gppShortcutProps, "@iconPath");
             
             JObject investigatedIconPath = FileSystem.InvestigatePath(iconPath);
-            if (investigatedIconPath["InterestLevel"] != null)
+            if ((investigatedIconPath != null) && (investigatedIconPath["InterestLevel"] != null))
             {
                 if ((int)investigatedIconPath["InterestLevel"] > interestLevel)
                 {
@@ -95,7 +95,8 @@ namespace Grouper2.GPPAssess
 
             string targetPath = Utility.GetSafeString(gppShortcutProps, "@targetPath");
             JObject investigatedTargetPath = FileSystem.InvestigatePath(targetPath);
-            if (investigatedTargetPath["InterestLevel"] != null)
+
+            if ((investigatedTargetPath != null) && (investigatedTargetPath["InterestLevel"] != null))
             {
                 if ((int) investigatedTargetPath["InterestLevel"] > interestLevel)
                 {
