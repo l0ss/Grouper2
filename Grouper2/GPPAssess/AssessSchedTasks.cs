@@ -72,14 +72,14 @@ namespace Grouper2.GPPAssess
                 interestLevel = interestLevel + commandInterest;
             }
 
-            string caption = "Action - Execute Command";
+            string caption = "Exec";
             if (number > 0)
             {
                 caption += " - " + number;
             }
             return new JProperty(caption, new JObject(
                         new JProperty("Command", command),
-                        new JProperty("Arguments", arguments)
+                        new JProperty("Args", arguments)
                     )
                 );
         }
