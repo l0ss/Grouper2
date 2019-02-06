@@ -49,6 +49,41 @@ namespace Grouper2.GPPAssess
             }
         }
 
+        private JProperty ExtractCommandFromScheduledTask(JToken scheduledTask, ref int interestLevel, int number = 0)
+        {
+            string commandString = Utility.GetSafeString(scheduledTask, "Command");
+            string argumentsString = Utility.GetSafeString(scheduledTask, "Arguments");
+
+            JObject command = new JObject(new JProperty("Command", commandString));
+            JObject arguments = new JObject(new JProperty("Arguments", argumentsString));
+
+
+            command = FileSystem.InvestigatePath(commandString);
+            arguments = Utility.InvestigateString(argumentsString);
+            if (arguments["InterestLevel"] != null)
+            {
+                int argumentInterest = (int)arguments["InterestLevel"];
+                interestLevel = interestLevel + argumentInterest;
+            }
+
+            if (command["InterestLevel"] != null)
+            {
+                int commandInterest = (int)command["InterestLevel"];
+                interestLevel = interestLevel + commandInterest;
+            }
+
+            string caption = "Exec";
+            if (number > 0)
+            {
+                caption += " - " + number;
+            }
+            return new JProperty(caption, new JObject(
+                        new JProperty("Command", command),
+                        new JProperty("Args", arguments)
+                    )
+                );
+        }
+
         private JObject GetAssessedScheduledTask(JToken scheduledTask, string schedTaskType)
         {
             int interestLevel = 4;
@@ -110,37 +145,21 @@ namespace Grouper2.GPPAssess
 
                 if (scheduledTask["Properties"]["Task"]["Actions"]["Exec"] != null)
                 {
-                    string commandString = Utility.GetSafeString(scheduledTask["Properties"]["Task"]["Actions"]["Exec"],
-                        "Command");
-                    string argumentsString =
-                        Utility.GetSafeString(scheduledTask["Properties"]["Task"]["Actions"]["Exec"], "Arguments");
-
-                    JObject command = new JObject(new JProperty("Command", commandString));
-                    JObject arguments = new JObject(new JProperty("Arguments", argumentsString));
-
-                    
-                    command = FileSystem.InvestigatePath(commandString);
-                    arguments = Utility.InvestigateString(argumentsString);
-                    if (arguments["InterestLevel"] != null)
+                    // do we have an array of Command?
+                    if (scheduledTask["Properties"]["Task"]["Actions"]["Exec"].Type == JTokenType.Array)
                     {
-                        int argumentInterest = (int) arguments["InterestLevel"];
-                        interestLevel = interestLevel + argumentInterest;
+                        int i = 1;
+                        foreach (var item in scheduledTask["Properties"]["Task"]["Actions"]["Exec"])
+                        {
+                            assessedScheduledTask.Add(ExtractCommandFromScheduledTask(item, ref interestLevel, i));
+                            i++;
+                        }
                     }
-
-                    if (command["InterestLevel"] != null)
+                    else
                     {
-                        int commandInterest = (int) command["InterestLevel"];
-                        interestLevel = interestLevel + commandInterest;
+                        // or just one?
+                        assessedScheduledTask.Add(ExtractCommandFromScheduledTask(scheduledTask["Properties"]["Task"]["Actions"]["Exec"], ref interestLevel));
                     }
-                    
-
-                    assessedScheduledTask.Add(
-                        new JProperty("Action - Execute Command", new JObject(
-                                new JProperty("Command", command),
-                                new JProperty("Arguments", arguments)
-                            )
-                        )
-                    );
                 }
 
                 if (scheduledTask["Properties"]["Task"]["Actions"]["SendEmail"] != null)
