@@ -44,6 +44,6 @@ steps:
     tag: '0.9.4'
     releaseTitle: 'sobbing and throwing fists against azure while screaming WORK'
     releaseNotes: 'die'
-    assets: '$(Build.ArtifactStagingDirectory)/Grouper2.exe'
+    assets: '$(Build.ArtifactStagingDirectory)\Grouper2.exe'
     #isPreRelease: true # Optional
     #addChangeLog: true # Optional
