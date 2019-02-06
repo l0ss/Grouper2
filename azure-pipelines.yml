@@ -40,7 +40,7 @@ steps:
     repositoryName: Grouper2
     action: 'create'
     target: '$(Build.SourceVersion)'
-    tagSource: 'auto'
+    tagSource: 'Git tag'
     releaseNotes: 'Automated release via Azure'
     assets: '$(Build.ArtifactStagingDirectory)/Grouper2.exe'
     isPreRelease: true
