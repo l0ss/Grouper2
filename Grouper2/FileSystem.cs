@@ -34,7 +34,7 @@ namespace Grouper2
             JArray interestingWordsFromFile = new JArray();
             string dirPath = "";
             // remove quotes
-            string inPath = pathToInvestigate.Trim("'","\"");
+            string inPath = pathToInvestigate.Trim('\'','\"');
             // and whitespace
             inPath = inPath.Trim();
 
