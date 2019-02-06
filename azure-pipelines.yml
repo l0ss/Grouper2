@@ -39,7 +39,7 @@ steps:
     gitHubConnection: 'l0ss'
     repositoryName: 'l0ss/Grouper2'
     action: 'create'
-    target: '$(Build.SourceVersion)'
+    target: 'master'
     tagSource: 'auto'
     releaseTitle: 'Azure AutoSomething'
     assets: '$(Build.ArtifactStagingDirectory)/Grouper2.exe'
