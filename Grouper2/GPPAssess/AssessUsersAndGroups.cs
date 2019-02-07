@@ -149,7 +149,7 @@ namespace Grouper2.GPPAssess
             assessedGroup.Add("Remove Accounts", Utility.GetSafeString(gppGroupProps, "@removeAccounts"));
             assessedGroup.Add("Action", groupAction);
 
-            JArray gppGroupMemberArray = new JArray();
+            JArray gppGroupMemberJArray = new JArray();
             if (gppGroupProps["Members"] != null)
             {
                 JToken members = gppGroupProps["Members"]["Member"];
@@ -158,12 +158,12 @@ namespace Grouper2.GPPAssess
                 {
                     foreach (JToken member in members.Children())
                     {
-                        gppGroupMemberArray.Add(GetAssessedGroupMember(member));
+                        gppGroupMemberJArray.Add(GetAssessedGroupMember(member));
                     }
                 }
                 else if (membersType == "Object")
                 {
-                    gppGroupMemberArray.Add(GetAssessedGroupMember(members));
+                    gppGroupMemberJArray.Add(GetAssessedGroupMember(members));
                 }
                 else
                 {
@@ -174,7 +174,18 @@ namespace Grouper2.GPPAssess
                 }
             }
 
-            assessedGroup.Add("Members", gppGroupMemberArray);
+            string membersString = gppGroupMemberJArray.ToString();
+            membersString = membersString.Replace("\"", "");
+            membersString = membersString.Replace(",", "");
+            membersString = membersString.Replace("[", "");
+            membersString = membersString.Replace("]", "");
+            membersString = membersString.Replace("{", "");
+            membersString = membersString.Replace("}", "");
+            membersString = membersString.Replace("    ", "");
+            membersString = membersString.Replace("\n\n\n", "\n");
+            membersString = membersString.Trim();
+
+            assessedGroup.Add("Members", membersString);
 
             if (interestLevel < GlobalVar.IntLevelToShow)
             {
