@@ -328,11 +328,13 @@ namespace Grouper2
                         return null;
                     }
                     // build the object
+                    string rightsString = fileSystemRightsJArray.ToString().Trim('[',']').Trim().Replace("\"", "");
+
                     JObject fileDaclJObject = new JObject
                     {
                         {accessControlTypeString, displayNameString},
                         {"Inherited?", isInheritedString},
-                        {"Rights", fileSystemRightsJArray.ToString()}
+                        {"Rights", rightsString}
                     };
                     // add the object to the array.
                     fileDaclsJObject.Add(inc.ToString(), fileDaclJObject);

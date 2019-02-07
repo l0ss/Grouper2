@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Newtonsoft.Json.Linq;
 
 namespace Grouper2.ScriptsIniAssess
@@ -43,15 +44,33 @@ namespace Grouper2.ScriptsIniAssess
                         JObject investigatedCommand = FileSystem.InvestigatePath(cmdLine);
                         if (investigatedCommand != null)
                         {
+                            if (investigatedCommand["InterestLevel"] != null)
+                            {
+                                if ((int) investigatedCommand["InterestLevel"] > interestLevel)
+                                {
+                                    interestLevel = (int) investigatedCommand["InterestLevel"];
+                                }
+                            }
+                        
                             assessedScriptIni.Add("Command Line", investigatedCommand);
                         }
                     }
 
                     if (parameters.Length > 0)
                     {
-                        assessedScriptIni.Add("Parameters", Utility.InvestigateString(parameters));
+                        JObject investigatedParams = Utility.InvestigateString(parameters);
+                        if (investigatedParams != null)
+                        {
+                            if (investigatedParams["InterestLevel"] != null)
+                            {
+                                if ((int)investigatedParams["InterestLevel"] > interestLevel)
+                                {
+                                    interestLevel = (int)investigatedParams["InterestLevel"];
+                                }
+                            }
+                            assessedScriptIni.Add("Parameters", Utility.InvestigateString(parameters));
+                        }
                     }
-                    
 
                     if (interestLevel >= GlobalVar.IntLevelToShow)
                     {
