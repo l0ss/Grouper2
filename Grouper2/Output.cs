@@ -338,15 +338,13 @@ namespace Grouper2
                             new Span("System Access") { Color = findingColor }, "\n",
                             new Span("~~~~~~~~~~~~~") { Color = findingColor }
                         );
-                        GridLength col1Width = GridLength.Auto;
-                        GridLength col2Width = GridLength.Auto;
                         Grid grid = new Grid
                         {
                             Color = ConsoleColor.White,
                             Columns =
                             {
-                                new Column { Width = col1Width, MinWidth = 25, MaxWidth = 40},
-                                new Column { Width = col2Width, MinWidth = 5, MaxWidth = 40}
+                                new Column { Width = GridLength.Auto, MinWidth = 25, MaxWidth = 40},
+                                new Column { Width = GridLength.Auto, MinWidth = 5, MaxWidth = 40}
                             },
                             Stroke = LineThickness.Single,
                             StrokeColor = ConsoleColor.Gray
@@ -367,7 +365,25 @@ namespace Grouper2
                             new Span("Kerberos Policy") { Color = findingColor }, "\n",
                             new Span("~~~~~~~~~~~~~~~") { Color = findingColor }
                         );
-                        findingsDocument.Children.Add(JsonToGrid(cat.Value, 0));
+                        Grid grid = new Grid
+                        {
+                            Color = ConsoleColor.White,
+                            Columns =
+                            {
+                                new Column { Width = GridLength.Auto, MinWidth = 25, MaxWidth = 40},
+                                new Column { Width = GridLength.Auto, MinWidth = 5, MaxWidth = 40}
+                            },
+                            Stroke = LineThickness.Single,
+                            StrokeColor = ConsoleColor.Gray
+                        };
+                        foreach (JProperty jprop in cat.Value)
+                        {
+                            string name = jprop.Name;
+                            JToken value = jprop.Value;
+                            grid.Children.Add(new Cell(jprop.Name), new Cell(jprop.Value.ToString()));
+                        }
+
+                        findingsDocument.Children.Add(grid);
                         
                         continue;
                     }
@@ -377,7 +393,25 @@ namespace Grouper2
                             new Span("Registry Values") { Color = findingColor }, "\n",
                             new Span("~~~~~~~~~~~~~~~") { Color = findingColor }
                         );
-                            findingsDocument.Children.Add(JsonToGrid(cat.Value, 0));
+                        Grid grid = new Grid
+                        {
+                            Color = ConsoleColor.White,
+                            Columns =
+                            {
+                                new Column { Width = GridLength.Auto, MinWidth = 25, MaxWidth = 60},
+                                new Column { Width = GridLength.Auto, MinWidth = 5, MaxWidth = 20}
+                            },
+                            Stroke = LineThickness.Single,
+                            StrokeColor = ConsoleColor.Gray
+                        };
+                        foreach (JProperty jprop in cat.Value)
+                        {
+                            string name = jprop.Name;
+                            JToken value = jprop.Value;
+                            grid.Children.Add(new Cell(jprop.Name), new Cell(jprop.Value.ToString()));
+                        }
+
+                        findingsDocument.Children.Add(grid);
                         continue;
                     }
                     if (cat.Key == "RegistrySettings")

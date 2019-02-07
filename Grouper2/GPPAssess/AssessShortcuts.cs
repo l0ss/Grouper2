@@ -21,11 +21,14 @@ namespace Grouper2.GPPAssess
             }
             else
             {
-                JObject gppShortcuts = (JObject) JToken.FromObject(gppCategory["Shortcut"]);
-                JObject assessedShortcut = GetAssessedShortcut(gppShortcuts);
-                if (assessedShortcut.HasValues)
+                if (gppCategory["Shortcut"] != null)
                 {
-                    assessedShortcuts.Add(gppShortcuts["@uid"].ToString(), assessedShortcut);
+                    JObject gppShortcuts = (JObject)JToken.FromObject(gppCategory["Shortcut"]);
+                    JObject assessedShortcut = GetAssessedShortcut(gppShortcuts);
+                    if (assessedShortcut.HasValues)
+                    {
+                        assessedShortcuts.Add(gppShortcuts["@uid"].ToString(), assessedShortcut);
+                    }
                 }
             }
 
