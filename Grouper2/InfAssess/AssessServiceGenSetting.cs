@@ -38,13 +38,14 @@ namespace Grouper2.InfAssess
                         break;
                 }
 
+                JObject assessedSddl = new JObject();
                 // go parse the SDDL
-                if (GlobalVar.OnlineChecks)
+                if (sddl.Length > 4)
                 {
                     JObject parsedSddl = ParseSddl.ParseSddlString(sddl, SecurableObjectType.WindowsService);
 
                     // then assess the results based on interestLevel
-                    JObject assessedSddl = new JObject();
+                    
 
                     if (parsedSddl["Owner"] != null)
                     {
@@ -63,7 +64,10 @@ namespace Grouper2.InfAssess
                         JObject assessedDacl = new JObject();
 
                         string[] boringSidEndings = new string[]
-                            {"-3-0", "-5-9", "5-18", "-512", "-519", "SY", "BA", "DA", "CO", "ED", "PA", "CG", "DD", "EA", "LA",};
+                        {
+                            "-3-0", "-5-9", "5-18", "-512", "-519", "SY", "BA", "DA", "CO", "ED", "PA", "CG", "DD",
+                            "EA", "LA",
+                        };
                         string[] interestingSidEndings = new string[]
                             {"DU", "WD", "IU", "BU", "AN", "AU", "BG", "DC", "DG", "LG"};
                         string[] interestingRights = new string[] {"WRITE_PROPERTY", "WRITE_DAC", "WRITE_OWNER"};
@@ -76,7 +80,7 @@ namespace Grouper2.InfAssess
                             bool boringUserPresent = false;
 
                             bool interestingRightPresent = false;
-                            
+
                             foreach (string interestingRight in interestingRights)
                             {
                                 foreach (JToken right in ace.Value["Rights"])
@@ -86,6 +90,7 @@ namespace Grouper2.InfAssess
                                         interestingRightPresent = true;
                                         break;
                                     }
+
                                     if (interestingRightPresent) break;
                                 }
                             }
@@ -137,28 +142,21 @@ namespace Grouper2.InfAssess
                             }
                         }
 
-                        if (assessedDacl.HasValues)
+                        if ((assessedDacl != null) && (assessedDacl.HasValues))
                         {
                             assessedSddl.Add("DACL", assessedDacl);
                         }
                     }
-                
+                    
+                }
+
+                if (interestLevel >= GlobalVar.IntLevelToShow)
+                {
                     if (assessedSddl.HasValues)
                     {
                         assessedSddl.AddFirst(new JProperty("Service", serviceName));
                         assessedSddl.Add("Startup Type", startupString);
                         assessedSvcGenSettings.Add(inc.ToString(), assessedSddl);
-                    }
-            
-                }
-                else
-                {
-                    if (interestLevel >= GlobalVar.IntLevelToShow)
-                    {
-                        assessedSvcGenSettings.Add(serviceName, new JObject(
-                            new JProperty("SDDL", sddl),
-                            new JProperty("Startup Type", startupString)
-                        ));
                     }
                 }
             }

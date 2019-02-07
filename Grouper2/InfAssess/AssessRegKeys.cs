@@ -50,11 +50,10 @@ namespace Grouper2.InfAssess
                 JObject assessedSddl = new JObject();
 
                 // go parse the SDDL
-                if (GlobalVar.OnlineChecks)
-                {
-                    JObject parsedSddl = ParseSddl.ParseSddlString(sddl, SecurableObjectType.WindowsService);
-                
+                JObject parsedSddl = ParseSddl.ParseSddlString(sddl, SecurableObjectType.WindowsService);
 
+                if (sddl.Length > 4)
+                {
                     if (parsedSddl["Owner"] != null)
                     {
                         assessedSddl.Add("Owner", parsedSddl["Owner"].ToString());
@@ -71,7 +70,10 @@ namespace Grouper2.InfAssess
                     if (parsedSddl["DACL"] != null)
                     {
                         string[] boringSidEndings = new string[]
-                            {"-3-0", "-5-9", "5-18", "-512", "-519", "SY", "BA", "DA", "CO", "ED", "PA", "CG", "DD", "EA", "LA",};
+                        {
+                            "-3-0", "-5-9", "5-18", "-512", "-519", "SY", "BA", "DA", "CO", "ED", "PA", "CG", "DD",
+                            "EA", "LA",
+                        };
                         string[] interestingSidEndings = new string[]
                             {"DU", "WD", "IU", "BU", "AN", "AU", "BG", "DC", "DG", "LG"};
 
@@ -100,7 +102,7 @@ namespace Grouper2.InfAssess
                                 }
                             }
 
-                            if (interestingUserPresent/* && interestingRightPresent*/)
+                            if (interestingUserPresent /* && interestingRightPresent*/)
                             {
                                 aceInterestLevel = 10;
                             }
@@ -121,9 +123,8 @@ namespace Grouper2.InfAssess
                             assessedSddl.Add("DACL", assessedDacl);
                         }
                     }
-                
                 }
-
+                
                 if (interestLevel >= GlobalVar.IntLevelToShow)
                 {
                     if (assessedSddl.HasValues)
@@ -134,6 +135,7 @@ namespace Grouper2.InfAssess
                     }
                 }
             }
+
 
             if (assessedRegKeys.Count <= 0)
             {

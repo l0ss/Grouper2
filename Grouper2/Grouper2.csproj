@@ -110,7 +110,7 @@
     <Compile Include="GPPAssess\AssessGpp.cs" />
     <Compile Include="AssessHandlers.cs" />
     <Compile Include="Output.cs" />
-    <Compile Include="ParseSDDL.cs" />
+    <Compile Include="SddlParser\ParseSDDL.cs" />
     <Compile Include="ScriptsIniAssess\AssessScriptsIni.cs" />
     <Compile Include="GPPAssess\AssessDataSources.cs" />
     <Compile Include="GPPAssess\AssessDrives.cs" />
