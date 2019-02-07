@@ -65,7 +65,7 @@ namespace Grouper2
                         err = Marshal.GetLastWin32Error();
                 }
             }
-            if ((err != 0) && GlobalVar.DebugMode)
+            if (err != 0)
                 Utility.DebugWrite(@"Error in SID Lookup : " + err + " resolving SID " + sidString);
 
             string lookupResult = "SID Resolution Failed";
