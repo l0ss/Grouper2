@@ -27,15 +27,15 @@ namespace Grouper2.ScriptsIniAssess
                     // get the unique ID of this script
                     string scriptNum = parsedScript.Key;
                     string parameters = "";
-                    string cmdLine = parsedScript.Value["CmdLine"].ToString();
+                    string cmdLine = "";
+                    if (parsedScript.Value["CmdLine"] != null)
+                    {
+                        cmdLine = parsedScript.Value["CmdLine"].ToString();
+                    }
                     // params are optional, handle it if it's missing.
-                    try
+                    if (parsedScript.Value["Parameters"] != null)
                     {
                         parameters = parsedScript.Value["Parameters"].ToString();
-                    }
-                    catch (System.NullReferenceException e)
-                    {
-                        Utility.DebugWrite(e.ToString());
                     }
 
                     // add cmdLine to result

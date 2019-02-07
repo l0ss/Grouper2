@@ -318,13 +318,22 @@ namespace Grouper2
 
             int filePathOffset = (upgradeCodeOffset + 66);
             int filePathLength = 0;
-            foreach (byte b in aasBytes.Skip(filePathOffset))
+            try
             {
-                if (b == 0x00)
+                foreach (byte b in aasBytes.Skip(filePathOffset))
                 {
-                    break;
+                    if (b == 0x00)
+                    {
+                        break;
+                    }
+                    else filePathLength++;
                 }
-                else filePathLength++;
+            }
+            catch (OverflowException e)
+            {
+                Utility.DebugWrite("Failed to parse AAS file properly.");
+                Utility.DebugWrite(e.ToString());
+                return null;
             }
 
             byte[] filePathBytes = new byte[filePathLength - 2];
