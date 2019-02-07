@@ -168,7 +168,9 @@ namespace Grouper2.SddlParser
                             continue;
                         }
                         else
-                        {
+                        { 
+                            // KEY_READ will land here. not sure what to do with it cos reading the right registry key is of course very interesting, but those cases are going to be pretty rare.
+                            // Might have to handle further downstream?
                             Utility.DebugWrite(right + " was not defined as either boring or interesting. Consider adding it to the dicts in Acl.cs?");
                             aceRightsJArray.Add(right);
                         }
