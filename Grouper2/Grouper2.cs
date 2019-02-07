@@ -553,10 +553,14 @@ public class GlobalVar
                     }
                 }
             }
-
-            Console.Error.WriteLine("\n\nDone! Press any key to exit.");
-            // wait for 'anykey'
-            Console.ReadKey();
+            // FINISHED!
+            bool isDebuggerAttached = System.Diagnostics.Debugger.IsAttached;
+            if (isDebuggerAttached)
+            {
+                Console.Error.WriteLine("Press any key to Exit");
+                Console.ReadKey();
+            }
+            Environment.Exit(0);
         }
 
         private static JObject ProcessScripts(List<string> scriptDirs)
