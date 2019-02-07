@@ -448,6 +448,10 @@ namespace Grouper2
             {
                 return false;
             }
+            catch (ArgumentNullException)
+            {
+                return false;
+            }
             return false;
         }
 
