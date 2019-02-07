@@ -323,7 +323,18 @@ namespace Grouper2
             Array.Copy(aasBytes, filePathOffset, filePathBytes, 0, filePathLength - 2);
             string filePath = Encoding.UTF8.GetString(filePathBytes, 0, filePathBytes.Length);
 
-            string msiPath = Path.Combine(filePath, fileName);
+            string msiPath = "";
+            try
+            {
+                msiPath = Path.Combine(filePath, fileName);
+            }
+            catch (ArgumentException)
+            {
+                msiPath = "Problem parsing AAS file. Try again with -v for details.";
+                Utility.DebugWrite("Failed to parse AAS file at " + aasFile);
+                Utility.DebugWrite("filePath : " + filePath.ToString());
+                Utility.DebugWrite("fileName : " + fileName.ToString());
+            }
 
             JObject parsedAasFile = new JObject(
                 new JProperty("Package Name", productName),
