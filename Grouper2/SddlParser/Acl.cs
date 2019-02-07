@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.DirectoryServices;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json.Linq;
@@ -105,11 +106,11 @@ namespace Grouper2.SddlParser
                     string aceSidAlias = ace.AceSid.Alias;
                     string aceSidRaw = ace.AceSid.Raw;
                     string aceType;
-                    if (ace.AceType == "ACCESS_ALLOWED")
+                    if ((ace.AceType == "ACCESS_ALLOWED") || (ace.AceType == "OBJECT_ACCESS_ALLOWED"))
                     {
                         aceType = "Allow";
                     }
-                    else if (ace.AceType == "ACCESS_DENIED")
+                    else if ((ace.AceType == "ACCESS_DENIED") || (ace.AceType == "OBJECT_ACCESS_DENIED"))
                     {
                         aceType = "Deny";
                     }
@@ -117,20 +118,73 @@ namespace Grouper2.SddlParser
                     {
                         aceType = ace.AceType;
                     }
+                    
+                    Dictionary<string, string> boringRights = new Dictionary<string, string>()
+                    {
+                        { "READ_CONTROL", "Read ACL"},
+                        { "SYNCHRONIZE", "Synchronize"},
+                        { "GENERIC_EXECUTE", "Execute"},
+                        { "GENERIC_READ", "Read"},
+                        { "READ_PROPERTY", "Read Property"},
+                        { "LIST_CHILDREN", "List Children"},
+                        { "LIST_OBJECT", "List Object"}
+                    };
 
-                    JArray aceRights = JArray.FromObject(ace.Rights);
+                    Dictionary<string, string> interestingRights = new Dictionary<string, string>()
+                    {
+                        {"KEY_ALL","Full Control"},
+                        {"DELETE_TREE", "Delete Tree"},
+                        {"STANDARD_DELETE", "Delete"},
+                        {"CREATE_CHILD", "Create Child"},
+                        {"DELETE_CHILD", "Delete Child"},
+                        {"WRITE_PROPERTY", "Write Property"},
+                        {"GENERIC_ALL", "Full Control"},
+                        {"GENERIC_WRITE", "Write"},
+                        {"WRITE_DAC", "Write ACL"},
+                        {"WRITE_OWNER", "Write Owner"},
+                        {"STANDARD_RIGHTS_ALL", "Full Control"},
+                        {"STANDARD_RIGHTS_REQUIRED", "Delete, Write DACL, Write Owner"},
+                        {"CONTROL_ACCESS", "Extended Rights"},
+                        {"SELF_WRITE", "Self Write"}
+                    };
 
+                    JArray aceRightsJArray = new JArray();
+                    foreach (string right in ace.Rights)
+                    {
+                        // if the right is interesting, we'll take it
+                        if (interestingRights.ContainsKey(right))
+                        {
+                            aceRightsJArray.Add(interestingRights[right]);
+                            continue;
+                        }
+                        // if it's boring and we're not showing defaults, we'll skip it.
+                        else if ((boringRights.ContainsKey(right)) && (GlobalVar.IntLevelToShow > 0))
+                        {
+                            continue;
+                        }
+                        else if ((boringRights.ContainsKey(right)) && (GlobalVar.IntLevelToShow == 0))
+                        {
+                            aceRightsJArray.Add(boringRights[right]);
+                            continue;
+                        }
+                        else
+                        {
+                            Utility.DebugWrite(right + " was not defined as either boring or interesting. Consider adding it to the dicts in Acl.cs?");
+                            aceRightsJArray.Add(right);
+                        }
+                    }
+                    
                     string displayName = LDAPstuff.GetUserFromSid(aceSidRaw);
                     parsedAce.Add("SID", aceSidRaw);
                     parsedAce.Add("Name", displayName);
                     parsedAce.Add("Type", aceType);
-                    if (aceRights.Count > 1)
+                    if (aceRightsJArray.Count > 1)
                     {
-                        parsedAce.Add("Rights", aceRights);
+                        parsedAce.Add("Rights", aceRightsJArray);
                     }
-                    else if (aceRights.Count == 1)
+                    else if (aceRightsJArray.Count == 1)
                     {
-                        parsedAce.Add("Rights", aceRights[0].ToString());
+                        parsedAce.Add("Rights", aceRightsJArray[0].ToString());
                     }
                     if (aceFlagsJArray.Count > 1)
                     {
