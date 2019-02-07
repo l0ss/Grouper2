@@ -81,7 +81,6 @@ namespace Grouper2.GPPAssess
 
         private JObject GetAssessedUser(JObject gppUser)
         {
-            //foreach (JToken gppUser in gppUsers) {
             // jobj for results from this specific user.
             JObject assessedUser = new JObject();
 
@@ -95,9 +94,9 @@ namespace Grouper2.GPPAssess
             userAction = Utility.GetActionString(userAction);
 
             // get the username and a bunch of other details:
-            assessedUser.Add("Name", Utility.GetSafeString(gppUserProps, "@name"));
+            assessedUser.Add("Name", Utility.GetSafeString(gppUser, "@name"));
             assessedUser.Add("User Name", Utility.GetSafeString(gppUserProps, "@userName"));
-            assessedUser.Add("DateTime Changed", Utility.GetSafeString(gppUserProps, "@changed"));
+            assessedUser.Add("Changed", Utility.GetSafeString(gppUser, "@changed"));
             assessedUser.Add("Account Disabled", Utility.GetSafeString(gppUserProps, "@acctDisabled"));
             assessedUser.Add("Password Never Expires", Utility.GetSafeString(gppUserProps, "@neverExpires"));
             assessedUser.Add("Description", Utility.GetSafeString(gppUserProps, "@description"));
@@ -125,7 +124,7 @@ namespace Grouper2.GPPAssess
             {
                 return null;
             }
-
+            //Utility.DebugWrite(assessedUser.ToString());
             return assessedUser;
         }
 
@@ -144,8 +143,15 @@ namespace Grouper2.GPPAssess
             // get the group name and a bunch of other details:
             assessedGroup.Add("Name", Utility.GetSafeString(gppGroup, "@name"));
             //TODO if the name is an interesting group, make the finding more interesting.
-            assessedGroup.Add("DateTime Changed", Utility.GetSafeString(gppGroup, "@changed"));
-            assessedGroup.Add("Description", Utility.GetSafeString(gppGroupProps, "@description"));
+            string[] highPrivLocalGroups = new string[]
+            {
+                "Administrators",
+                "Backup Operators",
+
+            };
+            
+            assessedGroup.Add("Changed", Utility.GetSafeString(gppGroup, "@changed"));
+            assessedGroup.Add("Description", Utility.GetSafeString(gppGroup, "@description"));
             assessedGroup.Add("New Name", Utility.GetSafeString(gppGroupProps, "@newName"));
             assessedGroup.Add("Delete All Users", Utility.GetSafeString(gppGroupProps, "@deleteAllUsers"));
             assessedGroup.Add("Delete All Groups", Utility.GetSafeString(gppGroupProps, "@deleteAllGroups"));

@@ -404,6 +404,7 @@ namespace Grouper2
                             Stroke = LineThickness.Single,
                             StrokeColor = ConsoleColor.Gray
                         };
+                        grid.Children.Add(new Cell("Key"), new Cell("Value"));
                         foreach (JProperty jprop in cat.Value)
                         {
                             string name = jprop.Name;

@@ -336,10 +336,19 @@ namespace Grouper2
                 return null;
             }
 
-            byte[] filePathBytes = new byte[filePathLength - 2];
-            Array.Copy(aasBytes, filePathOffset, filePathBytes, 0, filePathLength - 2);
-            string filePath = Encoding.UTF8.GetString(filePathBytes, 0, filePathBytes.Length);
-
+            string filePath = "";
+            try
+            {
+                byte[] filePathBytes = new byte[filePathLength - 2];
+                Array.Copy(aasBytes, filePathOffset, filePathBytes, 0, filePathLength - 2);
+                filePath = Encoding.UTF8.GetString(filePathBytes, 0, filePathBytes.Length);
+            }
+            catch (OverflowException e)
+            {
+                Utility.DebugWrite("Failed to parse AAS file properly.");
+                Utility.DebugWrite(e.ToString());
+                return null;
+            }
             string msiPath = "";
             try
             {
