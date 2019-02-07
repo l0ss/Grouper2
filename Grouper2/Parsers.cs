@@ -198,7 +198,15 @@ namespace Grouper2
                         }
                         else
                         {
-                            section.Add(lineKey, splitValuesJArray);
+                            try
+                            {
+                                section.Add(lineKey, splitValuesJArray);
+                            }
+                            catch (ArgumentException e)
+                            {
+                                Utility.DebugWrite("Hit duplicate value in inf.");
+                                Utility.DebugWrite(e.ToString());
+                            }
                         }
                     }
 
