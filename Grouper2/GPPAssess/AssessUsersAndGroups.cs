@@ -106,15 +106,18 @@ namespace Grouper2.GPPAssess
             assessedUser.Add("Action", userAction);
 
             // check for cpasswords
-            string cpassword = gppUserProps["@cpassword"].ToString();
-            if ((cpassword != null) && (cpassword.Length > 0))
+            if (gppUserProps["@cpassword"] != null)
             {
-                string decryptedCpassword = "";
-                decryptedCpassword = Utility.DecryptCpassword(cpassword);
-                // if we find one, that's super interesting.
-                assessedUser.Add("Cpassword", cpassword);
-                assessedUser.Add("Decrypted Password", decryptedCpassword);
-                interestLevel = 10;
+                string cpassword = gppUserProps["@cpassword"].ToString();
+                if (cpassword.Length > 0)
+                {
+                    string decryptedCpassword = "";
+                    decryptedCpassword = Utility.DecryptCpassword(cpassword);
+                    // if we find one, that's super interesting.
+                    assessedUser.Add("Cpassword", cpassword);
+                    assessedUser.Add("Decrypted Password", decryptedCpassword);
+                    interestLevel = 10;
+                }
             }
 
             // if it's too boring to be worth showing, return an empty jobj.
