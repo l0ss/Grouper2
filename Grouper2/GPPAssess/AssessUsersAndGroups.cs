@@ -155,25 +155,28 @@ namespace Grouper2.GPPAssess
             JArray gppGroupMemberJArray = new JArray();
             if (gppGroupProps["Members"] != null)
             {
-                JToken members = gppGroupProps["Members"]["Member"];
-                string membersType = members.Type.ToString();
-                if (membersType == "Array")
+                if (gppGroupProps["Members"]["Member"] != null)
                 {
-                    foreach (JToken member in members.Children())
+                    JToken members = gppGroupProps["Members"]["Member"];
+                    string membersType = members.Type.ToString();
+                    if (membersType == "Array")
                     {
-                        gppGroupMemberJArray.Add(GetAssessedGroupMember(member));
+                        foreach (JToken member in members.Children())
+                        {
+                            gppGroupMemberJArray.Add(GetAssessedGroupMember(member));
+                        }
                     }
-                }
-                else if (membersType == "Object")
-                {
-                    gppGroupMemberJArray.Add(GetAssessedGroupMember(members));
-                }
-                else
-                {
+                    else if (membersType == "Object")
+                    {
+                        gppGroupMemberJArray.Add(GetAssessedGroupMember(members));
+                    }
+                    else
+                    {
                         Utility.DebugWrite("Something went squirrely with Group Memberships");
                         Utility.DebugWrite(members.Type.ToString());
                         Utility.DebugWrite(" " + membersType + " ");
                         Utility.DebugWrite(members.ToString());
+                    }
                 }
             }
 
