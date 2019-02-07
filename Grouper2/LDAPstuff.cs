@@ -45,30 +45,48 @@ namespace Grouper2
             // stolen wholesale from http://www.pinvoke.net/default.aspx/advapi32.LookupAccountSid
 
             StringBuilder name = new StringBuilder();
-            uint cchName = (uint)name.Capacity;
+            uint cchName = (uint) name.Capacity;
             StringBuilder referencedDomainName = new StringBuilder();
-            uint cchReferencedDomainName = (uint)referencedDomainName.Capacity;
+            uint cchReferencedDomainName = (uint) referencedDomainName.Capacity;
             SID_NAME_USE sidUse;
-            SecurityIdentifier sidObj = new SecurityIdentifier(sidString);
-            byte[] sidBytes = new byte[sidObj.BinaryLength];
-            sidObj.GetBinaryForm(sidBytes, 0);
-            int err = NO_ERROR;
-            if (!LookupAccountSid(null, sidBytes, name, ref cchName, referencedDomainName, ref cchReferencedDomainName, out sidUse))
+            int err = 0;
+            try
             {
-                err = Marshal.GetLastWin32Error();
-                if (err == ERROR_INSUFFICIENT_BUFFER)
+                SecurityIdentifier sidObj = new SecurityIdentifier(sidString);
+                byte[] sidBytes = new byte[sidObj.BinaryLength];
+                sidObj.GetBinaryForm(sidBytes, 0);
+                err = NO_ERROR;
+
+                if (!LookupAccountSid(null, sidBytes, name, ref cchName, referencedDomainName,
+                    ref cchReferencedDomainName,
+                    out sidUse))
                 {
-                    name.EnsureCapacity((int)cchName);
-                    referencedDomainName.EnsureCapacity((int)cchReferencedDomainName);
-                    err = NO_ERROR;
-                    if (!LookupAccountSid(null, sidBytes, name, ref cchName, referencedDomainName, ref cchReferencedDomainName, out sidUse))
-                        err = Marshal.GetLastWin32Error();
+                    err = Marshal.GetLastWin32Error();
+                    if (err == ERROR_INSUFFICIENT_BUFFER)
+                    {
+                        name.EnsureCapacity((int) cchName);
+                        referencedDomainName.EnsureCapacity((int) cchReferencedDomainName);
+                        err = NO_ERROR;
+                        if (!LookupAccountSid(null, sidBytes, name, ref cchName, referencedDomainName,
+                            ref cchReferencedDomainName, out sidUse))
+                            err = Marshal.GetLastWin32Error();
+                    }
                 }
             }
-            if (err != 0)
-                Utility.DebugWrite(@"Error in SID Lookup : " + err + " resolving SID " + sidString);
+            catch (System.ArgumentException)
+            {
+                return "SID Lookup Failed";
+            }
 
-            string lookupResult = "SID Resolution Failed";
+            string lookupResult = "";
+            if (err != 0)
+            {
+                Utility.DebugWrite(@"Error in SID Lookup : " + err + " resolving SID " + sidString);
+            
+                lookupResult = "SID Lookup Failed";
+                return lookupResult;
+            }
+
             if (referencedDomainName.ToString().Length > 0)
             {
                 lookupResult = referencedDomainName.ToString() + "\\" + name.ToString();
