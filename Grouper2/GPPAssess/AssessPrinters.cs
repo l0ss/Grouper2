@@ -21,7 +21,10 @@ namespace Grouper2.GPPAssess
                     foreach (JToken gppPrinter in printerType)
                     {
                         JProperty assessedGppPrinter = AssessGppPrinter(gppPrinter);
-                        assessedGppPrinters.Add(assessedGppPrinter);
+                        if (assessedGppPrinter != null)
+                        {
+                            assessedGppPrinters.Add(assessedGppPrinter);
+                        }
                     }
                 }
                 else if (printerType != null)

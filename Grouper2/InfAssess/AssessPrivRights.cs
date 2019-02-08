@@ -1,4 +1,5 @@
-﻿using System.Security.Principal;
+﻿using System.Runtime.Serialization.Formatters;
+using System.Security.Principal;
 using Newtonsoft.Json.Linq;
 
 namespace Grouper2.InfAssess
@@ -23,8 +24,6 @@ namespace Grouper2.InfAssess
             //iterate over the entries
             foreach (JProperty privRight in privRights.Children<JProperty>())
             {
-                // our interest level always starts at 1. Everything is boring until proven otherwise.
-                int interestLevel = 2;
                 foreach (JToken intPrivRight in intPrivRights)
                 {
                     // if the priv is interesting
@@ -37,23 +36,45 @@ namespace Grouper2.InfAssess
                         {
                             foreach (JToken trusteeJToken in privRight.Value)
                             {
+                                int interestLevel = 2;
                                 string trustee = trusteeJToken.ToString();
                                 string trusteeClean = trustee.Trim('*');
-                                trustees.Add(GlobalVar.OnlineChecks
-                                    ? GetTrustee(trusteeClean)
-                                    : new JProperty(trusteeClean, "Unable to resolve SID"));
+                                string trusteeHighOrLow = Utility.GetWKSidHighOrLow(trusteeClean);
+                                if (trusteeHighOrLow == "Low")
+                                {
+                                    interestLevel = 10;
+                                }
+                                if (trusteeHighOrLow == "High")
+                                {
+                                    interestLevel = 0;
+                                }
+                                if (interestLevel >= GlobalVar.IntLevelToShow)
+                                {
+                                    trustees.Add(GetTrustee(trusteeClean));
+                                }
                             }
                         }
                         else
                         {
+                            int interestLevel = 2;
                             string trusteeClean = privRight.Value.ToString().Trim('*');
-                            trustees.Add(GlobalVar.OnlineChecks
-                                ? GetTrustee(trusteeClean)
-                                : new JProperty(trusteeClean, "Unable to resolve SID"));
+                            string trusteeHighOrLow = Utility.GetWKSidHighOrLow(trusteeClean);
+                            if (trusteeHighOrLow == "Low")
+                            {
+                                interestLevel = 10;
+                            }
+                            if (trusteeHighOrLow == "High")
+                            {
+                                interestLevel = 0;
+                            }
+                            if (interestLevel >= GlobalVar.IntLevelToShow)
+                            {
+                                trustees.Add(GetTrustee(trusteeClean));
+                            }
                         }
 
                         // add the results to our jobj of trustees if they are interesting enough.
-                        if (interestLevel >= GlobalVar.IntLevelToShow)
+                        if (trustees.HasValues)
                         {
                             assessedPrivRights.Add(new JProperty(privRight.Name, trustees));
                         }
@@ -69,21 +90,10 @@ namespace Grouper2.InfAssess
             string displayName = "";
             // clean up the trustee SID
 
-            try
-            {
-                string resolvedSid = LDAPstuff.GetUserFromSid(trustee);
-                displayName = resolvedSid;
-            }
-            catch (IdentityNotMappedException)
-            {
-                displayName = "Unable to resolve SID.";
-                // check if it's a well known trustee in our JankyDB
-                JToken checkedSid = Utility.CheckSid(trustee);
-                if (checkedSid != null)
-                {
-                    displayName = (string)checkedSid["displayName"];
-                }
-            }
+           
+           string resolvedSid = LDAPstuff.GetUserFromSid(trustee);
+           displayName = resolvedSid;
+           
 
             return new JProperty(trustee, displayName);
         }

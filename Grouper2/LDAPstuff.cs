@@ -150,12 +150,11 @@ namespace Grouper2
                 // make a searcher to find Packages
                 DirectorySearcher packageSearcher = new DirectorySearcher(root)
                 {
-                    Filter = "(objectClass=PackageRegistration)",
-                    PropertiesToLoad = {"msiFileList"}
+                    Filter = "(objectClass=PackageRegistration)"
                 };
 
-                //packageSearcher.PropertiesToLoad.Add("packageName");
-                //packageSearcher.PropertiesToLoad.Add("msiFileList");
+                packageSearcher.PropertiesToLoad.Add("packageName");
+                packageSearcher.PropertiesToLoad.Add("msiFileList");
 
                 
                 SearchResultCollection packageResultCollection = packageSearcher.FindAll();
@@ -172,11 +171,10 @@ namespace Grouper2
                     string packageName = "";
                     if (packageDe.Properties["packageName"] != null)
                     {
-                        //packageName = packageDe.Properties["packageName"].Value.ToString();
+                        packageName = packageDe.Properties["packageName"].Value.ToString();
                     }
-                    //string msiFileList = packageDe.Properties["msiFileList"].Value.ToString();
+                    string msiFileList = packageDe.Properties["msiFileList"].Value.ToString();
                         
-                    Utility.DebugWrite("");
                 }
                 */
 
