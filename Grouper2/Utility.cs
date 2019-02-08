@@ -13,16 +13,7 @@ namespace Grouper2
 {
     class Utility
     {
-        public static string[] GetHighPrivLocalGroups()
-        {
-            return new string[]
-            {
-                "Administrators",
-                "Backup Operators",
-                ""
-            };
-        }
-
+        
         public static List<string> DedupeList(List<string> listStrings)
         {
             List<string> result = new List<string>();

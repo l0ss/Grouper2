@@ -147,6 +147,111 @@ namespace Grouper2
                 SearchResultCollection gpoSearchResults = gpoSearcher.FindAll();
 
                 /*
+                 DirectoryEntry currentDomain = new DirectoryEntry("LDAP://CN=Policies,CN=System," + domainInput.Text);
+                 // Now search for Applications
+                 DirectorySearcher AppSearch = new DirectorySearcher(currentDomain);
+                 AppSearch.Filter = "(objectClass=packageRegistration)";
+                   AppSearch.PropertiesToLoad.Add("displayName");
+                   AppSearch.PropertiesToLoad.Add("distinquishedName");
+                   AppSearch.PropertiesToLoad.Add("msiFileList");
+                   AppSearch.PropertiesToLoad.Add("msiScriptName");
+                   AppSearch.PropertiesToLoad.Add("productCode");
+                   AppSearch.PropertiesToLoad.Add("whenCreated");
+                   AppSearch.PropertiesToLoad.Add("whenChanged");
+                 SearchResultCollection ADSearchResults= AppSearch.FindAll();
+                 if (ADSearchResults.Count == 0)
+                 {
+                     MessageBox.Show("No Applications Found in GPOs in this domain","No Applications Found",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                     return;
+                 }
+                 //iterate through the apps found
+                 string [] lvItems = new string[7];
+                 string appName;
+                 foreach (SearchResult Apps in ADSearchResults)
+                 {
+                     ClearList(lvItems);
+                     appName = Apps.Properties["displayName"][0].ToString();
+                     //check to see if there are transforms
+                     if (Apps.Properties["msiFileList"].Count > 1)
+                     {
+                         //first need to set lvItems[3] to something other than null
+                         lvItems[3] = "";
+                         for (int i = 0; i < Apps.Properties["msiFileList"].Count; i++)
+                         {
+                             string[] splitPath = Apps.Properties["msiFileList"][i].ToString().Split(new Char[] { ':' });
+                             if (splitPath[0] == "0")
+                                 lvItems[2] = splitPath[1];
+                             else
+                             {
+                                 // if there is more than one transform, need to concatenate them
+                                 if (Apps.Properties["msiFileList"].Count > 2)
+                                 {
+                                     lvItems[3] = splitPath[1] + ";" + lvItems[3];
+                                 }
+                                 else
+                                     lvItems[3] = splitPath[1];
+                             }
+                         }
+                     }
+                     else
+                     {
+                         lvItems[2] = Apps.Properties["msiFileList"][0].ToString().TrimStart(new char[] { '0', ':' });
+                         lvItems[3] = "";
+                     }
+                     //the product code is a byte array, so we need to get the enum on it and iterate through the collection
+                     ResultPropertyValueCollection colProductCode= Apps.Properties["productCode"];
+                     IEnumerator enumProductCode = colProductCode.GetEnumerator();
+                     lvItems[4] = this.buildProductCode(enumProductCode);
+                     //now do the whenChanged and whenCreated stuff
+                     lvItems[5] = ((DateTime)(Apps.Properties["whenCreated"][0])).ToString("G");
+                     lvItems[6] = ((DateTime) (Apps.Properties["whenChanged"][0])).ToString("G");
+                     //Next we need to find the GPO this app is in
+                     string DN=Apps.Properties["adsPath"][0].ToString();
+                     string [] arrFQDN=DN.Split(new Char[]{','});
+                     string FQDN="";
+                     for (int i=0;i!=arrFQDN.Length;i++)
+                     {
+                         if (i>3)
+                         {
+                             //if its the first one, don't put a comma in front of it
+                             if (i==4)
+                                 FQDN=arrFQDN[i];
+                             else
+                                 FQDN=FQDN+","+arrFQDN[i];
+                         }
+                     }
+                     
+                     FQDN = "LDAP://" + FQDN;
+                     DirectoryEntry GPOPath = new DirectoryEntry(FQDN);
+                     lvItems[0]=GPOPath.Properties["DisplayName"][0].ToString();
+                     //now resolve whether the app is published or assigned
+                     if (arrFQDN[3] == "CN=User")
+                     {
+                         if (Apps.Properties["msiScriptName"][0].ToString() == "A")
+                             lvItems[1]="User Assigned";
+                         if (Apps.Properties["msiScriptName"][0].ToString() == "P")
+                             lvItems[1]="User Published";
+                         if (Apps.Properties["msiScriptName"][0].ToString() == "R")
+                                 lvItems[1]="Package Removed";
+                     }
+                     else
+                         if (Apps.Properties["msiScriptName"][0].ToString() == "R")
+                                 lvItems[1]="Package Removed";
+                         
+                     else
+                         lvItems[1]="Computer Assigned";
+                     //now put the lvItems array into the listview
+                     lvItem = listView1.Items.Add(appName);
+                     lvItem.SubItems.AddRange(lvItems);
+                     if (lvItems[1]=="Package Removed")
+                         lvItem.BackColor=Color.Red;        
+                     else
+                         lvItem.BackColor=Color.White;
+                 }
+                 */
+
+                /*
+
                 // make a searcher to find Packages
                 DirectorySearcher packageSearcher = new DirectorySearcher(root)
                 {
