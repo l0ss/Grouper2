@@ -143,12 +143,7 @@ namespace Grouper2.GPPAssess
             // get the group name and a bunch of other details:
             assessedGroup.Add("Name", Utility.GetSafeString(gppGroup, "@name"));
             //TODO if the name is an interesting group, make the finding more interesting.
-            string[] highPrivLocalGroups = new string[]
-            {
-                "Administrators",
-                "Backup Operators",
-
-            };
+            
             
             assessedGroup.Add("Changed", Utility.GetSafeString(gppGroup, "@changed"));
             assessedGroup.Add("Description", Utility.GetSafeString(gppGroup, "@description"));

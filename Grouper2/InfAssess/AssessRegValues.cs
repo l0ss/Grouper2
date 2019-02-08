@@ -7,9 +7,9 @@ namespace Grouper2.InfAssess
     {
         public static JObject AssessRegValues(JToken regValues)
         {
-            JObject jsonData = JankyDb.Instance;
+            JObject jankyDb = JankyDb.Instance;
             // get our data about what regkeys are interesting
-            JArray intRegKeysData = (JArray) jsonData["regKeys"];
+            JArray intRegKeysData = (JArray) jankyDb["regKeys"];
             // set up a jobj for our results to go into
             JObject assessedRegValues = new JObject();
 

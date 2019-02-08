@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.DirectoryServices;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -81,9 +83,18 @@ namespace Grouper2
             string lookupResult = "";
             if (err != 0)
             {
-                Utility.DebugWrite(@"Error in SID Lookup : " + err + " resolving SID " + sidString);
-            
-                lookupResult = "SID Lookup Failed";
+                Utility.DebugWrite(@"Error in SID Lookup : " + err + " resolving SID " + sidString + " handing off to well known sids list.");
+
+                try
+                {
+                    lookupResult = Utility.GetWellKnownSid(sidString);
+                }
+                catch (Exception e)
+                {
+                    lookupResult = "SID Lookup Failed";
+                    Utility.DebugWrite(e.ToString());
+                }
+
                 return lookupResult;
             }
 
@@ -106,6 +117,7 @@ namespace Grouper2
                 DirectoryEntry rootDse = new DirectoryEntry();
                 DirectoryEntry root = new DirectoryEntry();
                 DirectoryEntry rootExtRightsContext = new DirectoryEntry();
+
                 if (GlobalVar.UserDefinedDomainDn != null)
                 {
                     rootDse = new DirectoryEntry(("LDAP://" + GlobalVar.UserDefinedDomain + "/rootDSE"), GlobalVar.UserDefinedUsername, GlobalVar.UserDefinedPassword);
@@ -132,8 +144,41 @@ namespace Grouper2
                     SecurityMasks = SecurityMasks.Dacl | SecurityMasks.Owner,
                     PageSize = 1000
                 };
-
                 SearchResultCollection gpoSearchResults = gpoSearcher.FindAll();
+
+                /*
+                // make a searcher to find Packages
+                DirectorySearcher packageSearcher = new DirectorySearcher(root)
+                {
+                    Filter = "(objectClass=PackageRegistration)",
+                    PropertiesToLoad = {"msiFileList"}
+                };
+
+                //packageSearcher.PropertiesToLoad.Add("packageName");
+                //packageSearcher.PropertiesToLoad.Add("msiFileList");
+
+                
+                SearchResultCollection packageResultCollection = packageSearcher.FindAll();
+
+                JObject packageData = new JObject();
+
+                foreach (SearchResult packageSearchResult in packageResultCollection)
+                {
+                    DirectoryEntry packageDe = packageSearchResult.GetDirectoryEntry();
+                    string packageCn = packageDe.Properties["cn"].Value.ToString();
+                    string packageGPO = packageDe.Parent.Parent.Parent.Parent.Name;
+                    string packageDisplayName = packageDe.Properties["displayName"].Value.ToString();
+                    string whenChanged = packageDe.Properties["whenChanged"].Value.ToString();
+                    string packageName = "";
+                    if (packageDe.Properties["packageName"] != null)
+                    {
+                        //packageName = packageDe.Properties["packageName"].Value.ToString();
+                    }
+                    //string msiFileList = packageDe.Properties["msiFileList"].Value.ToString();
+                        
+                    Utility.DebugWrite("");
+                }
+                */
 
                 // new dictionary for data from each GPO to go into
                 JObject gposData = new JObject();
@@ -143,6 +188,9 @@ namespace Grouper2
                     // object for all data for this one gpo
                     JObject gpoData = new JObject();
                     DirectoryEntry gpoDe = gpoSearchResult.GetDirectoryEntry();
+
+
+                    
                     // get some useful attributes of the gpo
                     string gpoDispName = gpoDe.Properties["displayName"].Value.ToString();
                     gpoData.Add("Display Name", gpoDispName);
@@ -150,7 +198,8 @@ namespace Grouper2
                     // this is to catch duplicate UIDs caused by Default Domain Policy and Domain Controller Policy having 'well known guids'
                     if (gposData[gpoUid] != null)
                     {
-                        Utility.DebugWrite("\nI think you're in a multi-domain environment cos I just saw two GPOs with the same GUID. You should be careful not to miss stuff in the Default Domain Policy and Default Domain Controller Policy.");
+                        Utility.DebugWrite("\nI think you're in a multi-domain environment cos I just saw two GPOs with the same GUID. " +
+                                           "\nYou should be careful not to miss stuff in the Default Domain Policy and Default Domain Controller Policy.");
                         continue;
                     }
                     gpoData.Add("UID", gpoUid);
@@ -308,28 +357,5 @@ namespace Grouper2
             string domainSid = id.User.AccountDomainSid.ToString();
             return domainSid;
         }
-        /*
-    public static string GetUserFromSid(string sid)
-    {
-        string account = "Failed to resolve SID";
-        try
-        {
-            account = new System.Security.Principal.SecurityIdentifier(sid)
-                .Translate(typeof(System.Security.Principal.NTAccount)).ToString();
-        }
-        catch (Exception e)
-        {
-            //Utility.DebugWrite(e.ToString());
-            Utility.DebugWrite("Failed to resolve SID: " + sid);
-        }
-
-        return account;
-    }
-    */
-
-
-
-
-    
     }
 }

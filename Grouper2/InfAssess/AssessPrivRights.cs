@@ -7,8 +7,8 @@ namespace Grouper2.InfAssess
     {
         public static JObject AssessPrivRights(JToken privRights)
         {
-            JObject jsonData = JankyDb.Instance;
-            JArray intPrivRights = (JArray) jsonData["privRights"];
+            JObject jankyDb = JankyDb.Instance;
+            JArray intPrivRights = (JArray) jankyDb["privRights"];
 
             // create an object to put the results in
             JObject assessedPrivRights = new JObject();
