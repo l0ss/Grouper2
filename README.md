@@ -3,7 +3,6 @@
 C# rewrite of Grouper - *WAY* better than the original.
 
 [![Build status](https://ci.appveyor.com/api/projects/status/qfevtf9s8nbw9eic/branch/master?svg=true)](https://ci.appveyor.com/project/l0ss/grouper2/branch/master)
-[![Build status](https://ci.appveyor.com/api/projects/status/qfevtf9s8nbw9eic?svg=true)](https://ci.appveyor.com/project/l0ss/grouper2)
 
 ## What is it for? 
 
