@@ -364,7 +364,6 @@ public class GlobalVar
                 }
             }
 
-
             // get all the policy dirs
             List<string> gpoPaths = new List<string>();
             foreach (string policyPath in sysvolPolDirs)
@@ -381,11 +380,20 @@ public class GlobalVar
                 }
             }
 
+            JObject gpoPackageData = new JObject();
+
+            // Grab Packages from LDAP
+            if (GlobalVar.OnlineChecks)
+            {
+                gpoPackageData = LDAPstuff.GetGpoPackages(Environment.UserDomainName.ToString());
+            }
+            
+                    
+                    
             // create a JObject to put all our output goodies in.
             JObject grouper2Output = new JObject();
             // so for each uid directory (including ones with that dumb broken domain replication condition)
             // we're going to gather up all our goodies and put them into that dict we just created.
-
             // Create a TaskScheduler
             LimitedConcurrencyLevelTaskScheduler lcts = new LimitedConcurrencyLevelTaskScheduler(maxThreads);
             List<Task> gpoTasks = new List<Task>();
@@ -407,6 +415,28 @@ public class GlobalVar
                     try
                     {
                         JObject gpoFindings = ProcessGpo(gpoPath);
+                        
+                        // see if we have any appropriate matching packages
+                        JObject matchedPackages = new JObject();
+                        string gpoUid = gpoFindings["GPOProps"]["UID"].ToString().ToLower().Trim('{', '}');
+                        foreach (KeyValuePair<string, JToken> gpoPackage in gpoPackageData)
+                        {
+                            string packageParentGpoUid = gpoPackage.Value["ParentGPO"].ToString().ToLower().Trim('{', '}');
+                            if (packageParentGpoUid == gpoUid)
+                            {
+                                JProperty assessedPackage = PackageAssess.AssessPackage(gpoPackage);
+                                if (assessedPackage != null)
+                                {
+                                    matchedPackages.Add(assessedPackage);
+                                }
+                            }
+                        }
+
+                        if (matchedPackages.HasValues)
+                        {
+                            gpoFindings.Add("Packages", matchedPackages);
+                        }
+
                         if (gpoFindings != null)
                         {
                             if (gpoFindings.HasValues)
@@ -663,11 +693,8 @@ public class GlobalVar
                         {"gpoPath", gpoPath}
                     };
                 }
-
-
-                // Add all this crap into a dict, if we found anything of interest.
+                
                 gpoResult.Add("GPOProps", gpoProps);
-                // turn dict of data for this gpo into jobj
                 JObject gpoResultJson = (JObject) JToken.FromObject(gpoResult);
 
                 // if I were smarter I would have done this shit with the machine and user dirs inside the Process methods instead of calling each one twice out here.
@@ -683,8 +710,6 @@ public class GlobalVar
                 JArray userPolGppResults = ProcessGpXml(userPolPath);
                 JArray machinePolScriptResults = ProcessScriptsIni(machinePolPath);
                 JArray userPolScriptResults = ProcessScriptsIni(userPolPath);
-                JArray machinePolAasResults = ProcessAas(machinePolPath);
-                JArray userPolAasResults = ProcessAas(userPolPath);
 
                 // add all our findings to a JArray in what seems a very inefficient manner but it's the only way i could see to avoid having a JArray of JArrays of Findings.
                 JArray userFindings = new JArray();
@@ -694,16 +719,14 @@ public class GlobalVar
                 {
                     machinePolInfResults,
                     machinePolGppResults,
-                    machinePolScriptResults,
-                    machinePolAasResults
+                    machinePolScriptResults
                 };
 
                 JArray[] allUserGpoResults =
                 {
                     userPolInfResults,
                     userPolGppResults,
-                    userPolScriptResults,
-                    userPolAasResults
+                    userPolScriptResults
                 };
 
                 foreach (JArray machineGpoResult in allMachineGpoResults)
@@ -843,68 +866,7 @@ public class GlobalVar
 
             return processedScriptsIniFiles;
         }
-
-        private static JArray ProcessAas(string path)
-        {
-            List<string> aasFiles = new List<string>();
-
-            try
-            {
-                aasFiles = Directory.GetFiles(path, "*.aas", SearchOption.AllDirectories).ToList();
-            }
-            catch (DirectoryNotFoundException e)
-            {
-                Utility.DebugWrite(e.ToString());
-
-                return null;
-            }
-            catch (UnauthorizedAccessException e)
-            {
-                Utility.DebugWrite(e.ToString());
-
-                return null;
-            }
-
-            JObject processedAases = new JObject();
-            if (aasFiles != null)
-            {
-                foreach (string aasFile in aasFiles)
-                {
-                    JObject parsedAasFile = new JObject();
-                    try
-                    {
-                        parsedAasFile = Parsers.ParseAasFile(aasFile);
-                    }
-                    catch (UnauthorizedAccessException e)
-                    {
-                        Utility.DebugWrite(e.ToString());
-                        continue;
-                    }
-
-                    JObject assessedAasFile = AasAssess.AssessAasFile(parsedAasFile);
-                    if (assessedAasFile != null && assessedAasFile.HasValues)
-                    {
-                        processedAases.Add(aasFile, assessedAasFile);
-                    }
-                }
-            }
-            else
-            {
-                return null;
-            }
-            
-            
-            JArray aasResult = new JArray();
-
-            if ((processedAases != null) && (processedAases.HasValues))
-            {
-                aasResult.Add(new JObject(new JProperty("Assigned Applications", processedAases)));
-                return aasResult;
-            }
-
-            return null;
-        }
-
+        
         private static JArray ProcessGpXml(string path)
         {
             if (!Directory.Exists(path))

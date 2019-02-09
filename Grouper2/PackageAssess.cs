@@ -1,19 +1,26 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Newtonsoft.Json.Linq;
 
 namespace Grouper2
 {
-    public class AasAssess
+    class PackageAssess
     {
-        public static JObject AssessAasFile(JObject parsedAasFile)
+        public static JProperty AssessPackage(KeyValuePair<string, JToken> gpoPackageKvp)
         {
+            JToken gpoPackage = gpoPackageKvp.Value;
             int interestLevel = 3;
-            if (parsedAasFile["MSI Path"] != null)
+            JArray assessedPackage = new JArray();
+
+            if (gpoPackage["MSI Path"] != null)
             {
-                string msiPath = parsedAasFile["MSI Path"].ToString();
+                string msiPath = gpoPackage["MSI Path"].ToString();
                 JObject assessedMsiPath = FileSystem.InvestigatePath(msiPath);
                 if ((assessedMsiPath != null) && (assessedMsiPath.HasValues))
                 {
-                    parsedAasFile["MSI Path"] = assessedMsiPath;
+                    gpoPackage["MSI Path"] = assessedMsiPath;
                     if (assessedMsiPath["InterestLevel"] != null)
                     {
                         if ((int)assessedMsiPath["InterestLevel"] > interestLevel)
@@ -25,7 +32,7 @@ namespace Grouper2
 
                 if (interestLevel >= GlobalVar.IntLevelToShow)
                 {
-                    return parsedAasFile;
+                    return new JProperty(gpoPackageKvp.Key, gpoPackage);
                 }
                 else
                 {
@@ -36,6 +43,8 @@ namespace Grouper2
             {
                 return null;
             }
+
         }
+        
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -6,6 +7,7 @@ using System.DirectoryServices;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
+using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
 using Grouper2.SddlParser;
@@ -115,30 +117,17 @@ namespace Grouper2
             try
             {
                 DirectoryEntry rootDse = new DirectoryEntry();
-                DirectoryEntry root = new DirectoryEntry();
+                DirectoryEntry rootDefNamingContext = new DirectoryEntry();
                 DirectoryEntry rootExtRightsContext = new DirectoryEntry();
-
-                if (GlobalVar.UserDefinedDomainDn != null)
-                {
-                    rootDse = new DirectoryEntry(("LDAP://" + GlobalVar.UserDefinedDomain + "/rootDSE"), GlobalVar.UserDefinedUsername, GlobalVar.UserDefinedPassword);
-                    root = new DirectoryEntry(("GC://" + rootDse.Properties["defaultNamingContext"].Value),
-                        GlobalVar.UserDefinedUsername, GlobalVar.UserDefinedPassword);
-                    string schemaContextString = rootDse.Properties["schemaNamingContext"].Value.ToString();
-                    rootExtRightsContext =
-                        new DirectoryEntry("LDAP://" + schemaContextString.Replace("Schema", "Extended-Rights"),
-                            GlobalVar.UserDefinedUsername, GlobalVar.UserDefinedPassword);
-                }
-                else
-                {
-                    rootDse = new DirectoryEntry("LDAP://rootDSE");
-                    root = new DirectoryEntry("GC://" + rootDse.Properties["defaultNamingContext"].Value);
-                    string schemaContextString = rootDse.Properties["schemaNamingContext"].Value.ToString();
-                    rootExtRightsContext =
+                
+                rootDse = new DirectoryEntry("LDAP://rootDSE");
+                rootDefNamingContext = new DirectoryEntry("GC://" + rootDse.Properties["defaultNamingContext"].Value);
+                string schemaContextString = rootDse.Properties["schemaNamingContext"].Value.ToString();
+                rootExtRightsContext =
                         new DirectoryEntry("LDAP://" + schemaContextString.Replace("Schema", "Extended-Rights"));
-                }
-            
+                
                 // make a searcher to find GPOs
-                DirectorySearcher gpoSearcher = new DirectorySearcher(root)
+                DirectorySearcher gpoSearcher = new DirectorySearcher(rootDefNamingContext)
                 {
                     Filter = "(objectClass=groupPolicyContainer)",
                     SecurityMasks = SecurityMasks.Dacl | SecurityMasks.Owner,
@@ -146,142 +135,8 @@ namespace Grouper2
                 };
                 SearchResultCollection gpoSearchResults = gpoSearcher.FindAll();
 
-                /*
-                 DirectoryEntry currentDomain = new DirectoryEntry("LDAP://CN=Policies,CN=System," + domainInput.Text);
-                 // Now search for Applications
-                 DirectorySearcher AppSearch = new DirectorySearcher(currentDomain);
-                 AppSearch.Filter = "(objectClass=packageRegistration)";
-                   AppSearch.PropertiesToLoad.Add("displayName");
-                   AppSearch.PropertiesToLoad.Add("distinquishedName");
-                   AppSearch.PropertiesToLoad.Add("msiFileList");
-                   AppSearch.PropertiesToLoad.Add("msiScriptName");
-                   AppSearch.PropertiesToLoad.Add("productCode");
-                   AppSearch.PropertiesToLoad.Add("whenCreated");
-                   AppSearch.PropertiesToLoad.Add("whenChanged");
-                 SearchResultCollection ADSearchResults= AppSearch.FindAll();
-                 if (ADSearchResults.Count == 0)
-                 {
-                     MessageBox.Show("No Applications Found in GPOs in this domain","No Applications Found",MessageBoxButtons.OK,MessageBoxIcon.Error);
-                     return;
-                 }
-                 //iterate through the apps found
-                 string [] lvItems = new string[7];
-                 string appName;
-                 foreach (SearchResult Apps in ADSearchResults)
-                 {
-                     ClearList(lvItems);
-                     appName = Apps.Properties["displayName"][0].ToString();
-                     //check to see if there are transforms
-                     if (Apps.Properties["msiFileList"].Count > 1)
-                     {
-                         //first need to set lvItems[3] to something other than null
-                         lvItems[3] = "";
-                         for (int i = 0; i < Apps.Properties["msiFileList"].Count; i++)
-                         {
-                             string[] splitPath = Apps.Properties["msiFileList"][i].ToString().Split(new Char[] { ':' });
-                             if (splitPath[0] == "0")
-                                 lvItems[2] = splitPath[1];
-                             else
-                             {
-                                 // if there is more than one transform, need to concatenate them
-                                 if (Apps.Properties["msiFileList"].Count > 2)
-                                 {
-                                     lvItems[3] = splitPath[1] + ";" + lvItems[3];
-                                 }
-                                 else
-                                     lvItems[3] = splitPath[1];
-                             }
-                         }
-                     }
-                     else
-                     {
-                         lvItems[2] = Apps.Properties["msiFileList"][0].ToString().TrimStart(new char[] { '0', ':' });
-                         lvItems[3] = "";
-                     }
-                     //the product code is a byte array, so we need to get the enum on it and iterate through the collection
-                     ResultPropertyValueCollection colProductCode= Apps.Properties["productCode"];
-                     IEnumerator enumProductCode = colProductCode.GetEnumerator();
-                     lvItems[4] = this.buildProductCode(enumProductCode);
-                     //now do the whenChanged and whenCreated stuff
-                     lvItems[5] = ((DateTime)(Apps.Properties["whenCreated"][0])).ToString("G");
-                     lvItems[6] = ((DateTime) (Apps.Properties["whenChanged"][0])).ToString("G");
-                     //Next we need to find the GPO this app is in
-                     string DN=Apps.Properties["adsPath"][0].ToString();
-                     string [] arrFQDN=DN.Split(new Char[]{','});
-                     string FQDN="";
-                     for (int i=0;i!=arrFQDN.Length;i++)
-                     {
-                         if (i>3)
-                         {
-                             //if its the first one, don't put a comma in front of it
-                             if (i==4)
-                                 FQDN=arrFQDN[i];
-                             else
-                                 FQDN=FQDN+","+arrFQDN[i];
-                         }
-                     }
-                     
-                     FQDN = "LDAP://" + FQDN;
-                     DirectoryEntry GPOPath = new DirectoryEntry(FQDN);
-                     lvItems[0]=GPOPath.Properties["DisplayName"][0].ToString();
-                     //now resolve whether the app is published or assigned
-                     if (arrFQDN[3] == "CN=User")
-                     {
-                         if (Apps.Properties["msiScriptName"][0].ToString() == "A")
-                             lvItems[1]="User Assigned";
-                         if (Apps.Properties["msiScriptName"][0].ToString() == "P")
-                             lvItems[1]="User Published";
-                         if (Apps.Properties["msiScriptName"][0].ToString() == "R")
-                                 lvItems[1]="Package Removed";
-                     }
-                     else
-                         if (Apps.Properties["msiScriptName"][0].ToString() == "R")
-                                 lvItems[1]="Package Removed";
-                         
-                     else
-                         lvItems[1]="Computer Assigned";
-                     //now put the lvItems array into the listview
-                     lvItem = listView1.Items.Add(appName);
-                     lvItem.SubItems.AddRange(lvItems);
-                     if (lvItems[1]=="Package Removed")
-                         lvItem.BackColor=Color.Red;        
-                     else
-                         lvItem.BackColor=Color.White;
-                 }
-                 */
-
-                /*
-
-                // make a searcher to find Packages
-                DirectorySearcher packageSearcher = new DirectorySearcher(root)
-                {
-                    Filter = "(objectClass=PackageRegistration)"
-                };
-
-                packageSearcher.PropertiesToLoad.Add("packageName");
-                packageSearcher.PropertiesToLoad.Add("msiFileList");
-
                 
-                SearchResultCollection packageResultCollection = packageSearcher.FindAll();
 
-                JObject packageData = new JObject();
-
-                foreach (SearchResult packageSearchResult in packageResultCollection)
-                {
-                    DirectoryEntry packageDe = packageSearchResult.GetDirectoryEntry();
-                    string packageCn = packageDe.Properties["cn"].Value.ToString();
-                    string packageGPO = packageDe.Parent.Parent.Parent.Parent.Name;
-                    string packageDisplayName = packageDe.Properties["displayName"].Value.ToString();
-                    string whenChanged = packageDe.Properties["whenChanged"].Value.ToString();
-                    string packageName = "";
-                    if (packageDe.Properties["packageName"] != null)
-                    {
-                        packageName = packageDe.Properties["packageName"].Value.ToString();
-                    }
-                    string msiFileList = packageDe.Properties["msiFileList"].Value.ToString();
-                        
-                }
-                */
 
                 // new dictionary for data from each GPO to go into
                 JObject gposData = new JObject();
@@ -292,8 +147,6 @@ namespace Grouper2
                     JObject gpoData = new JObject();
                     DirectoryEntry gpoDe = gpoSearchResult.GetDirectoryEntry();
 
-
-                    
                     // get some useful attributes of the gpo
                     string gpoDispName = gpoDe.Properties["displayName"].Value.ToString();
                     gpoData.Add("Display Name", gpoDispName);
@@ -338,14 +191,8 @@ namespace Grouper2
                     gpoData.Add("GPO Status", gpoEnabledStatus);
                     // get the acl
                     ActiveDirectorySecurity gpoAcl = gpoDe.ObjectSecurity;
-                    // // Get the owner in a really dumb way
-                    // string gpoSddl = gpoAcl.GetSecurityDescriptorSddlForm(AccessControlSections.Owner);
-                    // JObject parsedOwner = ParseSDDL.ParseSddlString(gpoSddl, SecurableObjectType.DirectoryServiceObject);
-                    // string gpoOwner = parsedOwner["Owner"].ToString();
-                    // gpoData.Add("Owner", gpoOwner);
-                    // make a JObject to put the stuff in
-                    JObject gpoAclJObject = new JObject();
 
+                    JObject gpoAclJObject = new JObject();
                     AccessControlSections sections = AccessControlSections.All;
                     string sddlString = gpoAcl.GetSecurityDescriptorSddlForm(sections);
                     JObject parsedSDDL = ParseSddl.ParseSddlString(sddlString, SecurableObjectType.DirectoryServiceObject);
@@ -431,13 +278,12 @@ namespace Grouper2
 
                     }
                 
-
                     //add the JObject to our blob of data about the gpo
                     if (gpoAclJObject.HasValues)
                     {
                         gpoData.Add("ACLs", gpoAclJObject);
                     }
-                
+                    
                     gposData.Add(gpoUid, gpoData);
                 }
         
@@ -452,6 +298,136 @@ namespace Grouper2
             }
 
             return null;
+        }
+
+        public static JObject GetGpoPackages(string domain)
+        {
+            // this bit c/o @grouppolicyguy
+            DirectorySearcher packageSearcher = new DirectorySearcher("LDAP://" + domain + "/System/Policies");
+            packageSearcher.Filter = "(objectClass=packageRegistration)";
+            packageSearcher.PropertiesToLoad.Add("displayName");
+            packageSearcher.PropertiesToLoad.Add("distinguishedName");
+            packageSearcher.PropertiesToLoad.Add("msiFileList");
+            packageSearcher.PropertiesToLoad.Add("msiScriptName");
+            packageSearcher.PropertiesToLoad.Add("productCode");
+            packageSearcher.PropertiesToLoad.Add("whenCreated");
+            packageSearcher.PropertiesToLoad.Add("whenChanged");
+            packageSearcher.PropertiesToLoad.Add("upgradeProductCode");
+            packageSearcher.PropertiesToLoad.Add("cn");
+
+            JObject gpoPackages = new JObject();
+
+            SearchResultCollection foundPackages = packageSearcher.FindAll();
+            if (foundPackages.Count > 0)
+            {
+                //iterate through the apps found
+                string displayName;
+                foreach (SearchResult package in foundPackages)
+                {
+                    string[] lvItems = new string[8];
+                    try
+                    {
+                        displayName = package.Properties["displayName"][0].ToString();
+                        //check to see if there are transforms
+                        if (package.Properties["msiFileList"].Count > 1)
+                        {
+                            for (int i = 0; i < package.Properties["msiFileList"].Count; i++)
+                            {
+                                string[] splitPath = package.Properties["msiFileList"][i].ToString()
+                                    .Split(new Char[] { ':' });
+                                if (splitPath[0] == "0")
+                                    lvItems[2] = splitPath[1];
+                                else
+                                {
+                                    // if there is more than one transform, need to concatenate them
+                                    if (package.Properties["msiFileList"].Count > 2)
+                                    {
+                                        lvItems[3] = splitPath[1] + ";" + lvItems[3];
+                                    }
+                                    else
+                                        lvItems[3] = splitPath[1];
+                                }
+                            }
+                        }
+                        else
+                        {
+                            lvItems[2] = package.Properties["msiFileList"][0].ToString()
+                                .TrimStart(new char[] { '0', ':' });
+                            lvItems[3] = "";
+                        }
+
+                        //the product code is a byte array, so we need to get the enum on it and iterate through the collection
+                        ResultPropertyValueCollection colProductCode = package.Properties["productCode"];
+                        byte[] productCodeBytes = (byte[])colProductCode[0];
+                        Guid productCodeGuid = new Guid(productCodeBytes);
+                        // and again for the upgradeCode
+                        ResultPropertyValueCollection colUpgradeCode = package.Properties["upgradeProductCode"];
+                        byte[] upgradeCodeBytes = (byte[])colUpgradeCode[0];
+                        Guid upgradeCodeGuid = new Guid(upgradeCodeBytes);
+
+                        lvItems[4] = productCodeGuid.ToString();
+                        lvItems[7] = upgradeCodeGuid.ToString();
+
+                        //now do the whenChanged and whenCreated stuff
+                        lvItems[5] = ((DateTime)(package.Properties["whenCreated"][0])).ToString("G");
+                        lvItems[6] = ((DateTime)(package.Properties["whenChanged"][0])).ToString("G");
+                        //Next we need to find the GPO this app is in
+                        string DN = package.Properties["adsPath"][0].ToString();
+                        string[] arrFQDN = DN.Split(new Char[] { ',' });
+                        string FQDN = "";
+                        for (int i = 0; i != arrFQDN.Length; i++)
+                        {
+                            if (i > 3)
+                            {
+                                //if its the first one, don't put a comma in front of it
+                                if (i == 4)
+                                    FQDN = arrFQDN[i];
+                                else
+                                    FQDN = FQDN + "," + arrFQDN[i];
+                            }
+                        }
+
+                        FQDN = "LDAP://" + FQDN;
+                        DirectoryEntry GPOPath = new DirectoryEntry(FQDN);
+                        lvItems[0] = GPOPath.Properties["Name"][0].ToString();
+                        //now resolve whether the app is published or assigned
+                        if (arrFQDN[3] == "CN=User")
+                        {
+                            if (package.Properties["msiScriptName"][0].ToString() == "A")
+                                lvItems[1] = "User Assigned";
+                            if (package.Properties["msiScriptName"][0].ToString() == "P")
+                                lvItems[1] = "User Published";
+                            if (package.Properties["msiScriptName"][0].ToString() == "R")
+                                lvItems[1] = "Package Removed";
+                        }
+                        else if (package.Properties["msiScriptName"][0].ToString() == "R")
+                            lvItems[1] = "Package Removed";
+
+                        else
+                            lvItems[1] = "Computer Assigned";
+
+                        JObject gpoPackage = new JObject();
+                        gpoPackage.Add("Display Name", displayName);
+                        gpoPackage.Add("MSI Path", lvItems[2]);
+                        gpoPackage.Add("MsiPath2", lvItems[3]);
+                        gpoPackage.Add("Changed", lvItems[5]);
+                        gpoPackage.Add("Created", lvItems[6]);
+                        gpoPackage.Add("Type", lvItems[1]);
+                        gpoPackage.Add("ProductCode", productCodeGuid.ToString());
+                        gpoPackage.Add("Upgrade Code", upgradeCodeGuid.ToString());
+                        gpoPackage.Add("ParentGPO", lvItems[0]);
+                        ResultPropertyValueCollection cnCol = package.Properties["cn"];
+                        gpoPackages.Add(cnCol[0].ToString(), gpoPackage);
+
+                    }
+                    catch (Exception e)
+                    {
+                        Utility.DebugWrite(e.ToString());
+                    }
+                }
+            }
+
+            return gpoPackages;
         }
     
         public static string GetDomainSid()
