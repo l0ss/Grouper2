@@ -416,25 +416,29 @@ public class GlobalVar
                     {
                         JObject gpoFindings = ProcessGpo(gpoPath);
                         
+                        // DUMB BUG where we only get back packages if there was some other finding too. UGH
                         // see if we have any appropriate matching packages
                         JObject matchedPackages = new JObject();
-                        string gpoUid = gpoFindings["GPOProps"]["UID"].ToString().ToLower().Trim('{', '}');
-                        foreach (KeyValuePair<string, JToken> gpoPackage in gpoPackageData)
+                        if (gpoFindings != null)
                         {
-                            string packageParentGpoUid = gpoPackage.Value["ParentGPO"].ToString().ToLower().Trim('{', '}');
-                            if (packageParentGpoUid == gpoUid)
+                            string gpoUid = gpoFindings["GPOProps"]["UID"].ToString().ToLower().Trim('{', '}');
+                            foreach (KeyValuePair<string, JToken> gpoPackage in gpoPackageData)
                             {
-                                JProperty assessedPackage = PackageAssess.AssessPackage(gpoPackage);
-                                if (assessedPackage != null)
+                                string packageParentGpoUid = gpoPackage.Value["ParentGPO"].ToString().ToLower().Trim('{', '}');
+                                if (packageParentGpoUid == gpoUid)
                                 {
-                                    matchedPackages.Add(assessedPackage);
+                                    JProperty assessedPackage = PackageAssess.AssessPackage(gpoPackage);
+                                    if (assessedPackage != null)
+                                    {
+                                        matchedPackages.Add(assessedPackage);
+                                    }
                                 }
                             }
-                        }
 
-                        if (matchedPackages.HasValues)
-                        {
-                            gpoFindings.Add("Packages", matchedPackages);
+                            if (matchedPackages.HasValues)
+                            {
+                                gpoFindings.Add("Packages", matchedPackages);
+                            }
                         }
 
                         if (gpoFindings != null)
@@ -501,7 +505,7 @@ public class GlobalVar
             // do the script grepping
             if (!(noGrepScripts))
             {
-                Console.Error.Write("Processing SYSVOL script dirs.");
+                Console.Error.Write("\n\nProcessing SYSVOL script dirs.\n\n");
                 JObject processedScriptDirs = ProcessScripts(sysvolScriptDirs);
                 if ((processedScriptDirs != null) && (processedScriptDirs.HasValues))
                 {

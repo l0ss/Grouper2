@@ -100,11 +100,13 @@ namespace Grouper2
             // grab all our findings
             JToken uPolFindings = inputKvp.Value["Findings"]["User Policy"];
             JToken mPolFindings = inputKvp.Value["Findings"]["Machine Policy"];
-            JToken scriptFindings = inputKvp.Value["Scripts"];
+            //JToken scriptFindings = inputKvp.Value["Scripts"];
+            JToken packageFindings = inputKvp.Value["Packages"];
             
             // create a document for each to go in
             Document userPolFindingsDoc = new Document();
             Document machinePolFindingsDoc = new Document();
+            Document packageFindingsDoc = new Document();
 
             // send the json off to get turned into nice output
             if (uPolFindings != null)
@@ -117,16 +119,38 @@ namespace Grouper2
             {
                 machinePolFindingsDoc = GetFindingsDocument(mPolFindings, "machine");
             }
-
+            /*
             if (scriptFindings != null)
             {
-                Utility.DebugWrite(scriptFindings.ToString());
+                Document scriptFindingsDoc = new Document();
+                scriptFindingsDoc.Children.Add(
+                    new Span("Scripts in SYSVOL") { Color = ConsoleColor.Yellow }, "\n",
+                    new Span("#################") { Color = ConsoleColor.Yellow }
+                );
+                foreach (JProperty script in scriptFindings)
+                {
+                    scriptFindingsDoc.Children.Add(JsonToGrid(script.Value, 0));
+                }
+            }
+            */
+
+            if (packageFindings != null)
+            {
+                packageFindingsDoc.Children.Add(
+                    new Span("MSI Packages") { Color = ConsoleColor.Yellow }, "\n",
+                    new Span("############") { Color = ConsoleColor.Yellow }
+                );
+                foreach (JProperty package in packageFindings)
+                {
+                    packageFindingsDoc.Children.Add(JsonToGrid(package.Value, 0));
+                }
             }
             
             // add our findings docs to our final doc
             outputDocument.Children.Add(
                 userPolFindingsDoc,
-                machinePolFindingsDoc
+                machinePolFindingsDoc,
+                packageFindingsDoc
                 );
 
             return outputDocument;
@@ -284,18 +308,6 @@ namespace Grouper2
                         }
                         continue;
                     }
-                    if (cat.Key == "Assigned Applications")
-                    {
-                        findingsDocument.Children.Add(
-                            new Span("Assigned Applications") { Color = findingColor }, "\n",
-                            new Span("~~~~~~~~~~~~~~~~~~~~~") { Color = findingColor }
-                        );
-                        foreach (JProperty aasFinding in cat.Value)
-                        {
-                            findingsDocument.Children.Add(JsonToGrid(aasFinding.Value, 0));
-                        }
-                        continue;
-                    }
                     if (cat.Key == "Service General Setting")
                     {
                         findingsDocument.Children.Add(
@@ -409,7 +421,7 @@ namespace Grouper2
                         {
                             string name = jprop.Name;
                             JToken value = jprop.Value;
-                            grid.Children.Add(new Cell(jprop.Name), new Cell(jprop.Value.ToString()));
+                            grid.Children.Add(new Cell(jprop.Name), new Cell(jprop.Value.ToString().Trim('[',']').Trim()));
                         }
 
                         findingsDocument.Children.Add(grid);
