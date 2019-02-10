@@ -100,13 +100,13 @@ namespace Grouper2
             // grab all our findings
             JToken uPolFindings = inputKvp.Value["Findings"]["User Policy"];
             JToken mPolFindings = inputKvp.Value["Findings"]["Machine Policy"];
-            //JToken scriptFindings = inputKvp.Value["Scripts"];
-            JToken packageFindings = inputKvp.Value["Packages"];
+            JToken packageFindings = inputKvp.Value["Findings"]["Packages"];
             
             // create a document for each to go in
             Document userPolFindingsDoc = new Document();
             Document machinePolFindingsDoc = new Document();
             Document packageFindingsDoc = new Document();
+
 
             // send the json off to get turned into nice output
             if (uPolFindings != null)
@@ -119,21 +119,8 @@ namespace Grouper2
             {
                 machinePolFindingsDoc = GetFindingsDocument(mPolFindings, "machine");
             }
-            /*
-            if (scriptFindings != null)
-            {
-                Document scriptFindingsDoc = new Document();
-                scriptFindingsDoc.Children.Add(
-                    new Span("Scripts in SYSVOL") { Color = ConsoleColor.Yellow }, "\n",
-                    new Span("#################") { Color = ConsoleColor.Yellow }
-                );
-                foreach (JProperty script in scriptFindings)
-                {
-                    scriptFindingsDoc.Children.Add(JsonToGrid(script.Value, 0));
-                }
-            }
-            */
-
+            
+            
             if (packageFindings != null)
             {
                 packageFindingsDoc.Children.Add(

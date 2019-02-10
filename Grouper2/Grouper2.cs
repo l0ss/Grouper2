@@ -414,14 +414,19 @@ public class GlobalVar
                 {
                     try
                     {
-                        JObject gpoFindings = ProcessGpo(gpoPath);
-                        
-                        // DUMB BUG where we only get back packages if there was some other finding too. UGH
-                        // see if we have any appropriate matching packages
                         JObject matchedPackages = new JObject();
-                        if (gpoFindings != null)
+                        if (GlobalVar.OnlineChecks)
                         {
-                            string gpoUid = gpoFindings["GPOProps"]["UID"].ToString().ToLower().Trim('{', '}');
+                            // figure out the gpo UID from the path so we can see which packages need to be processed here.
+                            string[] gpoPathArr = gpoPath.Split('{');
+                            string gpoPathBackString = gpoPathArr[1];
+                            string[] gpoPathBackArr = gpoPathBackString.Split('}');
+                            string gpoUid = gpoPathBackArr[0].ToString().ToLower();
+                            //Utility.DebugWrite(gpoUid);
+                            
+                            // see if we have any appropriate matching packages and construct a little bundle
+                            
+
                             foreach (KeyValuePair<string, JToken> gpoPackage in gpoPackageData)
                             {
                                 string packageParentGpoUid = gpoPackage.Value["ParentGPO"].ToString().ToLower().Trim('{', '}');
@@ -434,12 +439,10 @@ public class GlobalVar
                                     }
                                 }
                             }
-
-                            if (matchedPackages.HasValues)
-                            {
-                                gpoFindings.Add("Packages", matchedPackages);
-                            }
                         }
+                        
+
+                        JObject gpoFindings = ProcessGpo(gpoPath, matchedPackages);
 
                         if (gpoFindings != null)
                         {
@@ -647,7 +650,7 @@ public class GlobalVar
             }
         }
 
-        private static JObject ProcessGpo(string gpoPath)
+        private static JObject ProcessGpo(string gpoPath, JObject matchedPackages)
         {
             try
             {
@@ -699,7 +702,7 @@ public class GlobalVar
                 }
                 
                 gpoResult.Add("GPOProps", gpoProps);
-                JObject gpoResultJson = (JObject) JToken.FromObject(gpoResult);
+                //JObject gpoResultJson = (JObject) JToken.FromObject(gpoResult);
 
                 // if I were smarter I would have done this shit with the machine and user dirs inside the Process methods instead of calling each one twice out here.
                 // @liamosaur you reckon you can see how to clean it up after the fact?
@@ -763,17 +766,20 @@ public class GlobalVar
                     JProperty userFindingsJProp = new JProperty("User Policy", userFindings);
                     allFindings.Add(userFindingsJProp);
                 }
-
                 if (machineFindings.HasValues)
                 {
                     JProperty machineFindingsJProp = new JProperty("Machine Policy", machineFindings);
                     allFindings.Add(machineFindingsJProp);
                 }
-
+                if (matchedPackages.HasValues)
+                {
+                    JProperty packageFindingsJProp = new JProperty("Packages", matchedPackages);
+                    allFindings.Add(packageFindingsJProp);
+                }
                 if (allFindings.HasValues)
                 {
-                    gpoResultJson.Add("Findings", allFindings);
-                    return gpoResultJson;
+                    gpoResult.Add("Findings", allFindings);
+                    return gpoResult;
                 }
             }
             catch (UnauthorizedAccessException e)
