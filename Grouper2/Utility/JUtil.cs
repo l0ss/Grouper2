@@ -13,26 +13,7 @@ namespace Grouper2.Utility
                 JProperty safeJProp = new JProperty(propName, inToken[inString].ToString());
                 return safeJProp;
             }
-            return null;
-        }
 
-        public static JProperty GetSafeJProp(string propName, string valueString)
-        {
-            if (valueString != null)
-            {
-                JProperty safeJProp = new JProperty(propName, valueString);
-                return safeJProp;
-            }
-            return null;
-        }
-        
-        public static JProperty GetSafeJProp(string propName, JToken valueToken)
-        {
-            if ((valueToken != null) && (valueToken.HasValues))
-            {
-                JProperty safeJProp = new JProperty(propName, valueToken);
-                return safeJProp;
-            }
             return null;
         }
 
