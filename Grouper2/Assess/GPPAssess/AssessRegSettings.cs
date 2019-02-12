@@ -15,13 +15,13 @@ namespace Grouper2.GPPAssess
             if (gppCategory["Collection"] != null)
             {
                 JObject assessedGppRegCollections = GetAssessedRegistryCollections(gppCategory["Collection"]);
-                assessedGppRegSettingsOut.Add(JUtil.GetSafeJProp("Registry Setting Collections", assessedGppRegCollections));
+                assessedGppRegSettingsOut.Merge(JUtil.GetSafeJProp("Registry Setting Collections", assessedGppRegCollections));
             }
 
             if (gppCategory["Registry"] != null)
             {
                 JObject assessedGppRegSettingses = GetAssessedRegistrySettingses(gppCategory["Registry"]);
-                assessedGppRegSettingsOut.Add(JUtil.GetSafeJProp("Registry Settings", assessedGppRegSettingses));
+                assessedGppRegSettingsOut.Merge(JUtil.GetSafeJProp("Registry Settings", assessedGppRegSettingses));
             }
 
             if (assessedGppRegSettingsOut.HasValues)
@@ -44,14 +44,14 @@ namespace Grouper2.GPPAssess
                 foreach (JToken gppRegCollection in gppRegCollections)
                 {
                     JToken assessedGppRegCollection = GetAssessedRegistryCollection(gppRegCollection);
-                    assessedRegistryCollections.Add(JUtil.GetSafeJProp(inc.ToString(), assessedGppRegCollection));
+                    assessedRegistryCollections.Merge(JUtil.GetSafeJProp(inc.ToString(), assessedGppRegCollection));
                     inc++;
                 }
             }
             else
             {
                 JToken assessedGppRegCollection = GetAssessedRegistryCollection(gppRegCollections);
-                assessedRegistryCollections.Add(JUtil.GetSafeJProp("0", assessedGppRegCollection));
+                assessedRegistryCollections.Merge(JUtil.GetSafeJProp("0", assessedGppRegCollection));
             }
 
             if (assessedRegistryCollections != null && assessedRegistryCollections.HasValues)
@@ -81,13 +81,13 @@ namespace Grouper2.GPPAssess
                 Contains a Settings JArray
 
              */
-            JObject assessedRegistryCollection = new JObject
-            {
-                // add collection-specific properties
-                { JUtil.GetSafeJProp("Name", gppRegCollection, "@name") },
-                { JUtil.GetSafeJProp("Changed", gppRegCollection, "@changed") },
-                { JUtil.GetSafeJProp("Description", gppRegCollection, "@desc") }
-            };
+            JObject assessedRegistryCollection = new JObject();
+            
+            // add collection-specific properties
+            assessedRegistryCollection.Merge(JUtil.GetSafeJProp("Name", gppRegCollection, "@name"));
+            assessedRegistryCollection.Merge(JUtil.GetSafeJProp("Changed", gppRegCollection, "@changed"));
+            assessedRegistryCollection.Merge(JUtil.GetSafeJProp("Description", gppRegCollection, "@desc"));
+            
 
             if ((gppRegCollection["Registry"] != null) && gppRegCollection.HasValues)
             {
@@ -95,7 +95,7 @@ namespace Grouper2.GPPAssess
                 JToken assessedRegistrySettingses = GetAssessedRegistrySettingses(registrySettingses);
                 if ((assessedRegistrySettingses != null) && assessedRegistrySettingses.HasValues)
                 {
-                    assessedRegistryCollection.Add(JUtil.GetSafeJProp("Registry Settings in Collection", assessedRegistrySettingses));
+                    assessedRegistryCollection.Merge(JUtil.GetSafeJProp("Registry Settings in Collection", assessedRegistrySettingses));
                 }
                 else
                 {
@@ -128,14 +128,14 @@ namespace Grouper2.GPPAssess
                 foreach (JToken gppRegSetting in gppRegSettingses)
                 {
                     JToken assessedGppRegSetting = GetAssessedRegistrySetting(gppRegSetting);
-                    assessedRegistrySettingses.Add(JUtil.GetSafeJProp(inc.ToString(), assessedGppRegSetting));
+                    assessedRegistrySettingses.Merge(JUtil.GetSafeJProp(inc.ToString(), assessedGppRegSetting));
                     inc++;
                 }
             }
             else
             {
                 JObject assessedGppRegSetting = GetAssessedRegistrySetting(gppRegSettingses);
-                assessedRegistrySettingses.Add(JUtil.GetSafeJProp("0", assessedGppRegSetting));
+                assessedRegistrySettingses.Merge(JUtil.GetSafeJProp("0", assessedGppRegSetting));
             }
 
             if (assessedRegistrySettingses != null && assessedRegistrySettingses.HasValues)
@@ -149,13 +149,13 @@ namespace Grouper2.GPPAssess
         {
             JObject assessedRegistrySetting = new JObject();
             int interestLevel = 1;
-            assessedRegistrySetting.Add(JUtil.GetSafeJProp( "Display Name", gppRegSetting, "@name"));
-            assessedRegistrySetting.Add(JUtil.GetSafeJProp("Status", gppRegSetting, "@status"));
-            assessedRegistrySetting.Add(JUtil.GetSafeJProp("Changed", gppRegSetting, "@changed"));
+            assessedRegistrySetting.Merge(JUtil.GetSafeJProp( "Display Name", gppRegSetting, "@name"));
+            assessedRegistrySetting.Merge(JUtil.GetSafeJProp("Status", gppRegSetting, "@status"));
+            assessedRegistrySetting.Merge(JUtil.GetSafeJProp("Changed", gppRegSetting, "@changed"));
             JToken gppRegProps = gppRegSetting["Properties"];
-            assessedRegistrySetting.Add("Action", JUtil.GetActionString(gppRegProps["@action"].ToString()));
-            assessedRegistrySetting.Add(JUtil.GetSafeJProp("Default", gppRegProps, "@default"));
-            assessedRegistrySetting.Add(JUtil.GetSafeJProp("Hive", gppRegProps, "@hive"));
+            assessedRegistrySetting.Merge(JUtil.GetSafeJProp("Action", JUtil.GetActionString(gppRegProps["@action"].ToString())));
+            assessedRegistrySetting.Merge(JUtil.GetSafeJProp("Default", gppRegProps, "@default"));
+            assessedRegistrySetting.Merge(JUtil.GetSafeJProp("Hive", gppRegProps, "@hive"));
             // get the actual key
             string key = JUtil.GetSafeString(gppRegProps, "@key");
             // investigate it
@@ -164,7 +164,7 @@ namespace Grouper2.GPPAssess
             {
                 interestLevel = (int) investigatedKey["InterestLevel"];
             }
-            assessedRegistrySetting.Add(JUtil.GetSafeJProp("Key", investigatedKey));
+            assessedRegistrySetting.Merge(JUtil.GetSafeJProp("Key", investigatedKey));
             // repeat for the name
             string name = JUtil.GetSafeString(gppRegProps, "@name");
             JObject investigatedName = FileSystem.InvestigateString(name);
@@ -172,8 +172,8 @@ namespace Grouper2.GPPAssess
             {
                 interestLevel = (int)investigatedKey["InterestLevel"];
             }
-            assessedRegistrySetting.Add(JUtil.GetSafeJProp("Name", investigatedName));
-            assessedRegistrySetting.Add(JUtil.GetSafeJProp("Type", gppRegProps, "@type"));
+            assessedRegistrySetting.Merge(JUtil.GetSafeJProp("Name", investigatedName));
+            assessedRegistrySetting.Merge(JUtil.GetSafeJProp("Type", gppRegProps, "@type"));
             // then investigate the value
             string value = JUtil.GetSafeString(gppRegProps, "@value");
             JObject investigatedValue = FileSystem.InvestigateString(value);
@@ -181,7 +181,7 @@ namespace Grouper2.GPPAssess
             {
                 interestLevel = (int)investigatedKey["InterestLevel"];
             }
-            assessedRegistrySetting.Add(JUtil.GetSafeJProp("Value", investigatedValue));
+            assessedRegistrySetting.Merge(JUtil.GetSafeJProp("Value", investigatedValue));
 
             if (interestLevel >= GlobalVar.IntLevelToShow)
             {
