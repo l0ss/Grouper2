@@ -20,7 +20,7 @@ namespace Grouper2.InfAssess
             {
                 JProperty parsedGrpMembershipJProp = (JProperty) parsedGrpMembership;
 
-                // break immediately if there's no value.
+                // skip immediately if there's no value.
                 if (parsedGrpMembershipJProp.Value.ToString() == "")
                 {
                     continue;

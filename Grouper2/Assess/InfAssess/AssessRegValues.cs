@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Grouper2.Utility;
 using Newtonsoft.Json.Linq;
 
 namespace Grouper2.InfAssess
@@ -49,7 +50,7 @@ namespace Grouper2.InfAssess
                             if (keyTypeString == "REG_DWORD")
                             {
                                 // if it's a dword it'll only have one value
-                                assessedRegValues.Add(matchedRegKey, regValue.Value[1].ToString());
+                                assessedRegValues.Add(JUtil.GetSafeJProp(matchedRegKey, regValue.Value[1].ToString()));
                             }
                             else if (keyTypeString == "REG_MULTI_SZ")
                             {
@@ -59,7 +60,7 @@ namespace Grouper2.InfAssess
                                 {
                                     regValuesJArray.Add(value.ToString());
                                 }
-                                assessedRegValues.Add(matchedRegKey, regValuesJArray);
+                                assessedRegValues.Add(JUtil.GetSafeJProp(matchedRegKey, regValuesJArray));
                             }
                         }
                     }
