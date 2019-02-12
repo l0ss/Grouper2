@@ -25,6 +25,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Alba.CsConsoleFormat;
 using Grouper2.ScriptsIniAssess;
+using Grouper2.Utility;
+using Console = System.Console;
 
 namespace Grouper2
 {
@@ -52,8 +54,8 @@ namespace Grouper2
                     }
                     catch (Exception e)
                     {
-                        Utility.DebugWrite("Failed to get all the GPO Data from DC.");
-                        Utility.DebugWrite(e.ToString());
+                        Utility.Output.DebugWrite("Failed to get all the GPO Data from DC.");
+                        Utility.Output.DebugWrite(e.ToString());
                         _domainGpoData = new JObject();
                     }
                 }
@@ -271,7 +273,7 @@ public class GlobalVar
             Console.Error.WriteLine("\nAll online checks will be performed in the context of this user.");
 
 
-            if (!prettyOutput) Utility.PrintBanner();
+            if (!prettyOutput) Output.PrintBanner();
 
             // Ask the DC for GPO details
             string currentDomainString = "";
@@ -291,7 +293,7 @@ public class GlobalVar
                     catch (ActiveDirectoryOperationException e)
                     {
                         Console.WriteLine("\nCouldn't talk to the domain properly. If you're trying to run offline you should use the -o switch. Failing that, try rerunning with -d to specify a domain or -v to get more information about the error.");
-                        Utility.DebugWrite(e.ToString());
+                        Utility.Output.DebugWrite(e.ToString());
 
                         Environment.Exit(1);
                     }
@@ -376,7 +378,7 @@ public class GlobalVar
                 {
                     Console.Error.WriteLine("I had a problem with " + policyPath +
                                             ". I guess you could try to fix it?");
-                    Utility.DebugWrite(e.ToString());
+                    Utility.Output.DebugWrite(e.ToString());
                 }
             }
 
@@ -578,7 +580,7 @@ public class GlobalVar
 
             if (GlobalVar.CleanupList != null)
             {
-                List<string> cleanupList = Utility.DedupeList(GlobalVar.CleanupList);
+                List<string> cleanupList = Util.DedupeList(GlobalVar.CleanupList);
                 if (cleanupList.Count >= 1)
                 {
                     Console.WriteLine("\n\nGrouper2 tried to create these files. It probably failed, but just in case it didn't, you might want to check and clean them up.\n");
@@ -634,7 +636,7 @@ public class GlobalVar
                 }
                 catch (Exception e)
                 {
-                    Utility.DebugWrite(e.ToString());
+                    Utility.Output.DebugWrite(e.ToString());
                 }
             }
             
@@ -680,7 +682,7 @@ public class GlobalVar
                         }
                         else
                         {
-                            Utility.DebugWrite("Couldn't get GPO Properties from the domain for the following GPO: " +
+                            Utility.Output.DebugWrite("Couldn't get GPO Properties from the domain for the following GPO: " +
                                                gpoUid);
                             // if we weren't able to select the GPO's details, do what we can with what we have.
                             gpoProps = new JObject()
@@ -692,7 +694,7 @@ public class GlobalVar
                     }
                     catch (ArgumentNullException e)
                     {
-                        Utility.DebugWrite(e.ToString());
+                        Utility.Output.DebugWrite(e.ToString());
                     }
                 }
                 // otherwise do what we can with what we have
@@ -788,7 +790,7 @@ public class GlobalVar
             }
             catch (UnauthorizedAccessException e)
             {
-                Utility.DebugWrite(e.ToString());
+                Utility.Output.DebugWrite(e.ToString());
             }
 
             return null;
@@ -804,13 +806,13 @@ public class GlobalVar
             }
             catch (DirectoryNotFoundException e)
             {
-                Utility.DebugWrite(e.ToString());
+                Utility.Output.DebugWrite(e.ToString());
 
                 return null;
             }
             catch (UnauthorizedAccessException e)
             {
-                Utility.DebugWrite(e.ToString());
+                Utility.Output.DebugWrite(e.ToString());
 
                 return null;
             }
@@ -828,7 +830,7 @@ public class GlobalVar
                 }
                 catch (UnauthorizedAccessException e)
                 {
-                    Utility.DebugWrite(e.ToString());
+                    Utility.Output.DebugWrite(e.ToString());
                 }
                 //send the inf file to be assessed
                 JObject assessedGpTmpl = AssessHandlers.AssessGptmpl(parsedInfFile);

@@ -104,34 +104,35 @@
     <Reference Include="mscorlib" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CurrentUserSecurity.cs" />
-    <Compile Include="FileSystem.cs" />
-    <Compile Include="GPPAssess\AssessGpp.cs" />
-    <Compile Include="AssessHandlers.cs" />
-    <Compile Include="Output.cs" />
-    <Compile Include="PackageAssess.cs" />
-    <Compile Include="SddlParser\ParseSDDL.cs" />
-    <Compile Include="ScriptsIniAssess\AssessScriptsIni.cs" />
-    <Compile Include="GPPAssess\AssessDataSources.cs" />
-    <Compile Include="GPPAssess\AssessDrives.cs" />
-    <Compile Include="GPPAssess\AssessEnvVars.cs" />
-    <Compile Include="GPPAssess\AssessFiles.cs" />
-    <Compile Include="GPPAssess\AssessIniFiles.cs" />
-    <Compile Include="GPPAssess\AssessNetworkOptions.cs" />
-    <Compile Include="GPPAssess\AssessNetworkShares.cs" />
-    <Compile Include="GPPAssess\AssessNTServices.cs" />
-    <Compile Include="GPPAssess\AssessPrinters.cs" />
-    <Compile Include="GPPAssess\AssessRegSettings.cs" />
-    <Compile Include="GPPAssess\AssessSchedTasks.cs" />
-    <Compile Include="GPPAssess\AssessShortcuts.cs" />
-    <Compile Include="GPPAssess\AssessUsersAndGroups.cs" />
-    <Compile Include="InfAssess\AssessGroupMembership.cs" />
-    <Compile Include="InfAssess\AssessKerbPolicy.cs" />
-    <Compile Include="InfAssess\AssessPrivRights.cs" />
-    <Compile Include="InfAssess\AssessRegKeys.cs" />
-    <Compile Include="InfAssess\AssessRegValues.cs" />
-    <Compile Include="InfAssess\AssessServiceGenSetting.cs" />
-    <Compile Include="InfAssess\AssessSysAccess.cs" />
+    <Compile Include="Utility\CurrentUserSecurity.cs" />
+    <Compile Include="Utility\FileSystem.cs" />
+    <Compile Include="Assess\GPPAssess\AssessGpp.cs" />
+    <Compile Include="Assess\AssessHandlers.cs" />
+    <Compile Include="Utility\JUtil.cs" />
+    <Compile Include="Utility\Output.cs" />
+    <Compile Include="Assess\PackageAssess\PackageAssess.cs" />
+    <Compile Include="Utility\SddlParser\ParseSDDL.cs" />
+    <Compile Include="Assess\ScriptsIniAssess\AssessScriptsIni.cs" />
+    <Compile Include="Assess\GPPAssess\AssessDataSources.cs" />
+    <Compile Include="Assess\GPPAssess\AssessDrives.cs" />
+    <Compile Include="Assess\GPPAssess\AssessEnvVars.cs" />
+    <Compile Include="Assess\GPPAssess\AssessFiles.cs" />
+    <Compile Include="Assess\GPPAssess\AssessIniFiles.cs" />
+    <Compile Include="Assess\GPPAssess\AssessNetworkOptions.cs" />
+    <Compile Include="Assess\GPPAssess\AssessNetworkShares.cs" />
+    <Compile Include="Assess\GPPAssess\AssessNTServices.cs" />
+    <Compile Include="Assess\GPPAssess\AssessPrinters.cs" />
+    <Compile Include="Assess\GPPAssess\AssessRegSettings.cs" />
+    <Compile Include="Assess\GPPAssess\AssessSchedTasks.cs" />
+    <Compile Include="Assess\GPPAssess\AssessShortcuts.cs" />
+    <Compile Include="Assess\GPPAssess\AssessUsersAndGroups.cs" />
+    <Compile Include="Assess\InfAssess\AssessGroupMembership.cs" />
+    <Compile Include="Assess\InfAssess\AssessKerbPolicy.cs" />
+    <Compile Include="Assess\InfAssess\AssessPrivRights.cs" />
+    <Compile Include="Assess\InfAssess\AssessRegKeys.cs" />
+    <Compile Include="Assess\InfAssess\AssessRegValues.cs" />
+    <Compile Include="Assess\InfAssess\AssessServiceGenSetting.cs" />
+    <Compile Include="Assess\InfAssess\AssessSysAccess.cs" />
     <Compile Include="LDAPstuff.cs" />
     <Compile Include="Parsers.cs" />
     <Compile Include="Grouper2.cs" />
@@ -141,15 +142,16 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="SddlParser\Ace.cs" />
-    <Compile Include="SddlParser\Acl.cs" />
-    <Compile Include="SddlParser\Format.cs" />
-    <Compile Include="SddlParser\Match.cs" />
-    <Compile Include="SddlParser\Sddl.cs" />
-    <Compile Include="SddlParser\SecurableObjectType.cs" />
-    <Compile Include="SddlParser\Sid.cs" />
-    <Compile Include="SddlParser\StringBuilderExtensions.cs" />
-    <Compile Include="Utility.cs" />
+    <Compile Include="Utility\SddlParser\Ace.cs" />
+    <Compile Include="Utility\SddlParser\Acl.cs" />
+    <Compile Include="Utility\SddlParser\Format.cs" />
+    <Compile Include="Utility\SddlParser\Match.cs" />
+    <Compile Include="Utility\SddlParser\Sddl.cs" />
+    <Compile Include="Utility\SddlParser\SecurableObjectType.cs" />
+    <Compile Include="Utility\SddlParser\Sid.cs" />
+    <Compile Include="Utility\SddlParser\StringBuilderExtensions.cs" />
+    <Compile Include="Utility\Sid.cs" />
+    <Compile Include="Utility\Util.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

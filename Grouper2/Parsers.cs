@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using Newtonsoft.Json.Linq;
 using System.Xml;
+using Grouper2.Utility;
 using Newtonsoft.Json;
 
 namespace Grouper2
@@ -65,7 +66,7 @@ namespace Grouper2
                 parsedScriptsIniJson.Add(parsedItemJProp);
             }
             //Console.WriteLine("return: ");
-            //Utility.DebugWrite(parsedScriptsIniJson.ToString());
+            //Utility.Output.DebugWrite(parsedScriptsIniJson.ToString());
             return parsedScriptsIniJson;
         }
 
@@ -78,7 +79,7 @@ namespace Grouper2
 
             string infContentString = String.Join(Environment.NewLine, infContentArray);
 
-            if (Utility.IsEmptyOrWhiteSpace(infContentString))
+            if (Util.IsEmptyOrWhiteSpace(infContentString))
             {
                 return null;
             }
@@ -111,7 +112,7 @@ namespace Grouper2
                 }
                 catch (ArgumentOutOfRangeException)
                 {
-                    //Utility.DebugWrite(e.ToString());
+                    //Utility.Output.DebugWrite(e.ToString());
                     int sectionHeading = headingLines[fuck];
                     int sectionFinalLine = infContentArray.Length - 1;
                     sectionSlices.Add(sectionHeading, sectionFinalLine);
@@ -204,15 +205,15 @@ namespace Grouper2
                             }
                             catch (ArgumentException e)
                             {
-                                Utility.DebugWrite("Hit duplicate value in inf.");
-                                Utility.DebugWrite(e.ToString());
+                                Utility.Output.DebugWrite("Hit duplicate value in inf.");
+                                Utility.Output.DebugWrite(e.ToString());
                             }
                         }
                     }
 
                     if (lineKey == "")
                     {
-                        Utility.DebugWrite("Something has gone wrong parsing an Inf/Ini file.");
+                        Utility.Output.DebugWrite("Something has gone wrong parsing an Inf/Ini file.");
                     }
                     
                 }
@@ -232,7 +233,7 @@ namespace Grouper2
             }
             catch (UnauthorizedAccessException e)
             {
-                Utility.DebugWrite(e.ToString());
+                Utility.Output.DebugWrite(e.ToString());
                 return null;
             }
 

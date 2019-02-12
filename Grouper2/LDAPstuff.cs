@@ -85,16 +85,16 @@ namespace Grouper2
             string lookupResult = "";
             if (err != 0)
             {
-                Utility.DebugWrite(@"Error in SID Lookup : " + err + " resolving SID " + sidString + " handing off to well known sids list.");
+                Utility.Output.DebugWrite(@"Error in SID Lookup : " + err + " resolving SID " + sidString + " handing off to well known sids list.");
 
                 try
                 {
-                    lookupResult = Utility.GetWellKnownSid(sidString);
+                    lookupResult = Utility.Sid.GetWellKnownSid(sidString);
                 }
                 catch (Exception e)
                 {
                     lookupResult = "SID Lookup Failed";
-                    Utility.DebugWrite(e.ToString());
+                    Utility.Output.DebugWrite(e.ToString());
                 }
 
                 return lookupResult;
@@ -154,7 +154,7 @@ namespace Grouper2
                     // this is to catch duplicate UIDs caused by Default Domain Policy and Domain Controller Policy having 'well known guids'
                     if (gposData[gpoUid] != null)
                     {
-                        Utility.DebugWrite("\nI think you're in a multi-domain environment cos I just saw two GPOs with the same GUID. " +
+                        Utility.Output.DebugWrite("\nI think you're in a multi-domain environment cos I just saw two GPOs with the same GUID. " +
                                            "\nYou should be careful not to miss stuff in the Default Domain Policy and Default Domain Controller Policy.");
                         continue;
                     }
@@ -292,7 +292,7 @@ namespace Grouper2
             }
             catch (Exception exception)
             {
-                Utility.DebugWrite(exception.ToString());
+                Utility.Output.DebugWrite(exception.ToString());
                 Console.ReadKey();
                 Environment.Exit(1);
             }
@@ -409,7 +409,7 @@ namespace Grouper2
                         JObject gpoPackage = new JObject();
                         gpoPackage.Add("Display Name", displayName);
                         gpoPackage.Add("MSI Path", lvItems[2]);
-                        gpoPackage.Add("MsiPath2", lvItems[3]);
+                        //gpoPackage.Add("MsiPath2", lvItems[3]);
                         gpoPackage.Add("Changed", lvItems[5]);
                         gpoPackage.Add("Created", lvItems[6]);
                         gpoPackage.Add("Type", lvItems[1]);
@@ -422,7 +422,7 @@ namespace Grouper2
                     }
                     catch (Exception e)
                     {
-                        Utility.DebugWrite(e.ToString());
+                        Utility.Output.DebugWrite(e.ToString());
                     }
                 }
             }
