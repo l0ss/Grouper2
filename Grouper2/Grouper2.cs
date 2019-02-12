@@ -422,14 +422,12 @@ public class GlobalVar
                             string gpoPathBackString = gpoPathArr[1];
                             string[] gpoPathBackArr = gpoPathBackString.Split('}');
                             string gpoUid = gpoPathBackArr[0].ToString().ToLower();
-                            //Utility.DebugWrite(gpoUid);
-                            
-                            // see if we have any appropriate matching packages and construct a little bundle
-                            
 
+                            // see if we have any appropriate matching packages and construct a little bundle
                             foreach (KeyValuePair<string, JToken> gpoPackage in gpoPackageData)
                             {
-                                string packageParentGpoUid = gpoPackage.Value["ParentGPO"].ToString().ToLower().Trim('{', '}');
+                                string packageParentGpoUid = gpoPackage.Value["ParentGPO"].ToString().ToLower()
+                                    .Trim('{', '}');
                                 if (packageParentGpoUid == gpoUid)
                                 {
                                     JProperty assessedPackage = PackageAssess.AssessPackage(gpoPackage);
@@ -440,7 +438,7 @@ public class GlobalVar
                                 }
                             }
                         }
-                        
+
 
                         JObject gpoFindings = ProcessGpo(gpoPath, matchedPackages);
 
@@ -462,6 +460,7 @@ public class GlobalVar
                             }
                         }
                     }
+
                     catch (Exception e)
                     {
                         taskErrors.Add(gpoPath, e.ToString());
@@ -652,6 +651,11 @@ public class GlobalVar
 
         private static JObject ProcessGpo(string gpoPath, JObject matchedPackages)
         {
+            if (gpoPath.Contains("PolicyDefinitions"))
+            {
+                return null;
+            }
+
             try
             {
                 // create a dict to put the stuff we find for this GPO into.
