@@ -199,13 +199,13 @@ namespace Grouper2
                 
                     foreach (KeyValuePair<string, JToken> thing in parsedSDDL)
                     {
-                        if (thing.Key == "Owner")
+                        if ((thing.Key == "Owner") && (thing.Value.ToString() != "DOMAIN_ADMINISTRATORS"))
                         {
                             gpoAclJObject.Add("Owner", thing.Value.ToString());
                             continue;
                         }
 
-                        if (thing.Key == "Group")
+                        if ((thing.Key == "Group") && (thing.Value.ToString() != "DOMAIN_ADMINISTRATORS"))
                         {
                             gpoAclJObject.Add("Group", thing.Value);
                             continue;

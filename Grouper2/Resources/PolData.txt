@@ -56,11 +56,6 @@
       "remotelyExploitable": null
     },
     {
-      "privRight": "SeSecurityPrivilege",
-      "interestLevel": null,
-      "remotelyExploitable": null
-    },
-    {
       "privRight": "SeNetworkLogonRight",
       "interestLevel": null,
       "remotelyExploitable": null
