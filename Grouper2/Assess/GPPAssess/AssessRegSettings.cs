@@ -167,28 +167,33 @@ namespace Grouper2.GPPAssess
         {
             JObject assessedRegistrySetting = new JObject();
             int interestLevel = 1;
-            assessedRegistrySetting.Add("Display Name", JUtil.GetSafeString(gppRegSetting, "@name"));
-            assessedRegistrySetting.Add("Status", JUtil.GetSafeString(gppRegSetting, "@status"));
-            assessedRegistrySetting.Add("Changed", JUtil.GetSafeString(gppRegSetting, "@changed"));
-            assessedRegistrySetting.Add("Action", JUtil.GetActionString(gppRegSetting["Properties"]["@action"].ToString()));
-            assessedRegistrySetting.Add("Default", JUtil.GetSafeString(gppRegSetting["Properties"], "@default"));
-            assessedRegistrySetting.Add("Hive", JUtil.GetSafeString(gppRegSetting["Properties"], "@hive"));
-            string key = JUtil.GetSafeString(gppRegSetting["Properties"], "@key");
+            assessedRegistrySetting.Add(JUtil.GetSafeJProp( "Display Name", gppRegSetting, "@name"));
+            assessedRegistrySetting.Add(JUtil.GetSafeJProp("Status", gppRegSetting, "@status"));
+            assessedRegistrySetting.Add(JUtil.GetSafeJProp("Changed", gppRegSetting, "@changed"));
+            JToken gppRegProps = gppRegSetting["Properties"];
+            assessedRegistrySetting.Add("Action", JUtil.GetActionString(gppRegProps["@action"].ToString()));
+            assessedRegistrySetting.Add(JUtil.GetSafeJProp("Default", gppRegProps, "@default"));
+            assessedRegistrySetting.Add(JUtil.GetSafeJProp("Hive", gppRegProps, "@hive"));
+            // get the actual key
+            string key = JUtil.GetSafeString(gppRegProps, "@key");
+            // investigate it
             JObject investigatedKey = FileSystem.InvestigateString(key);
             if ((int) investigatedKey["InterestLevel"] >= interestLevel)
             {
                 interestLevel = (int) investigatedKey["InterestLevel"];
             }
-            assessedRegistrySetting.Add("Key", investigatedKey);
-            string name = JUtil.GetSafeString(gppRegSetting["Properties"], "@name");
+            assessedRegistrySetting.Add(JUtil.GetSafeJProp("Key", investigatedKey));
+            // repeat for the name
+            string name = JUtil.GetSafeString(gppRegProps, "@name");
             JObject investigatedName = FileSystem.InvestigateString(name);
             if ((int)investigatedName["InterestLevel"] >= interestLevel)
             {
                 interestLevel = (int)investigatedKey["InterestLevel"];
             }
-            assessedRegistrySetting.Add("Name", investigatedName);
-            assessedRegistrySetting.Add("Type", JUtil.GetSafeString(gppRegSetting["Properties"], "@type"));
-            string value = JUtil.GetSafeString(gppRegSetting["Properties"], "@value");
+            assessedRegistrySetting.Add(JUtil.GetSafeJProp("Name", investigatedName));
+            assessedRegistrySetting.Add(JUtil.GetSafeJProp("Type", gppRegProps, "@type"));
+            // then investigate the value
+            string value = JUtil.GetSafeString(gppRegProps, "@value");
             JObject investigatedValue = FileSystem.InvestigateString(value);
             if ((int)investigatedValue["InterestLevel"] >= interestLevel)
             {
@@ -198,31 +203,12 @@ namespace Grouper2.GPPAssess
 
             if (interestLevel >= GlobalVar.IntLevelToShow)
             {
-                return new JObject(assessedRegistrySetting);
+                return assessedRegistrySetting;
             }
             else
             {
                 return null;
             }
         }
-        /*
-
-            Settings objects are just a JArray of individual regkeys which have:
-            @name
-            @status
-            @changed
-            @uid
-            Properties
-                @action
-                @displayDecimal
-                @default
-                @hive
-                @key
-                @name
-                @type
-                @value
-
-
-        */
     }
 }
