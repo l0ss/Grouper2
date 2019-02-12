@@ -19,7 +19,7 @@ namespace Grouper2.GPPAssess
                     {
                         JObject assessedGroup = GetAssessedGroup(gppGroup);
                         string gppGroupUid = gppGroup["@uid"].ToString();
-                        assessedGroups.Merge(JUtil.GetSafeJProp(gppGroupUid, assessedGroup));
+                        assessedGroups.Add(JUtil.GetSafeJProp(gppGroupUid, assessedGroup));
                     }
                 }
                 else
@@ -27,7 +27,7 @@ namespace Grouper2.GPPAssess
                     JObject gppGroup = (JObject) JToken.FromObject(gppCategory["Group"]);
                     JObject assessedGroup = GetAssessedGroup(gppGroup);
                     string gppGroupUid = gppGroup["@uid"].ToString();
-                    assessedGroups.Merge(JUtil.GetSafeJProp(gppGroupUid, assessedGroup));
+                    assessedGroups.Add(JUtil.GetSafeJProp(gppGroupUid, assessedGroup));
                 }
             }
             
@@ -39,7 +39,7 @@ namespace Grouper2.GPPAssess
                     {
                         JObject assessedUser = GetAssessedUser(gppUser);
                         string gppUserUid = gppUser["@uid"].ToString();
-                        assessedUsers.Merge(JUtil.GetSafeJProp(gppUserUid, assessedUser));
+                        assessedUsers.Add(JUtil.GetSafeJProp(gppUserUid, assessedUser));
                     }
                 }
                 else
@@ -47,15 +47,15 @@ namespace Grouper2.GPPAssess
                     JObject gppUser = (JObject) JToken.FromObject(gppCategory["User"]);
                     JObject assessedUser = GetAssessedUser(gppUser);
                     string gppUserUid = gppUser["@uid"].ToString();
-                    assessedUsers.Merge(JUtil.GetSafeJProp(gppUserUid, assessedUser));
+                    assessedUsers.Add(JUtil.GetSafeJProp(gppUserUid, assessedUser));
                 }
             }
             
             // chuck the users and groups together in one JObject
             JObject assessedGppGroupsJson = new JObject();
             // only want to actually output these things if there's anything useful in them.
-            assessedGppGroupsJson.Merge(JUtil.GetSafeJProp("GPP Users", assessedUsers));
-            assessedGppGroupsJson.Merge(JUtil.GetSafeJProp("GPP Groups", assessedGroups));
+            assessedGppGroupsJson.Add(JUtil.GetSafeJProp("GPP Users", assessedUsers));
+            assessedGppGroupsJson.Add(JUtil.GetSafeJProp("GPP Groups", assessedGroups));
 
             return assessedGppGroupsJson;
         }
@@ -75,15 +75,15 @@ namespace Grouper2.GPPAssess
             userAction = JUtil.GetActionString(userAction);
 
             // get the username and a bunch of other details:
-            assessedUser.Merge(JUtil.GetSafeJProp("Name", gppUser, "@name"));
-            assessedUser.Merge(JUtil.GetSafeJProp("User Name", gppUserProps, "@userName"));
-            assessedUser.Merge(JUtil.GetSafeJProp("Changed", gppUser, "@changed"));
-            assessedUser.Merge(JUtil.GetSafeJProp("Account Disabled", gppUserProps, "@acctDisabled"));
-            assessedUser.Merge(JUtil.GetSafeJProp("Password Never Expires", gppUserProps, "@neverExpires"));
-            assessedUser.Merge(JUtil.GetSafeJProp("Description", gppUserProps, "@description"));
-            assessedUser.Merge(JUtil.GetSafeJProp("Full Name", gppUserProps, "@fullName"));
-            assessedUser.Merge(JUtil.GetSafeJProp("New Name", gppUserProps, "@newName"));
-            assessedUser.Merge(JUtil.GetSafeJProp("Action", userAction));
+            assessedUser.Add(JUtil.GetSafeJProp("Name", gppUser, "@name"));
+            assessedUser.Add(JUtil.GetSafeJProp("User Name", gppUserProps, "@userName"));
+            assessedUser.Add(JUtil.GetSafeJProp("Changed", gppUser, "@changed"));
+            assessedUser.Add(JUtil.GetSafeJProp("Account Disabled", gppUserProps, "@acctDisabled"));
+            assessedUser.Add(JUtil.GetSafeJProp("Password Never Expires", gppUserProps, "@neverExpires"));
+            assessedUser.Add(JUtil.GetSafeJProp("Description", gppUserProps, "@description"));
+            assessedUser.Add(JUtil.GetSafeJProp("Full Name", gppUserProps, "@fullName"));
+            assessedUser.Add(JUtil.GetSafeJProp("New Name", gppUserProps, "@newName"));
+            assessedUser.Add(JUtil.GetSafeJProp("Action", userAction));
 
             // check for cpasswords
             if (gppUserProps["@cpassword"] != null)
@@ -91,10 +91,11 @@ namespace Grouper2.GPPAssess
                 string cpassword = gppUserProps["@cpassword"].ToString();
                 if (cpassword.Length > 0)
                 {
-                    string decryptedCpassword = Util.DecryptCpassword(cpassword);
+                    string decryptedCpassword = "";
+                    decryptedCpassword = Util.DecryptCpassword(cpassword);
                     // if we find one, that's super interesting.
-                    assessedUser.Merge(JUtil.GetSafeJProp("Cpassword", cpassword));
-                    assessedUser.Merge(JUtil.GetSafeJProp("Decrypted Password", decryptedCpassword));
+                    assessedUser.Add(JUtil.GetSafeJProp("Cpassword", cpassword));
+                    assessedUser.Add(JUtil.GetSafeJProp("Decrypted Password", decryptedCpassword));
                     interestLevel = 10;
                 }
             }
@@ -121,15 +122,15 @@ namespace Grouper2.GPPAssess
             groupAction = JUtil.GetActionString(groupAction);
 
             // get the group name and a bunch of other details:
-            assessedGroup.Merge(JUtil.GetSafeJProp("Name", gppGroup, "@name"));
+            assessedGroup.Add(JUtil.GetSafeJProp("Name", gppGroup, "@name"));
             //TODO if the name is an interesting group, make the finding more interesting.
-            assessedGroup.Merge(JUtil.GetSafeJProp("Changed", gppGroup, "@changed"));
-            assessedGroup.Merge(JUtil.GetSafeJProp("Description", gppGroup, "@description"));
-            assessedGroup.Merge(JUtil.GetSafeJProp("New Name", gppGroupProps, "@newName"));
-            assessedGroup.Merge(JUtil.GetSafeJProp("Delete All Users", gppGroupProps, "@deleteAllUsers"));
-            assessedGroup.Merge(JUtil.GetSafeJProp("Delete All Groups", gppGroupProps, "@deleteAllGroups"));
-            assessedGroup.Merge(JUtil.GetSafeJProp("Remove Accounts", gppGroupProps, "@removeAccounts"));
-            assessedGroup.Merge(JUtil.GetSafeJProp("Action", groupAction));
+            assessedGroup.Add(JUtil.GetSafeJProp("Changed", gppGroup, "@changed"));
+            assessedGroup.Add(JUtil.GetSafeJProp("Description", gppGroup, "@description"));
+            assessedGroup.Add(JUtil.GetSafeJProp("New Name", gppGroupProps, "@newName"));
+            assessedGroup.Add(JUtil.GetSafeJProp("Delete All Users", gppGroupProps, "@deleteAllUsers"));
+            assessedGroup.Add(JUtil.GetSafeJProp("Delete All Groups", gppGroupProps, "@deleteAllGroups"));
+            assessedGroup.Add(JUtil.GetSafeJProp("Remove Accounts", gppGroupProps, "@removeAccounts"));
+            assessedGroup.Add(JUtil.GetSafeJProp("Action", groupAction));
 
             JArray gppGroupMemberJArray = new JArray();
 
@@ -176,7 +177,7 @@ namespace Grouper2.GPPAssess
             membersString = membersString.Replace("\n\n\n", "\n");
             membersString = membersString.Trim();
 
-            assessedGroup.Merge(JUtil.GetSafeJProp("Members", membersString));
+            assessedGroup.Add(JUtil.GetSafeJProp("Members", membersString));
 
             if (interestLevel < GlobalVar.IntLevelToShow)
             {
@@ -194,7 +195,7 @@ namespace Grouper2.GPPAssess
                 {JUtil.GetSafeJProp("Action", member, "@action")}
             };
             string memberSid = JUtil.GetSafeString(member, "@sid");
-            assessedMember.Merge(JUtil.GetSafeJProp("SID", memberSid));
+            assessedMember.Add(JUtil.GetSafeJProp("SID", memberSid));
 
             string resolvedSid = LDAPstuff.GetUserFromSid(memberSid);
             assessedMember.Add("DisplayName", resolvedSid);

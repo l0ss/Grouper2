@@ -6,7 +6,7 @@ namespace Grouper2.Utility
     class JUtil
     {
 
-        public static JToken GetSafeJProp(string propName, JToken inToken, string inString)
+        public static JProperty GetSafeJProp(string propName, JToken inToken, string inString)
         {
             if ((inToken[inString] != null) && (inToken[inString].ToString() != ""))
             {
@@ -16,7 +16,7 @@ namespace Grouper2.Utility
             return null;
         }
 
-        public static JToken GetSafeJProp(string propName, string valueString)
+        public static JProperty GetSafeJProp(string propName, string valueString)
         {
             if (!string.IsNullOrEmpty(valueString))
             {
@@ -26,7 +26,7 @@ namespace Grouper2.Utility
             return null;
         }
         
-        public static JToken GetSafeJProp(string propName, JToken valueToken)
+        public static JProperty GetSafeJProp(string propName, JToken valueToken)
         {
             if ((valueToken != null) && (valueToken.HasValues))
             {
