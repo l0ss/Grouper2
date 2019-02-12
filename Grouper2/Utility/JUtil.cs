@@ -8,7 +8,7 @@ namespace Grouper2.Utility
 
         public static JProperty GetSafeJProp(string propName, JToken inToken, string inString)
         {
-            if ((inToken[inString] != null) && (inToken[inString].ToString() != ""))
+            if (inToken[inString] != null)
             {
                 JProperty safeJProp = new JProperty(propName, inToken[inString].ToString());
                 return safeJProp;
@@ -18,7 +18,7 @@ namespace Grouper2.Utility
 
         public static JProperty GetSafeJProp(string propName, string valueString)
         {
-            if (!string.IsNullOrEmpty(valueString))
+            if (valueString != null)
             {
                 JProperty safeJProp = new JProperty(propName, valueString);
                 return safeJProp;

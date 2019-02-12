@@ -5,7 +5,6 @@ namespace Grouper2.GPPAssess
 {
     public partial class AssessGpp
     {
-        // checked for JUtil.GetSafeJProp
         private JObject GetAssessedGroups(JObject gppCategory)
         {
             JObject assessedGroups = new JObject();
@@ -18,19 +17,25 @@ namespace Grouper2.GPPAssess
                     foreach (JObject gppGroup in gppCategory["Group"])
                     {
                         JObject assessedGroup = GetAssessedGroup(gppGroup);
-                        string gppGroupUid = gppGroup["@uid"].ToString();
-                        assessedGroups.Add(JUtil.GetSafeJProp(gppGroupUid, assessedGroup));
+                        if (assessedGroup != null)
+                        {
+                            assessedGroups.Add(gppGroup["@uid"].ToString(), assessedGroup);
+                        }
                     }
                 }
                 else
                 {
                     JObject gppGroup = (JObject) JToken.FromObject(gppCategory["Group"]);
                     JObject assessedGroup = GetAssessedGroup(gppGroup);
-                    string gppGroupUid = gppGroup["@uid"].ToString();
-                    assessedGroups.Add(JUtil.GetSafeJProp(gppGroupUid, assessedGroup));
+                    if (assessedGroup != null)
+                    {
+                        assessedGroups.Add(gppGroup["@uid"].ToString(), assessedGroup);
+                    }
                 }
             }
-            
+
+            JObject assessedGppGroups = (JObject) JToken.FromObject(assessedGroups);
+
             if (gppCategory["User"] != null)
             {
                 if (gppCategory["User"] is JArray)
@@ -38,24 +43,39 @@ namespace Grouper2.GPPAssess
                     foreach (JObject gppUser in gppCategory["User"])
                     {
                         JObject assessedUser = GetAssessedUser(gppUser);
-                        string gppUserUid = gppUser["@uid"].ToString();
-                        assessedUsers.Add(JUtil.GetSafeJProp(gppUserUid, assessedUser));
+                        if (assessedUser != null)
+                        {
+                            assessedUsers.Add(gppUser["@uid"].ToString(), assessedUser);
+                        }
                     }
                 }
                 else
                 {
                     JObject gppUser = (JObject) JToken.FromObject(gppCategory["User"]);
                     JObject assessedUser = GetAssessedUser(gppUser);
-                    string gppUserUid = gppUser["@uid"].ToString();
-                    assessedUsers.Add(JUtil.GetSafeJProp(gppUserUid, assessedUser));
+                    if (assessedUser != null)
+                    {
+                        assessedUsers.Add(gppUser["@uid"].ToString(), assessedUser);
+                    }
                 }
             }
-            
+
+            JObject assessedGppUsers = (JObject) JToken.FromObject(assessedUsers);
+
+            JProperty assessedUsersJson = new JProperty("GPP Users", assessedGppUsers);
+            JProperty assessedGroupsJson = new JProperty("GPP Groups", assessedGppGroups);
             // chuck the users and groups together in one JObject
             JObject assessedGppGroupsJson = new JObject();
             // only want to actually output these things if there's anything useful in them.
-            assessedGppGroupsJson.Add(JUtil.GetSafeJProp("GPP Users", assessedUsers));
-            assessedGppGroupsJson.Add(JUtil.GetSafeJProp("GPP Groups", assessedGroups));
+            if (assessedUsers.Count > 0)
+            {
+                assessedGppGroupsJson.Add(assessedUsersJson);
+            }
+
+            if (assessedGroups.Count > 0)
+            {
+                assessedGppGroupsJson.Add(assessedGroupsJson);
+            }
 
             return assessedGppGroupsJson;
         }
@@ -75,15 +95,15 @@ namespace Grouper2.GPPAssess
             userAction = JUtil.GetActionString(userAction);
 
             // get the username and a bunch of other details:
-            assessedUser.Add(JUtil.GetSafeJProp("Name", gppUser, "@name"));
-            assessedUser.Add(JUtil.GetSafeJProp("User Name", gppUserProps, "@userName"));
-            assessedUser.Add(JUtil.GetSafeJProp("Changed", gppUser, "@changed"));
-            assessedUser.Add(JUtil.GetSafeJProp("Account Disabled", gppUserProps, "@acctDisabled"));
-            assessedUser.Add(JUtil.GetSafeJProp("Password Never Expires", gppUserProps, "@neverExpires"));
-            assessedUser.Add(JUtil.GetSafeJProp("Description", gppUserProps, "@description"));
-            assessedUser.Add(JUtil.GetSafeJProp("Full Name", gppUserProps, "@fullName"));
-            assessedUser.Add(JUtil.GetSafeJProp("New Name", gppUserProps, "@newName"));
-            assessedUser.Add(JUtil.GetSafeJProp("Action", userAction));
+            assessedUser.Add("Name", JUtil.GetSafeString(gppUser, "@name"));
+            assessedUser.Add("User Name", JUtil.GetSafeString(gppUserProps, "@userName"));
+            assessedUser.Add("Changed", JUtil.GetSafeString(gppUser, "@changed"));
+            assessedUser.Add("Account Disabled", JUtil.GetSafeString(gppUserProps, "@acctDisabled"));
+            assessedUser.Add("Password Never Expires", JUtil.GetSafeString(gppUserProps, "@neverExpires"));
+            assessedUser.Add("Description", JUtil.GetSafeString(gppUserProps, "@description"));
+            assessedUser.Add("Full Name", JUtil.GetSafeString(gppUserProps, "@fullName"));
+            assessedUser.Add("New Name", JUtil.GetSafeString(gppUserProps, "@newName"));
+            assessedUser.Add("Action", userAction);
 
             // check for cpasswords
             if (gppUserProps["@cpassword"] != null)
@@ -94,8 +114,8 @@ namespace Grouper2.GPPAssess
                     string decryptedCpassword = "";
                     decryptedCpassword = Util.DecryptCpassword(cpassword);
                     // if we find one, that's super interesting.
-                    assessedUser.Add(JUtil.GetSafeJProp("Cpassword", cpassword));
-                    assessedUser.Add(JUtil.GetSafeJProp("Decrypted Password", decryptedCpassword));
+                    assessedUser.Add("Cpassword", cpassword);
+                    assessedUser.Add("Decrypted Password", decryptedCpassword);
                     interestLevel = 10;
                 }
             }
@@ -122,19 +142,21 @@ namespace Grouper2.GPPAssess
             groupAction = JUtil.GetActionString(groupAction);
 
             // get the group name and a bunch of other details:
-            assessedGroup.Add(JUtil.GetSafeJProp("Name", gppGroup, "@name"));
+            assessedGroup.Add("Name", JUtil.GetSafeString(gppGroup, "@name"));
             //TODO if the name is an interesting group, make the finding more interesting.
-            assessedGroup.Add(JUtil.GetSafeJProp("Changed", gppGroup, "@changed"));
-            assessedGroup.Add(JUtil.GetSafeJProp("Description", gppGroup, "@description"));
-            assessedGroup.Add(JUtil.GetSafeJProp("New Name", gppGroupProps, "@newName"));
-            assessedGroup.Add(JUtil.GetSafeJProp("Delete All Users", gppGroupProps, "@deleteAllUsers"));
-            assessedGroup.Add(JUtil.GetSafeJProp("Delete All Groups", gppGroupProps, "@deleteAllGroups"));
-            assessedGroup.Add(JUtil.GetSafeJProp("Remove Accounts", gppGroupProps, "@removeAccounts"));
-            assessedGroup.Add(JUtil.GetSafeJProp("Action", groupAction));
+            
+            
+            assessedGroup.Add("Changed", JUtil.GetSafeString(gppGroup, "@changed"));
+            assessedGroup.Add("Description", JUtil.GetSafeString(gppGroup, "@description"));
+            assessedGroup.Add("New Name", JUtil.GetSafeString(gppGroupProps, "@newName"));
+            assessedGroup.Add("Delete All Users", JUtil.GetSafeString(gppGroupProps, "@deleteAllUsers"));
+            assessedGroup.Add("Delete All Groups", JUtil.GetSafeString(gppGroupProps, "@deleteAllGroups"));
+            assessedGroup.Add("Remove Accounts", JUtil.GetSafeString(gppGroupProps, "@removeAccounts"));
+            assessedGroup.Add("Action", groupAction);
 
             JArray gppGroupMemberJArray = new JArray();
 
-            // this is kind of pants
+
             if (gppGroupProps["Members"] != null)
             {
                 if (!(gppGroupProps["Members"] is JValue))
@@ -165,7 +187,6 @@ namespace Grouper2.GPPAssess
                 }
             }
 
-            // strings are good.
             string membersString = gppGroupMemberJArray.ToString();
             membersString = membersString.Replace("\"", "");
             membersString = membersString.Replace(",", "");
@@ -177,7 +198,7 @@ namespace Grouper2.GPPAssess
             membersString = membersString.Replace("\n\n\n", "\n");
             membersString = membersString.Trim();
 
-            assessedGroup.Add(JUtil.GetSafeJProp("Members", membersString));
+            assessedGroup.Add("Members", membersString);
 
             if (interestLevel < GlobalVar.IntLevelToShow)
             {
@@ -191,14 +212,19 @@ namespace Grouper2.GPPAssess
         {
             JObject assessedMember = new JObject
             {
-                {JUtil.GetSafeJProp("Name", member, "@name")},
-                {JUtil.GetSafeJProp("Action", member, "@action")}
+                {"Name", JUtil.GetSafeString(member, "@name")},
+                {"Action", JUtil.GetSafeString(member, "@action")}
             };
             string memberSid = JUtil.GetSafeString(member, "@sid");
-            assessedMember.Add(JUtil.GetSafeJProp("SID", memberSid));
-
-            string resolvedSid = LDAPstuff.GetUserFromSid(memberSid);
-            assessedMember.Add("DisplayName", resolvedSid);
+            if (memberSid.Length > 0)
+            {
+                assessedMember.Add("SID", memberSid);
+                if (GlobalVar.OnlineChecks)
+                {
+                    string resolvedSID = LDAPstuff.GetUserFromSid(memberSid);
+                    assessedMember.Add("Display Name From SID", resolvedSID);
+                }
+            }
 
             return assessedMember;
         }

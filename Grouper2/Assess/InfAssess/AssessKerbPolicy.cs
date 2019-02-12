@@ -2,12 +2,19 @@
 
 namespace Grouper2.InfAssess
 {
-    // checked for GetSafeJProp
     internal static partial class AssessInf
     {
         public static JObject AssessKerbPolicy(JToken kerbPolicy)
         {
             int interestLevel = 0;
+            /* Defaults
+
+        MaxTicketAge = 10
+        MaxRenewAge = 7
+        MaxServiceAge = 600
+        MaxClockSkew = 5
+        TicketValidateClient = 1
+        */
 
             JObject assessedKerbPolicy = new JObject();
 
