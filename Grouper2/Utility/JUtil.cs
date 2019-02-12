@@ -1,13 +1,21 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Grouper2.Utility
 {
     class JUtil
     {
+
+        public static JProperty GetSafeJProp(string propName, JToken inToken, string inString)
+        {
+            if (inToken[inString] != null)
+            {
+                JProperty safeJProp = new JProperty(propName, inToken[inString].ToString());
+                return safeJProp;
+            }
+
+            return null;
+        }
 
         public static string GetSafeString(JToken json, string inString)
         {
