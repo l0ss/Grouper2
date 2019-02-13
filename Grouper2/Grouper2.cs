@@ -281,14 +281,14 @@ public class GlobalVar
                 }
                 else
                 {
-                    Console.WriteLine("\nTrying to figure out what AD domain we're working with.");
+                    Console.Error.WriteLine("\nTrying to figure out what AD domain we're working with.");
                     try
                     {
                         currentDomainString = Domain.GetCurrentDomain().ToString();
                     }
                     catch (ActiveDirectoryOperationException e)
                     {
-                        Console.WriteLine("\nCouldn't talk to the domain properly. If you're trying to run offline you should use the -o switch. Failing that, try rerunning with -d to specify a domain or -v to get more information about the error.");
+                        Console.Error.WriteLine("\nCouldn't talk to the domain properly. If you're trying to run offline you should use the -o switch. Failing that, try rerunning with -d to specify a domain or -v to get more information about the error.");
                         Utility.Output.DebugWrite(e.ToString());
 
                         Environment.Exit(1);
@@ -310,12 +310,12 @@ public class GlobalVar
                 if (sysvolDir == "")
                 {
                     sysvolDir = @"\\" + currentDomainString + @"\sysvol\" + currentDomainString + @"\";
-                    Console.WriteLine("Targeting SYSVOL at: " + sysvolDir);
+                    Console.Error.WriteLine("Targeting SYSVOL at: " + sysvolDir);
                 }
             }
             else if ((GlobalVar.OnlineChecks == false) && sysvolDir.Length > 1)
             {
-                Console.WriteLine("\nTargeting SYSVOL at: " + sysvolDir);
+                Console.Error.WriteLine("\nTargeting SYSVOL at: " + sysvolDir);
             }
             else
             {
@@ -374,7 +374,7 @@ public class GlobalVar
                 {
                     Console.Error.WriteLine("I had a problem with " + policyPath +
                                             ". I guess you could try to fix it?");
-                    Utility.Output.DebugWrite(e.ToString());
+                    Output.DebugWrite(e.ToString());
                 }
             }
 
