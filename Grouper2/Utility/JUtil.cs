@@ -10,10 +10,12 @@ namespace Grouper2.Utility
         {
             if (inToken[inString] != null)
             {
-                JProperty safeJProp = new JProperty(propName, inToken[inString].ToString());
-                return safeJProp;
+                if (!string.IsNullOrEmpty(inToken[inString].ToString()))
+                {
+                    JProperty safeJProp = new JProperty(propName, inToken[inString].ToString());
+                    return safeJProp;
+                }
             }
-
             return null;
         }
 

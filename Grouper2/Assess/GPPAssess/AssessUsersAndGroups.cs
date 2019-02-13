@@ -1,4 +1,7 @@
-﻿using Grouper2.Utility;
+﻿using System;
+using System.CodeDom;
+using System.Collections.Generic;
+using Grouper2.Utility;
 using Newtonsoft.Json.Linq;
 
 namespace Grouper2.GPPAssess
@@ -76,7 +79,7 @@ namespace Grouper2.GPPAssess
             {
                 assessedGppGroupsJson.Add(assessedGroupsJson);
             }
-
+            
             return assessedGppGroupsJson;
         }
 
@@ -210,23 +213,31 @@ namespace Grouper2.GPPAssess
 
         private JObject GetAssessedGroupMember(JToken member)
         {
-            JObject assessedMember = new JObject
+            List<JProperty> memberProps = new List<JProperty>
             {
-                {"Name", JUtil.GetSafeString(member, "@name")},
-                {"Action", JUtil.GetSafeString(member, "@action")}
+                JUtil.GetSafeJProp("Name", member, "@name"),
+                JUtil.GetSafeJProp("Action", member, "@action"),
+                JUtil.GetSafeJProp("SID", member, "@sid")
             };
+
             string memberSid = JUtil.GetSafeString(member, "@sid");
-            if (memberSid.Length > 0)
+            if (!string.IsNullOrEmpty(memberSid))
             {
-                assessedMember.Add("SID", memberSid);
-                if (GlobalVar.OnlineChecks)
+                string resolvedSID = LDAPstuff.GetUserFromSid(memberSid);
+                memberProps.Add(new JProperty("Display Name From SID", resolvedSID));
+            }
+
+            JObject assessedMember = new JObject();
+            foreach (JProperty memberProp in memberProps)
+            {
+                if (memberProp != null)
                 {
-                    string resolvedSID = LDAPstuff.GetUserFromSid(memberSid);
-                    assessedMember.Add("Display Name From SID", resolvedSID);
+                    assessedMember.Add(memberProp);
                 }
             }
 
-            return assessedMember;
+            if (assessedMember.HasValues) return assessedMember;
+            return null;
         }
     }
 }
