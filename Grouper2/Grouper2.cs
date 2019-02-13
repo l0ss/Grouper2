@@ -6,7 +6,7 @@
  *     `Y8bo,,,o88o 888b "88bo,"888,_ _,88P88    .d888   888o      888oo,__  888b "88bo,d88 _,oo,
  *       `'YMUP"YMM MMMM   "W"   "YMMMMMP"  "YmmMMMM""   YMMMb     """"YUMMM MMMM   "W" MMMUP*"^^
  *
- *      Alpha
+ *      Beta
  *                        By Mike Loss (@mikeloss)                                                
  */
 
@@ -26,18 +26,17 @@ using System.Threading.Tasks;
 using Alba.CsConsoleFormat;
 using Grouper2.ScriptsIniAssess;
 using Grouper2.Utility;
-using Console = System.Console;
 
 namespace Grouper2
 {
-    // Create a singleton that contains our big GPO data blob so we can access it without reparsing it.
+    // Create several singletons that contain our big GPO data blob so we can access it without reparsing it.
     public static class JankyDb
     {
         private static JObject _instance;
 
         public static JObject Instance => _instance ?? (_instance = JObject.Parse(Resources.PolData));
     }
-
+    
     public static class GetDomainGpoData
     {
         private static JObject _domainGpoData;
@@ -83,9 +82,6 @@ public class GlobalVar
         private static void Main(string[] args)
         {
             DateTime grouper2StartTime = DateTime.Now;
-            
-            
-            
             CommandLineParser.CommandLineParser parser = new CommandLineParser.CommandLineParser();
             ValueArgument<string> htmlArg = new ValueArgument<string>('f', "html", "Path for html output file.");
             SwitchArgument debugArg = new SwitchArgument('v', "verbose", "Enables debug mode. Probably quite noisy and rarely necessary. Will also show you the names of any categories of policies"+
@@ -331,21 +327,21 @@ public class GlobalVar
             string[] sysvolDirs =
                 Directory.GetDirectories(sysvolDir);
 
-            Console.WriteLine(
+            Console.Error.WriteLine(
                 "\nI found all these directories in SYSVOL...");
-            Console.WriteLine("#########################################");
+            Console.Error.WriteLine("#########################################");
             foreach (string line in sysvolDirs)
             {
-                Console.WriteLine(line);
+                Console.Error.WriteLine(line);
             }
-            Console.WriteLine("#########################################");
+            Console.Error.WriteLine("#########################################");
 
             List<string> sysvolPolDirs = new List<string>();
             List<string> sysvolScriptDirs = new List<string>();
 
             if (noNtfrs)
             {
-                Console.WriteLine("... but I'm not going to look in any of them except .\\Policies and .\\Scripts because you told me not to.");
+                Console.Error.WriteLine("... but I'm not going to look in any of them except .\\Policies and .\\Scripts because you told me not to.");
                 sysvolPolDirs.Add(sysvolDir + "Policies\\");
                 sysvolScriptDirs.Add(sysvolDir + "Scripts\\");
             }
