@@ -5,6 +5,8 @@ namespace Grouper2.InfAssess
 {
     internal static partial class AssessInf
     {
+        // these are the reg keys that the admin doesn't usually set manually
+        // e.g. set using the 'security policy' gui
         public static JObject AssessRegValues(JToken regValues)
         {
             JObject jankyDb = JankyDb.Instance;

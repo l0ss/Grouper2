@@ -165,8 +165,11 @@ namespace Grouper2.GPPAssess
 
         private JObject GetAssessedRegistrySetting(JToken gppRegSetting)
         {
+            JObject jankyDb = JankyDb.Instance;
+            // get our data about what regkeys are interesting
+            JArray intRegKeysData = (JArray)jankyDb["regKeys"];
+
             JObject assessedRegistrySetting = new JObject();
-            int interestLevel = 1;
             assessedRegistrySetting.Add("Display Name", JUtil.GetSafeString(gppRegSetting, "@name"));
             assessedRegistrySetting.Add("Status", JUtil.GetSafeString(gppRegSetting, "@status"));
             assessedRegistrySetting.Add("Changed", JUtil.GetSafeString(gppRegSetting, "@changed"));
@@ -174,6 +177,25 @@ namespace Grouper2.GPPAssess
             assessedRegistrySetting.Add("Default", JUtil.GetSafeString(gppRegSetting["Properties"], "@default"));
             assessedRegistrySetting.Add("Hive", JUtil.GetSafeString(gppRegSetting["Properties"], "@hive"));
             string key = JUtil.GetSafeString(gppRegSetting["Properties"], "@key");
+
+            int interestLevel = 1;
+            foreach (JToken intRegKey in intRegKeysData)
+            {
+                if (key.ToLower().Contains(intRegKey["regKey"].ToString().ToLower()))
+                {
+                    // get the name
+                    string interestLevelString = intRegKey["intLevel"].ToString();
+                    // if it matches at all it's a 1.
+                    
+                    // if we can get the interest level from it, do so, otherwise throw an error that we need to fix something.
+                    if (!int.TryParse(interestLevelString, out interestLevel))
+                    {
+                        Utility.Output.DebugWrite(intRegKey["regKey"].ToString() +
+                                                  " in jankydb doesn't have an interest level assigned.");
+                    }
+                }
+            }
+            
             JObject investigatedKey = FileSystem.InvestigateString(key);
             if ((int) investigatedKey["InterestLevel"] >= interestLevel)
             {
