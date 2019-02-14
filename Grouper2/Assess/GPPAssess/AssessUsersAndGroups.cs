@@ -134,39 +134,17 @@ namespace Grouper2.GPPAssess
 
         private JObject GetAssessedGroup(JObject gppGroup)
         {
-            //jobj for results from this specific group
-            JObject assessedGroup = new JObject();
             int interestLevel = 3;
 
             JToken gppGroupProps = gppGroup["Properties"];
 
             // check what the entry is doing to the group and turn it into real word
             string groupAction = JUtil.GetActionString(gppGroupProps["@action"].ToString());
-
-            // get the group name and a bunch of other details:
-            assessedGroup.Add("Name", JUtil.GetSafeString(gppGroup, "@name"));
+            
             //TODO if the name is an interesting group, make the finding more interesting.
-            assessedGroup.Add("Changed", JUtil.GetSafeString(gppGroup, "@changed"));
-            assessedGroup.Add("Description", JUtil.GetSafeString(gppGroup, "@description"));
-            assessedGroup.Add("New Name", JUtil.GetSafeString(gppGroupProps, "@newName"));
-            assessedGroup.Add("Delete All Users", JUtil.GetSafeString(gppGroupProps, "@deleteAllUsers"));
-            assessedGroup.Add("Delete All Groups", JUtil.GetSafeString(gppGroupProps, "@deleteAllGroups"));
-            assessedGroup.Add("Remove Accounts", JUtil.GetSafeString(gppGroupProps, "@removeAccounts"));
-            assessedGroup.Add("Action", groupAction);
-
-            List<JProperty> groupProps = new List<JProperty>
-            {
-                JUtil.GetSafeJProp("Name", gppGroup, "@name"),
-                JUtil.GetSafeJProp("Description", gppGroup, "@description"),
-                JUtil.GetSafeJProp("New Name", gppGroup, "@newName"),
-                JUtil.GetSafeJProp("Delete All Users", gppGroup, "@deleteAllUsers"),
-                JUtil.GetSafeJProp("Delete All Groups", gppGroup, "@deleteAllGroups"),
-                JUtil.GetSafeJProp("Remove Accounts", gppGroup, "@removeAccounts"),
-                JUtil.GetSafeJProp("Action", groupAction),
-            }
 
             JArray gppGroupMemberJArray = new JArray();
-
+            string membersString = "";
 
             if (gppGroupProps["Members"] != null)
             {
@@ -189,39 +167,59 @@ namespace Grouper2.GPPAssess
                         }
                         else
                         {
-                            Utility.Output.DebugWrite("Something went squirrely with Group Memberships");
-                            Utility.Output.DebugWrite(members.Type.ToString());
-                            Utility.Output.DebugWrite(" " + membersType + " ");
-                            Utility.Output.DebugWrite(members.ToString());
+                            Output.DebugWrite("Something went squirrely with Group Memberships");
+                            Output.DebugWrite(members.Type.ToString());
+                            Output.DebugWrite(" " + membersType + " ");
+                            Output.DebugWrite(members.ToString());
                         }
                     }
                 }
+                // munge jarray string to make it tidier.
+                membersString = gppGroupMemberJArray.ToString();
+                membersString = membersString.Replace("\"", "");
+                membersString = membersString.Replace(",", "");
+                membersString = membersString.Replace("[", "");
+                membersString = membersString.Replace("]", "");
+                membersString = membersString.Replace("{", "");
+                membersString = membersString.Replace("}", "");
+                membersString = membersString.Replace("    ", "");
+                membersString = membersString.Replace("\r\n  \r\n  \r\n", "\r\n\r\n");
+                membersString = membersString.Trim();
             }
 
-            string membersString = gppGroupMemberJArray.ToString();
-            membersString = membersString.Replace("\"", "");
-            membersString = membersString.Replace(",", "");
-            membersString = membersString.Replace("[", "");
-            membersString = membersString.Replace("]", "");
-            membersString = membersString.Replace("{", "");
-            membersString = membersString.Replace("}", "");
-            membersString = membersString.Replace("    ", "");
-            membersString = membersString.Replace("\n\n\n", "\n");
-            membersString = membersString.Trim();
-
-            assessedGroup.Add("Members", membersString);
-
-            if (interestLevel < GlobalVar.IntLevelToShow)
+            List<JToken> groupProps = new List<JToken>
             {
-                return null;
+                JUtil.GetSafeJProp("Name", gppGroup, "@name"),
+                JUtil.GetSafeJProp("Description", gppGroup, "@description"),
+                JUtil.GetSafeJProp("New Name", gppGroupProps, "@newName"),
+                JUtil.GetSafeJProp("Delete All Users", gppGroupProps, "@deleteAllUsers"),
+                JUtil.GetSafeJProp("Delete All Groups", gppGroupProps, "@deleteAllGroups"),
+                JUtil.GetSafeJProp("Remove Accounts", gppGroupProps, "@removeAccounts"),
+                JUtil.GetSafeJProp("Action", groupAction),
+                JUtil.GetSafeJProp("Members", membersString)
+            };
+
+            JObject assessedGroup = new JObject();
+
+            foreach (JProperty groupProp in groupProps)
+            {
+                if (groupProp != null)
+                {
+                    assessedGroup.Add(groupProp);
+                }
             }
 
-            return assessedGroup;
+            if ((interestLevel > GlobalVar.IntLevelToShow) && (assessedGroup.HasValues))
+            {
+                return assessedGroup;
+            }
+
+            return null;
         }
 
         private JObject GetAssessedGroupMember(JToken member)
         {
-            List<JProperty> memberProps = new List<JProperty>
+            List<JToken> memberProps = new List<JToken>
             {
                 JUtil.GetSafeJProp("Name", member, "@name"),
                 JUtil.GetSafeJProp("Action", member, "@action"),

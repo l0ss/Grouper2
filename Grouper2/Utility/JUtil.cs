@@ -5,16 +5,32 @@ namespace Grouper2.Utility
 {
     class JUtil
     {
-
-        public static JProperty GetSafeJProp(string propName, JToken inToken, string inString)
+        public static JToken GetSafeJProp(string propName, JToken inToken, string inString)
         {
-            if (inToken[inString] != null)
+            if ((inToken[inString] != null) && (inToken[inString].ToString() != ""))
             {
-                if (!string.IsNullOrEmpty(inToken[inString].ToString()))
-                {
-                    JProperty safeJProp = new JProperty(propName, inToken[inString].ToString());
-                    return safeJProp;
-                }
+                JProperty safeJProp = new JProperty(propName, inToken[inString].ToString());
+                return safeJProp;
+            }
+            return null;
+        }
+
+        public static JToken GetSafeJProp(string propName, string valueString)
+        {
+            if (!string.IsNullOrEmpty(valueString))
+            {
+                JProperty safeJProp = new JProperty(propName, valueString);
+                return safeJProp;
+            }
+            return null;
+        }
+
+        public static JToken GetSafeJProp(string propName, JToken valueToken)
+        {
+            if ((valueToken != null) && (valueToken.HasValues))
+            {
+                JProperty safeJProp = new JProperty(propName, valueToken);
+                return safeJProp;
             }
             return null;
         }
