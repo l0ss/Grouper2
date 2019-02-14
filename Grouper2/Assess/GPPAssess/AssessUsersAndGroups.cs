@@ -141,14 +141,11 @@ namespace Grouper2.GPPAssess
             JToken gppGroupProps = gppGroup["Properties"];
 
             // check what the entry is doing to the group and turn it into real word
-            string groupAction = gppGroupProps["@action"].ToString();
-            groupAction = JUtil.GetActionString(groupAction);
+            string groupAction = JUtil.GetActionString(gppGroupProps["@action"].ToString());
 
             // get the group name and a bunch of other details:
             assessedGroup.Add("Name", JUtil.GetSafeString(gppGroup, "@name"));
             //TODO if the name is an interesting group, make the finding more interesting.
-            
-            
             assessedGroup.Add("Changed", JUtil.GetSafeString(gppGroup, "@changed"));
             assessedGroup.Add("Description", JUtil.GetSafeString(gppGroup, "@description"));
             assessedGroup.Add("New Name", JUtil.GetSafeString(gppGroupProps, "@newName"));
@@ -156,6 +153,17 @@ namespace Grouper2.GPPAssess
             assessedGroup.Add("Delete All Groups", JUtil.GetSafeString(gppGroupProps, "@deleteAllGroups"));
             assessedGroup.Add("Remove Accounts", JUtil.GetSafeString(gppGroupProps, "@removeAccounts"));
             assessedGroup.Add("Action", groupAction);
+
+            List<JProperty> groupProps = new List<JProperty>
+            {
+                JUtil.GetSafeJProp("Name", gppGroup, "@name"),
+                JUtil.GetSafeJProp("Description", gppGroup, "@description"),
+                JUtil.GetSafeJProp("New Name", gppGroup, "@newName"),
+                JUtil.GetSafeJProp("Delete All Users", gppGroup, "@deleteAllUsers"),
+                JUtil.GetSafeJProp("Delete All Groups", gppGroup, "@deleteAllGroups"),
+                JUtil.GetSafeJProp("Remove Accounts", gppGroup, "@removeAccounts"),
+                JUtil.GetSafeJProp("Action", groupAction),
+            }
 
             JArray gppGroupMemberJArray = new JArray();
 
