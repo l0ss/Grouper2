@@ -85,9 +85,6 @@ namespace Grouper2.GPPAssess
 
         private JObject GetAssessedUser(JObject gppUser)
         {
-            // jobj for results from this specific user.
-            JObject assessedUser = new JObject();
-
             //set base interest level
             int interestLevel = 3;
 
@@ -97,29 +94,40 @@ namespace Grouper2.GPPAssess
             string userAction = gppUserProps["@action"].ToString();
             userAction = JUtil.GetActionString(userAction);
 
-            // get the username and a bunch of other details:
-            assessedUser.Add("Name", JUtil.GetSafeString(gppUser, "@name"));
-            assessedUser.Add("User Name", JUtil.GetSafeString(gppUserProps, "@userName"));
-            assessedUser.Add("Changed", JUtil.GetSafeString(gppUser, "@changed"));
-            assessedUser.Add("Account Disabled", JUtil.GetSafeString(gppUserProps, "@acctDisabled"));
-            assessedUser.Add("Password Never Expires", JUtil.GetSafeString(gppUserProps, "@neverExpires"));
-            assessedUser.Add("Description", JUtil.GetSafeString(gppUserProps, "@description"));
-            assessedUser.Add("Full Name", JUtil.GetSafeString(gppUserProps, "@fullName"));
-            assessedUser.Add("New Name", JUtil.GetSafeString(gppUserProps, "@newName"));
-            assessedUser.Add("Action", userAction);
-
+            string cpassword = "";
+            string decryptedCpassword = "";
             // check for cpasswords
             if (gppUserProps["@cpassword"] != null)
             {
-                string cpassword = gppUserProps["@cpassword"].ToString();
+                cpassword = gppUserProps["@cpassword"].ToString();
                 if (cpassword.Length > 0)
                 {
-                    string decryptedCpassword = "";
                     decryptedCpassword = Util.DecryptCpassword(cpassword);
-                    // if we find one, that's super interesting.
-                    assessedUser.Add("Cpassword", cpassword);
-                    assessedUser.Add("Decrypted Password", decryptedCpassword);
                     interestLevel = 10;
+                }
+            }
+
+            List<JToken> userProps = new List<JToken>
+            {
+                JUtil.GetSafeJProp("Name", gppUser, "@name"),
+                JUtil.GetSafeJProp("Changed", gppUser, "@changed"),
+                JUtil.GetSafeJProp("User Name", gppUserProps, "@userName"),
+                JUtil.GetSafeJProp("cPassword", cpassword),
+                JUtil.GetSafeJProp("Decrypted Password", decryptedCpassword),
+                JUtil.GetSafeJProp("Account Disabled", gppUserProps, "@acctDisabled"),
+                JUtil.GetSafeJProp("Password Never Expires", gppUserProps, "@neverExpires"),
+                JUtil.GetSafeJProp("Description", gppUserProps, "@description"),
+                JUtil.GetSafeJProp("Full Name", gppUserProps, "@fullName"),
+                JUtil.GetSafeJProp("New Name", gppUserProps, "@newName"),
+                JUtil.GetSafeJProp("Action", userAction),
+            };
+
+            JObject assessedUser = new JObject();
+            foreach (JToken userProp in userProps)
+            {
+                if (userProp != null)
+                {
+                    assessedUser.Add(userProp);
                 }
             }
 
