@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters;
 using System.Security.Principal;
 using Grouper2.Utility;
@@ -59,7 +60,14 @@ namespace Grouper2.InfAssess
                                 }
                                 if (interestLevel >= GlobalVar.IntLevelToShow)
                                 {
-                                    trustees.Add(GetTrustee(trusteeClean));
+                                    try
+                                    {
+                                        trustees.Add(GetTrustee(trusteeClean));
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        Utility.Output.DebugWrite(e.ToString());
+                                    }
                                 }
                             }
                         }
