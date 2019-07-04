@@ -134,6 +134,13 @@ public class GlobalVar
             bool htmlOut = false;
             string htmlOutPath = "";
 
+            // extra checks to handle builtin behaviour from cmd line arg parser
+            if ((args.Contains("--help") || args.Contains("/?") || args.Contains("help")))
+            {
+                parser.ShowUsage();
+                Environment.Exit(0);
+            }
+
             try
             {
                 parser.ParseCommandLine(args);
