@@ -415,6 +415,11 @@ public class GlobalVar
             // Create a task for each GPO
             foreach (string gpoPath in gpoPaths)
             {
+                // skip PolicyDefinitions directory
+                if (gpoPath.Contains("PolicyDefinitions"))
+                {
+                    continue;
+                }
                 Task t = gpoFactory.StartNew(() =>
                 {
                     try
