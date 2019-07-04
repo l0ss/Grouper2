@@ -143,7 +143,7 @@ namespace Grouper2
                 ArraySegment<string> sectionContent = new ArraySegment<string>(infContentArray, firstLineOfSection, sectionLength);
                 //Console.WriteLine("This section contains: ");               
                 //Utility.PrintIndexAndValues(sectionContent);
-                //create the dictionary that we're going to put the lines into.
+                //create the jobject that we're going to put the lines into.
                 JObject section = new JObject();
                 //iterate over the lines in the section
                 for (int b = sectionContent.Offset; b < (sectionContent.Offset + sectionContent.Count); b++)
@@ -163,17 +163,36 @@ namespace Grouper2
                         string lineValues = (splitLine[1]).Trim();
                         // and split them into an array on ","
                         string[] splitValues = lineValues.Split(',');
-                        //Add the restructured line into the dictionary.
-                        JArray splitValuesJArray = new JArray();
-                        foreach (string thing in splitValues) splitValuesJArray.Add(thing);
-
-                        if (splitValuesJArray.Count == 1)
+                        // handle cases where we have multiple entries with the same 'key'
+                        // check if we have an existing entry in 'section'
+                        // if we don't.. 
+                        if (section[lineKey] == null)
                         {
-                            section.Add(lineKey, splitValues[0]);
+                            if (splitValues.Length == 1)
+                            {
+                                section.Add(lineKey, splitValues[0]);
+                            }
+                            else
+                            {
+                                //Add the restructured line into the jobject.
+                                JArray splitValuesJArray = new JArray();
+                                foreach (string thing in splitValues) splitValuesJArray.Add(thing);
+                                section.Add(lineKey, splitValuesJArray);
+                            }
                         }
+                        // if we do...
                         else
                         {
-                            section.Add(lineKey, splitValuesJArray);
+                            // pull out our existing section
+                            JArray existingSection = new JArray(section[lineKey]);
+                            section.Remove(lineKey);
+                            // add the new values to it
+                            foreach (string splitValue in splitValues)
+                            {
+                                existingSection.Add(splitValue);
+                            }
+                            // add it back in.
+                            section.Add(lineKey, existingSection);
                         }
                     }
                     else
