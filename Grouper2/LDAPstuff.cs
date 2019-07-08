@@ -120,7 +120,14 @@ namespace Grouper2
                 DirectoryEntry rootDefNamingContext = new DirectoryEntry();
                 DirectoryEntry rootExtRightsContext = new DirectoryEntry();
                 
-                rootDse = new DirectoryEntry("LDAP://rootDSE");
+                if (GlobalVar.UserDefinedDomainController != null)
+                {
+                    rootDse = new DirectoryEntry("LDAP://" + GlobalVar.UserDefinedDomainController + "/rootDSE");
+                }
+                else
+                {
+                    rootDse = new DirectoryEntry("LDAP://rootDSE");
+                }
                 rootDefNamingContext = new DirectoryEntry("GC://" + rootDse.Properties["defaultNamingContext"].Value);
                 string schemaContextString = rootDse.Properties["schemaNamingContext"].Value.ToString();
                 rootExtRightsContext =

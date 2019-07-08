@@ -70,6 +70,7 @@ public class GlobalVar
         public static int IntLevelToShow;
         public static bool DebugMode;
         public static bool NoMess;
+        public static string UserDefinedDomainController;
         public static string UserDefinedDomain;
         public static string UserDefinedDomainDn;
         public static string UserDefinedUsername;
@@ -96,17 +97,17 @@ public class GlobalVar
                 "everything except some extremely dull defaults. If you want to see those too, do -i 0.");
             ValueArgument<int> threadsArg = new ValueArgument<int>('t',"threads", "Max number of threads. Defaults to 10.");
             ValueArgument<string> domainArg =
-                new ValueArgument<string>('d', "domain", "Domain to query for Group Policy Goodies.");
-            ValueArgument<string> passwordArg = new ValueArgument<string>('p', "password", "Password to use for LDAP operations.");
+                new ValueArgument<string>('d', "domainController", "Domain controller to query for Group Policy Goodies.");
+            ValueArgument<string> passwordArg = new ValueArgument<string>('p', "password", "DOESNT WORK - Password to use for LDAP operations.");
             ValueArgument<string> usernameArg =
-                new ValueArgument<string>('u', "username", "Username to use for LDAP operations.");
+                new ValueArgument<string>('u', "username", "DOESNT WORK - Username to use for LDAP operations.");
             SwitchArgument helpArg = new SwitchArgument('h', "help", "Displays this help.", false);
             SwitchArgument prettyArg = new SwitchArgument('g', "pretty", "Switches output from the raw Json to a prettier format.", false);
             SwitchArgument noMessArg = new SwitchArgument('m', "nomess", "Avoids file writes at all costs. May find less stuff.", false);
             SwitchArgument currentPolOnlyArg = new SwitchArgument('c', "currentonly", "Only checks current policies, ignoring stuff in those " +
                                                                                       "Policies_NTFRS_* directories that result from replication failures.", false);
             SwitchArgument noGrepScriptsArg = new SwitchArgument('n', "nogrepscripts", "Don't grep through the files in the \"Scripts\" subdirectory", false);
-        
+
             parser.Arguments.Add(usernameArg);
             parser.Arguments.Add(passwordArg);
             parser.Arguments.Add(debugArg);
@@ -227,13 +228,17 @@ public class GlobalVar
 
                 if (domainArg.Parsed)
                 {
+                    GlobalVar.UserDefinedDomainController = domainArg.Value;
+                    /*
                     Console.Error.Write("\nYou told me to talk to domain " + domainArg.Value + " so I'm gonna do that.");
                     if (!(usernameArg.Parsed) || !(passwordArg.Parsed))
                     {
                         Console.Error.Write("\nIf you specify a domain you need to specify a username and password too using -u and -p.");
                     }
+                    
 
-                    userDefinedDomain = domainArg.Value;
+                    GlobalVar.UserDefinedDomain = domainArg.Value;
+                    
                     string[] splitDomain = userDefinedDomain.Split('.');
                     StringBuilder sb = new StringBuilder();
                     int pi = splitDomain.Length;
@@ -251,7 +256,7 @@ public class GlobalVar
                     GlobalVar.UserDefinedDomain = userDefinedDomain;
                     GlobalVar.UserDefinedDomainDn = sb.ToString();
                     GlobalVar.UserDefinedPassword = passwordArg.Value;
-                    GlobalVar.UserDefinedUsername = usernameArg.Value;
+                    GlobalVar.UserDefinedUsername = usernameArg.Value;*/
                 }
 
                 if (noGrepScriptsArg.Parsed)
