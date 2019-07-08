@@ -76,6 +76,7 @@ public class GlobalVar
         public static string UserDefinedUsername;
         public static string UserDefinedPassword;
         public static List<String> CleanupList = new List<string>();
+        public static bool QuietMode;
     }
 
     internal class Grouper2
@@ -107,6 +108,7 @@ public class GlobalVar
             SwitchArgument currentPolOnlyArg = new SwitchArgument('c', "currentonly", "Only checks current policies, ignoring stuff in those " +
                                                                                       "Policies_NTFRS_* directories that result from replication failures.", false);
             SwitchArgument noGrepScriptsArg = new SwitchArgument('n', "nogrepscripts", "Don't grep through the files in the \"Scripts\" subdirectory", false);
+            SwitchArgument quietModeArg = new SwitchArgument('q', "quiet", "Enables quiet mode. Turns off progress counter.", false);
 
             parser.Arguments.Add(usernameArg);
             parser.Arguments.Add(passwordArg);
@@ -122,6 +124,7 @@ public class GlobalVar
             parser.Arguments.Add(noGrepScriptsArg);
             parser.Arguments.Add(domainArg);
             parser.Arguments.Add(htmlArg);
+            parser.Arguments.Add(quietModeArg);
 
             // set a few defaults
             string sysvolDir = "";
@@ -219,7 +222,10 @@ public class GlobalVar
 
                     GlobalVar.NoMess = true;
                 }
-
+                if (quietModeArg.Parsed)
+                {
+                    GlobalVar.QuietMode = true;
+                }
                 if (currentPolOnlyArg.Parsed)
                 {
                     Console.Error.WriteLine("\nOnly looking at current policies and scripts, not checking any of those weird old NTFRS dirs.");
@@ -503,15 +509,18 @@ public class GlobalVar
                 int completeTaskCount = totalGpoTasksCount - incompleteTaskCount - faultedTaskCount;
                 int percentage = (int) Math.Round((double) (100 * completeTaskCount) / totalGpoTasksCount);
                 string percentageString = percentage.ToString();
-                Console.Error.Write("");
-            
-                Console.Error.Write("\r" + completeTaskCount.ToString() + "/" + totalGpoTasksCount.ToString() +
-                              " GPOs processed. " + percentageString + "% complete. ");
-                if (faultedTaskCount > 0)
+                if (GlobalVar.QuietMode != true)
                 {
-                    Console.Error.Write(faultedTaskCount.ToString() + " GPOs failed to process.");
-                }
+                    Console.Error.Write("");
 
+                    Console.Error.Write("\r" + completeTaskCount.ToString() + "/" + totalGpoTasksCount.ToString() +
+                                        " GPOs processed. " + percentageString + "% complete. ");
+                    if (faultedTaskCount > 0)
+                    {
+                        Console.Error.Write(faultedTaskCount.ToString() + " GPOs failed to process.");
+                    }
+                }
+                
                 remainingTaskCount = incompleteTaskCount - faultedTaskCount;
             }
 
