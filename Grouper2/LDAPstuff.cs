@@ -126,7 +126,7 @@ namespace Grouper2
                 }
                 else
                 {
-                    rootDse = new DirectoryEntry("LDAP://rootDSE");
+                rootDse = new DirectoryEntry("LDAP://rootDSE");
                 }
                 rootDefNamingContext = new DirectoryEntry("GC://" + rootDse.Properties["defaultNamingContext"].Value);
                 string schemaContextString = rootDse.Properties["schemaNamingContext"].Value.ToString();
