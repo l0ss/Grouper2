@@ -401,7 +401,7 @@ public class GlobalVar
             // Grab Packages from LDAP
             if (GlobalVar.OnlineChecks)
             {
-                if (GlobalVar.UserDefinedDomainController != null)
+                if (GlobalVar.UserDefinedDomainController != "")
                 {
                     gpoPackageData = LDAPstuff.GetGpoPackages(GlobalVar.UserDefinedDomainController);
                 }

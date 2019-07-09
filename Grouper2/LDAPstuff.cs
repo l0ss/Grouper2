@@ -120,18 +120,23 @@ namespace Grouper2
                 DirectoryEntry rootDefNamingContext = new DirectoryEntry();
                 DirectoryEntry rootExtRightsContext = new DirectoryEntry();
                 
-                if (GlobalVar.UserDefinedDomainController != null)
+                if (GlobalVar.UserDefinedDomainController != "")
                 {
                     rootDse = new DirectoryEntry("LDAP://" + GlobalVar.UserDefinedDomainController + "/rootDSE");
+                    rootDefNamingContext = new DirectoryEntry("GC://" + GlobalVar.UserDefinedDomainController + "/" + rootDse.Properties["defaultNamingContext"].Value);
+                    string schemaContextString = rootDse.Properties["schemaNamingContext"].Value.ToString();
+                    rootExtRightsContext =
+                        new DirectoryEntry("LDAP://" + GlobalVar.UserDefinedDomainController + "/" + schemaContextString.Replace("Schema", "Extended-Rights"));
                 }
                 else
                 {
-                rootDse = new DirectoryEntry("LDAP://rootDSE");
-                }
-                rootDefNamingContext = new DirectoryEntry("GC://" + rootDse.Properties["defaultNamingContext"].Value);
-                string schemaContextString = rootDse.Properties["schemaNamingContext"].Value.ToString();
-                rootExtRightsContext =
+                    rootDse = new DirectoryEntry("LDAP://rootDSE");
+                    rootDefNamingContext = new DirectoryEntry("GC://" + rootDse.Properties["defaultNamingContext"].Value);
+                    string schemaContextString = rootDse.Properties["schemaNamingContext"].Value.ToString();
+                    rootExtRightsContext =
                         new DirectoryEntry("LDAP://" + schemaContextString.Replace("Schema", "Extended-Rights"));
+                }
+                
                 
                 // make a searcher to find GPOs
                 DirectorySearcher gpoSearcher = new DirectorySearcher(rootDefNamingContext)
