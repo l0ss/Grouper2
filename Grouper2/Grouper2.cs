@@ -27,10 +27,10 @@ namespace Grouper2
 
             // get the time it took to do the thing and give to user
             AuditReport report = plan.Execute();
-            Console.Error.WriteLine("Grouper2 took " + report.Runtime + " to run.");
+            Console.WriteLine("Grouper2 took " + report.Runtime + " to run.");
 
             // output the report however was requested
-            Output.OutputAuditReport(report, plan);
+            Output.OutputAuditReport(report);
 
             // FINISHED!
 #if DEBUG

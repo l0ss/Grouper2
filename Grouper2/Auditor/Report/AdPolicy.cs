@@ -195,9 +195,13 @@ namespace Grouper2.Auditor
         [JsonProperty("Action")] public string Action { get; set; }
         [JsonProperty("SID")] public string Sid { get; set; }
         [JsonProperty("Display Name From SID")] public string DisplayName { get; set; }
-        [JsonProperty("Task Details")] public JObject SchedTaskDetails { get; set; }
+        [JsonProperty("Quick Workaround")] public JObject WORKAROUND { get; set; }
     }
-
+    
+    
+    
+    
+    
     [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
     public class AuditedGppXmlPrinters : Finding
     {

@@ -1,23 +1,38 @@
-﻿namespace Grouper2.Host.SysVol.Files
+﻿using System.Collections.Generic;
+
+namespace Grouper2.Host.SysVol.Files
 {
+    public class DotPolFileContents
+    {
+        public string Signature { get; set; } // the first 4 bytes of the file
+        public int Version { get; set; } // the section 4 bytes of the file
+        public List<RegistryEntry> Entries { get; set; }
+    }
+
+    public class RegValueLength
+    {
+        public string Type { get; }
+        public long Length { get; set; }
+
+        public RegValueLength(string type)
+        {
+            this.Type = type;
+        }
+    }
+    
+    
     public class RegistryEntry
     {
-        public RegistryEntryCategory Category { get; private set; }
-        public string Key { get; private set; }
-        public string Value { get; private set; }
-        public string Data { get; private set; }
+        public string Key { get;  set; }
+        public string Value { get;  set; }
+        public RegistryEntryCategory ValueType { get; set; }
+        public int ValueLength { get; set; }
+        public string ValueData { get;  set; }
 
-
-
-        public RegistryEntry(RegistryEntryCategory category, string key, string value, string data)
+        public RegistryEntry()
         {
-            this.Category = category;
-            this.Key = key;
-            this.Value = value;
-            this.Data = data;
+            
         }
-
-
 
         /// <summary>
         /// Enum for converting the int in the file into the registry value type string

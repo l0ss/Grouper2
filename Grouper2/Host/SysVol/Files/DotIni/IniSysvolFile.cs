@@ -162,10 +162,9 @@ namespace Grouper2.Host.SysVol.Files
                     throw new InvalidOperationException("The INI file length is too short to be a valid sysvol INI");
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 // we know not all files will be readable, so lets just ignore errors here and return a blank list
-                Utility.Output.DebugWrite("Something went wrong parsing an INI file.\n" + e.ToString());
                 return new List<IniSection>();
             }
             

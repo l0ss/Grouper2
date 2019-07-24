@@ -1,12 +1,12 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Grouper2Tests2
 {
-    [TestClass]
+    [TestFixture()]
     public class XmlSchemaTests
     {
-        [TestMethod]
+        [Test()]
         public void DataSourcesRead()
         {
 

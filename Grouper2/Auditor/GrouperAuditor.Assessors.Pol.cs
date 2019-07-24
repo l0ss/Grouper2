@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Grouper2.Host.SysVol.Files;
+using Grouper2.Utility;
 
 namespace Grouper2.Auditor
 {
@@ -8,12 +9,25 @@ namespace Grouper2.Auditor
     {
         public Finding Audit(PolSysvolFile file)
         {
-            return AuditDotPolFile(file.GetFileData());
+            // attempt a file read and parse
+            DotPolFileContents data;
+            try
+            {
+                data = file.GetFileData();
+            }
+            catch (Exception e)
+            {
+                Log.Degub("Failed to read/parse a pol file");
+                data = null;
+            }
+
+            AuditedDotPolFile audit = AuditDotPolFile(data);
+            return audit;
         }
 
-        private AuditedDotPolFile AuditDotPolFile(List<RegistryEntry> polData)
+        private AuditedDotPolFile AuditDotPolFile(DotPolFileContents polData)
         {
-            if (polData == null || polData.Count == 0)
+            if (polData == null || polData.Entries.Count == 0)
                 return null;
             
             // TODO: parse the registry entries for interesting shit

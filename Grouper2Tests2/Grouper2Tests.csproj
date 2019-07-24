@@ -95,6 +95,7 @@
     <Compile Include="Host\SysVol\SysvolTests.cs" />
     <Compile Include="Host\SysVol\TreeNodeTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utility\ExtensionsPwshRngTests.cs" />
     <Compile Include="Utility\ExtensionsTests.cs" />
     <Compile Include="Utility\FileSystemTests.cs" />
     <Compile Include="Utility\JUtilTests.cs" />

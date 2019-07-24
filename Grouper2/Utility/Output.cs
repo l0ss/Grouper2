@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Alba.CsConsoleFormat;
 using Grouper2.Auditor;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Grouper2.Utility
@@ -45,45 +43,42 @@ namespace Grouper2.Utility
             return outputDocument;
         }
 
-        public static void OutputAuditReport(AuditReport report, GrouperPlan plan)
+        public static void OutputAuditReport(AuditReport report)
         {
-
             // TODO: Actually do the output of the report!!!!!!!!!!!
-            // Final output is finally happening finally here:
+            /*
+             * // Final output is finally happening finally here:
 
-            string grossJsonOutput = JsonConvert.SerializeObject(report, Formatting.Indented);
-            
-            Console.WriteLine(grossJsonOutput);
-
-            
             // dump the json if we are in a basic output mode
-            if (!plan.PrettyOutput && !plan.HtmlOut)
+            if (!this.PrettyOutput && !this.HtmlOut)
             {
-                Console.WriteLine(grossJsonOutput);
+                Console.WriteLine(this.Results.ToString());
                 Console.Error.WriteLine(
                     "If you find yourself thinking 'wtf this is very ugly and hard to read', consider trying the -g argument.");
                 return;
             }
             
+            
             // gotta add a line feed to make sure we're clear to write the nice output.
             Console.Error.WriteLine("\n");
-            /*
-            if (plan.HtmlOut)
+
+            if (this.HtmlOut)
             {
                 try
                 {
-                    // TODO 
+                    // gotta add a line feed to make sure we're clear to write the nice output.
+
                     Document htmlDoc = new Document();
 
                     htmlDoc.Children.Add(Output.GetG2BannerDocument());
 
-                    foreach (KeyValuePair<string, AdPolicy> gpo in report.CurrentPolicies)
+                    foreach (KeyValuePair<string, JToken> gpo in this.Results)
                     {
                         htmlDoc.Children.Add(Output.GetAssessedGpoOutput(gpo));
                     }
 
                     ConsoleRenderer.RenderDocument(htmlDoc,
-                        new HtmlRenderTarget( System.IO.File.Create(plan.HtmlOutPath), new UTF8Encoding(false)));
+                        new HtmlRenderTarget( System.IO.File.Create(this.HtmlOutPath), new UTF8Encoding(false)));
                 }
                 catch (UnauthorizedAccessException)
                 {
@@ -91,20 +86,20 @@ namespace Grouper2.Utility
                 }
             }
 
-            if (plan.PrettyOutput)
+            if (this.PrettyOutput)
             {
                 Document prettyDoc = new Document();
 
                 prettyDoc.Children.Add(Output.GetG2BannerDocument());
 
-                foreach (KeyValuePair<string, AdPolicy> gpo in report.CurrentPolicies)
+                foreach (KeyValuePair<string, JToken> gpo in this.Results)
                 {
                     prettyDoc.Children.Add(Output.GetAssessedGpoOutput(gpo));
                 }
 
                 ConsoleRenderer.RenderDocument(prettyDoc);
             }
-            */
+             */
         }
 
         public static Document GetAssessedGpoOutput (KeyValuePair<string, JToken> inputKvp)
@@ -668,17 +663,16 @@ namespace Grouper2.Utility
 
         public static void PrintBanner()
         {
-            List<string> barfLines = new List<string>
-                              {@"  .,-:::::/::::::..      ..     ...   ::::::::::::..,::::::::::::..  ,;'``;. "};
-            barfLines.Add(@",;;-'````' ;;;``;;;;  .;;;;;;.  ;;    ;;;`;;;```.;;;;;;'''';;;``;;;; ''  ,[[ ");
-            barfLines.Add(@"[[[   [[[[[[[[,/[[[' ,[[    \[[[['    [[[ `]]nnn]]' [[cccc  [[,/[[['  .c$P'  ");
-            barfLines.Add(@"'$$c.    '$$$$$$$c   $$$,    $$$$     $$$  $$$''    $$''''  $$$$$c   d8MMMUP*");
-            barfLines.Add(@" `Y8bo,,,o8888b '88bo'888,__,8888   .d888  888o     888oo,__88b '88bo        ");
-            barfLines.Add(@"   `'YMUP'YMMMM   'W'  'YMMMMP' 'YmMMMM''  YMMMb    ''''YUMMMMM   'W'        ");
-            barfLines.Add(@"                                                    Now even Grouperer.      ");
-            barfLines.Add(@"                                                    github.com/l0ss/Grouper2 ");
-            barfLines.Add(@"                                                    @mikeloss                ");
-            //string[] barfLines = barf.Split(new [] { Environment.NewLine }, StringSplitOptions.None);
+            string barf = @"  .,-:::::/::::::..      ..     ...   ::::::::::::..,::::::::::::..  ,;'``;. 
+,;;-'````' ;;;``;;;;  .;;;;;;.  ;;    ;;;`;;;```.;;;;;;'''';;;``;;;; ''  ,[[ 
+[[[   [[[[[[[[,/[[[' ,[[    \[[[['    [[[ `]]nnn]]' [[cccc  [[,/[[['  .c$P'  
+'$$c.    '$$$$$$$c   $$$,    $$$$     $$$  $$$''    $$''''  $$$$$c   d8MMMUP*
+ `Y8bo,,,o8888b '88bo'888,__,8888   .d888  888o     888oo,__88b '88bo        
+   `'YMUP'YMMMM   'W'  'YMMMMP' 'YmMMMM''  YMMMb    ''''YUMMMMM   'W'        
+                                                    Now even Grouperer.      
+                                                    github.com/l0ss/Grouper2 
+                                                    @mikeloss                ";
+            string[] barfLines = barf.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
 
             ConsoleColor[] patternOne = { ConsoleColor.White, ConsoleColor.Yellow, ConsoleColor.Red, ConsoleColor.Red, ConsoleColor.DarkRed, ConsoleColor.DarkRed, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White };
             ConsoleColor[] patternTwo =
