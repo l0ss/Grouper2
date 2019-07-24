@@ -1257,7 +1257,17 @@
     },
     {
       "intLevel": "10",
-      "regKey": "Microsoft\\Windows NT\\CurrentVersion\\Winlogon",
+      "regKey": "Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\DefaultPassword",
+      "intValue": "Any"
+    },
+	{
+      "intLevel": "10",
+      "regKey": "Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\DefaultUserName",
+      "intValue": "Any"
+    },
+	{
+      "intLevel": "10",
+      "regKey": "Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\AutoAdminLogon",
       "intValue": "Any"
     }
   ],
