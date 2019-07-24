@@ -30,7 +30,7 @@ namespace Grouper2
             Console.Error.WriteLine("Grouper2 took " + report.Runtime + " to run.");
 
             // output the report however was requested
-            Output.OutputAuditReport(report);
+            Output.OutputAuditReport(report, plan);
 
             // FINISHED!
 #if DEBUG

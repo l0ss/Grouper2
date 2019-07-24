@@ -619,7 +619,7 @@ namespace Grouper2.Utility
             }
             catch(Exception e)
             {
-                Log.Degub("unable to build a filepath assessment");
+                Log.Degub("unable to build a filepath assessment", e);
                 filePathAssessment = null;
             }
 

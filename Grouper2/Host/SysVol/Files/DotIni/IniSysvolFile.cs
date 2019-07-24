@@ -70,7 +70,7 @@ namespace Grouper2.Host.SysVol.Files
             }
             catch (Exception e)
             {
-                Log.Degub("Unable to decompose INI line????");
+                Log.Degub("Unable to decompose INI line????", e);
                 return null;
             }
 
@@ -165,6 +165,7 @@ namespace Grouper2.Host.SysVol.Files
             catch (Exception e)
             {
                 // we know not all files will be readable, so lets just ignore errors here and return a blank list
+                Utility.Output.DebugWrite("Something went wrong parsing an INI file.\n" + e.ToString());
                 return new List<IniSection>();
             }
             

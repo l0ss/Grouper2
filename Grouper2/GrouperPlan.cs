@@ -529,7 +529,6 @@ namespace Grouper2
                 }
             }
 
-
             // wait for tasks to finish
             // put 'em all in a happy little array
             ReportingLoop(gpoWaitGroup.ToArray());

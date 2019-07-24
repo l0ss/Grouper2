@@ -12,10 +12,7 @@ namespace Grouper2
         public int IntLevel { get; set; }
         public string Key { get; set; }
     }
-    
-    
-    
-    
+
     // Create several singletons that contain our big GPO data blob so we can access it without reparsing it.
     public static class JankyDb
     {
@@ -290,10 +287,23 @@ namespace Grouper2
             IntLevel = 8,
             Key =  @"TightVNC\\Server",
         },
+        /*
+        new RegKey(){
+            IntLevel = 0,
+            Key =  @"Microsoft\\Windows NT\\CurrentVersion\\Winlogon",
+        },*/
+        new RegKey(){
+            IntLevel = 8,
+            Key =  @"Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\DefaultUserName",
+        },
         new RegKey(){
             IntLevel = 10,
-            Key =  @"Microsoft\\Windows NT\\CurrentVersion\\Winlogon",
-        }
+            Key =  @"Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\DefaultPassword",
+        },
+        new RegKey(){
+            IntLevel = 8,
+            Key =  @"Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\AutoAdminLogon",
+        },
             };
         }
         

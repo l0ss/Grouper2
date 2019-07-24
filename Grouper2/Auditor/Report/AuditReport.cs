@@ -34,5 +34,7 @@ namespace Grouper2.Auditor
             this.CurrentPolicies = new ConcurrentDictionary<string, AdPolicy>();
             this.Scripts = new ConcurrentBag<Finding>();
         }
+
+
     }
 }

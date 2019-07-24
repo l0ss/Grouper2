@@ -18,6 +18,7 @@ Grouper2/obj/*
 .vs/
 .DS_Store
 */.DS_Store
+packages/*
 
 # User-specific files
 *.rsuser

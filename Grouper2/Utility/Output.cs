@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Alba.CsConsoleFormat;
 using Grouper2.Auditor;
 using Newtonsoft.Json;
@@ -44,15 +45,19 @@ namespace Grouper2.Utility
             return outputDocument;
         }
 
-        public static void OutputAuditReport(AuditReport report)
+        public static void OutputAuditReport(AuditReport report, GrouperPlan plan)
         {
+
             // TODO: Actually do the output of the report!!!!!!!!!!!
             // Final output is finally happening finally here:
 
             string grossJsonOutput = JsonConvert.SerializeObject(report, Formatting.Indented);
+            
+            Console.WriteLine(grossJsonOutput);
 
+            
             // dump the json if we are in a basic output mode
-            if (!this.PrettyOutput && !this.HtmlOut)
+            if (!plan.PrettyOutput && !plan.HtmlOut)
             {
                 Console.WriteLine(grossJsonOutput);
                 Console.Error.WriteLine(
@@ -62,24 +67,23 @@ namespace Grouper2.Utility
             
             // gotta add a line feed to make sure we're clear to write the nice output.
             Console.Error.WriteLine("\n");
-
-            if (this.HtmlOut)
+            /*
+            if (plan.HtmlOut)
             {
                 try
                 {
-                    // gotta add a line feed to make sure we're clear to write the nice output.
-
+                    // TODO 
                     Document htmlDoc = new Document();
 
                     htmlDoc.Children.Add(Output.GetG2BannerDocument());
 
-                    foreach (KeyValuePair<string, JToken> gpo in this.Results)
+                    foreach (KeyValuePair<string, AdPolicy> gpo in report.CurrentPolicies)
                     {
                         htmlDoc.Children.Add(Output.GetAssessedGpoOutput(gpo));
                     }
 
                     ConsoleRenderer.RenderDocument(htmlDoc,
-                        new HtmlRenderTarget( System.IO.File.Create(this.HtmlOutPath), new UTF8Encoding(false)));
+                        new HtmlRenderTarget( System.IO.File.Create(plan.HtmlOutPath), new UTF8Encoding(false)));
                 }
                 catch (UnauthorizedAccessException)
                 {
@@ -87,20 +91,20 @@ namespace Grouper2.Utility
                 }
             }
 
-            if (this.PrettyOutput)
+            if (plan.PrettyOutput)
             {
                 Document prettyDoc = new Document();
 
                 prettyDoc.Children.Add(Output.GetG2BannerDocument());
 
-                foreach (KeyValuePair<string, JToken> gpo in this.Results)
+                foreach (KeyValuePair<string, AdPolicy> gpo in report.CurrentPolicies)
                 {
                     prettyDoc.Children.Add(Output.GetAssessedGpoOutput(gpo));
                 }
 
                 ConsoleRenderer.RenderDocument(prettyDoc);
             }
-             */
+            */
         }
 
         public static Document GetAssessedGpoOutput (KeyValuePair<string, JToken> inputKvp)
