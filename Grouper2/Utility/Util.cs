@@ -10,13 +10,7 @@ namespace Grouper2.Utility
     {
         public static List<string> DedupeList(List<string> listStrings)
         {
-            List<string> result = new List<string>();
-            foreach (string t in listStrings)
-            {
-                if (!result.Contains(t))
-                    result.Add(t);
-            }
-            return result;
+            return listStrings.Distinct().ToList();
         }
 
         public static bool IsEmptyOrWhiteSpace(string inString)

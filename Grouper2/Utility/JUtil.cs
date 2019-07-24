@@ -7,7 +7,7 @@ namespace Grouper2.Utility
     {
         public static JToken GetSafeJProp(string propName, JToken inToken, string inString)
         {
-            if ((inToken[inString] != null) && (inToken[inString].ToString() != ""))
+            if (inToken[inString] != null && !string.IsNullOrWhiteSpace(inToken[inString].ToString() ))
             {
                 JProperty safeJProp = new JProperty(propName, inToken[inString].ToString());
                 return safeJProp;
@@ -27,7 +27,7 @@ namespace Grouper2.Utility
 
         public static JToken GetSafeJProp(string propName, JToken valueToken)
         {
-            if ((valueToken != null) && (valueToken.HasValues))
+            if (valueToken != null && valueToken.HasValues)
             {
                 JProperty safeJProp = new JProperty(propName, valueToken);
                 return safeJProp;
@@ -44,7 +44,7 @@ namespace Grouper2.Utility
             }
             catch (NullReferenceException)
             {
-                stringOut = "";
+                stringOut = string.Empty;
             }
             return stringOut;
         }

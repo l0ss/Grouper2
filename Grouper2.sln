@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2041
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29020.237
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Grouper2", "Grouper2\Grouper2.csproj", "{5DECAEA3-2610-4065-99DC-65B9B4BA6CCD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Grouper2Tests", "Grouper2Tests2\Grouper2Tests.csproj", "{6B4CE396-E15B-4DE4-A94D-5DF6737EC6FB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,14 @@ Global
 		{5DECAEA3-2610-4065-99DC-65B9B4BA6CCD}.DebugLiveFromDC|Any CPU.Build.0 = DebugLiveFromDC|Any CPU
 		{5DECAEA3-2610-4065-99DC-65B9B4BA6CCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5DECAEA3-2610-4065-99DC-65B9B4BA6CCD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B4CE396-E15B-4DE4-A94D-5DF6737EC6FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B4CE396-E15B-4DE4-A94D-5DF6737EC6FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B4CE396-E15B-4DE4-A94D-5DF6737EC6FB}.DebugFromTestPath|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B4CE396-E15B-4DE4-A94D-5DF6737EC6FB}.DebugFromTestPath|Any CPU.Build.0 = Debug|Any CPU
+		{6B4CE396-E15B-4DE4-A94D-5DF6737EC6FB}.DebugLiveFromDC|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B4CE396-E15B-4DE4-A94D-5DF6737EC6FB}.DebugLiveFromDC|Any CPU.Build.0 = Debug|Any CPU
+		{6B4CE396-E15B-4DE4-A94D-5DF6737EC6FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B4CE396-E15B-4DE4-A94D-5DF6737EC6FB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,53 @@
+HostMachine:
+  NetworkInterface:
+    ActiveDirectory:
+      Users: # data ingested from a list of System.DirectoryServices.AccountManagement.UserPrincipal
+        - User:
+            Name(alias??): string
+            DistinguishedName: string
+            Description: string
+            Sid: # this is a System.Security.Principal.SecurityIdentifier cause it has useful shit
+              fields: https://docs.microsoft.com/en-us/dotnet/api/system.security.principal.securityidentifier?view=netframework-4.8
+      Groups: # data ingested from a list of System.DirectoryServices.AccountManagement.
+        - Group:
+            Name(alias??): string
+            DistinguishedName: string
+            Description: string
+            Sid: # this is a System.Security.Principal.SecurityIdentifier cause it has useful shit
+              fields: https://docs.microsoft.com/en-us/dotnet/api/system.security.principal.securityidentifier?view=netframework-4.8
+  Registry:
+    - registryEntry:
+        key: string
+        value: string
+        data: string
+  Sysvol:
+    PolicyDirectory:
+      location: string
+      GPOs:
+        - GPO:
+            location: string
+            uid: string
+            folder: # base class: one for Machine and one for User
+              - file: # base class for files we think are kinda cool, currently inf, ini, xml, pol
+                  location: string
+                  # props for the inf files inheriting the base class
+                  - section:
+                      heading: string
+                      values: Dictionary<string, string> # will need logic to populate this without overwriting multiple key bullshit
+                  # props for the ini files inheriting the base class
+                  maxindex: int
+                  - section:
+                      heading: string
+                      commands:
+                        - command:
+                            target: string
+                            params: string
+                  # props for the xml files inheriting the file base
+                  xmldata: object # this is created from a factory based on the type of file using schema definitions
+                  # props for the pol files inheriting the base class
+                  - registryEntry:
+                      key: string
+                      value: string
+                      data: string
+                  # props for the aas files which inherit the base file class
+                  pathIsWritable: bool

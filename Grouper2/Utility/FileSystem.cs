@@ -1,82 +1,67 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
 using System.Security.Principal;
+using Grouper2.Auditor;
+using Grouper2.Host;
+using Grouper2.Host.DcConnection;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Grouper2.Utility
 {
     class FileSystem
     {
+        
+
         public static List<string> FindFilePathsInString(string inString)
         {
-            List<string> foundFilePaths = new List<string>();
+            if (inString == null) throw new ArgumentNullException(nameof(inString));
 
-            string[] stringBits = inString.Split(' ');
-
-            foreach (string stringBit in stringBits)
-            {
-                string cleanedBit = stringBit.Trim('\'', '\"');
-                if (IsValidPath(cleanedBit))
-                {
-                    foundFilePaths.Add(cleanedBit);
-                }
-            }
-
-            return foundFilePaths;
+            return inString.Split(' ').Select(s => s.Trim('\'', '\"')).ToList();
         }
 
 
-        public static JObject InvestigateString(string inString)
+        public static AuditedString InvestigateString(string inString, int desiredInterestLevel)
         // general purpose method for returning some information about why a string might be interesting.
         {
-            int interestLevel = 0;
-            JObject investigationResults = new JObject { { "Value", inString } };
+            AuditedString investigated = new AuditedString()
+            {
+                Value = inString,
+                Interest = 0
+            };
 
             // make a list to put any interesting words we find in it
-            JArray interestingWordsFound = new JArray();
             // refer to our master list of interesting words
-            JArray interestingWords = (JArray)JankyDb.Instance["interestingWords"];
+            List<string> interestingWords = JankyDb.Db.InterestingWords.ToList();
             foreach (string interestingWord in interestingWords)
             {
                 if (inString.ToLower().Contains(interestingWord))
                 {
-                    interestingWordsFound.Add(interestingWord);
-                    interestLevel = 4;
+                    investigated.InterestingWords.Add(interestingWord);
+                    investigated.Interest = 4;
                 }
             }
 
             List<string> foundFilePaths = FindFilePathsInString(inString);
 
-            JArray investigatedPaths = new JArray();
-
             foreach (string foundFilePath in foundFilePaths)
             {
-                JObject investigatedPath = FileSystem.InvestigatePath(foundFilePath);
+                AuditedPath investigatedPath = InvestigatePath(foundFilePath);
 
                 if (investigatedPath != null)
                 {
-                    if (investigatedPath["InterestLevel"] != null && Int32.Parse(investigatedPath["InterestLevel"].ToString()) >= GlobalVar.IntLevelToShow)
+                    if (investigatedPath.Interest >= desiredInterestLevel)
                     {
-                        investigatedPaths.Add(investigatedPath);
+                        investigated.InterestingPaths.Add(investigatedPath);
                     }
                 }
             }
 
-            if (investigatedPaths.Count > 0)
-            {
-                investigationResults.Add("Paths", investigatedPaths);
-            }
-
-            if (interestingWordsFound.Count > 0)
-            {
-                investigationResults.Add("Interesting Words", interestingWordsFound);
-            }
-
-            investigationResults.Add("InterestLevel", interestLevel);
-            return investigationResults;
+            return investigated;
 
         }
 
@@ -111,13 +96,13 @@ namespace Grouper2.Utility
         public static JObject GetFileDaclJObject(string filePathString)
         {
             int inc = 0;
-
+            int interest = JankyDb.Vars.Interest;
             string[] interestingTrustees = new string[] { "Everyone", "BUILTIN\\Users", "Authenticated Users", "Domain Users", "INTERACTIVE", };
             string[] boringTrustees = new string[] { "TrustedInstaller", "Administrators", "NT AUTHORITY\\SYSTEM", "Domain Admins", "Enterprise Admins", "Domain Controllers" };
             string[] interestingRights = new string[] { "FullControl", "Modify", "Write", "AppendData", "TakeOwnership" };
             string[] boringRights = new string[] { "Synchronize", "ReadAndExecute" };
 
-            if (!GlobalVar.OnlineChecks)
+            if (!JankyDb.Vars.OnlineMode)
             {
                 return null;
             }
@@ -155,7 +140,7 @@ namespace Grouper2.Utility
 
                 // get the user's SID
                 string sid = fileAccessRule.IdentityReference.ToString();
-                string displayNameString = LDAPstuff.GetUserFromSid(sid);
+                string displayNameString = Ldap.Use().GetUserFromSid(sid);
                 // do some interest level analysis
                 bool trusteeBoring = false;
                 bool trusteeInteresting = false;
@@ -163,7 +148,7 @@ namespace Grouper2.Utility
                 foreach (string boringTrustee in boringTrustees)
                 {
                     // if we're showing everything that's fine, keep going
-                    if (GlobalVar.IntLevelToShow == 0)
+                    if (interest == 0)
                     {
                         break;
                     }
@@ -176,7 +161,7 @@ namespace Grouper2.Utility
                     }
                 }
                 // skip rest of access rule if trustee is boring and we're not showing int level 0
-                if ((GlobalVar.IntLevelToShow != 0) && trusteeBoring)
+                if (interest != 0 && trusteeBoring)
                 {
                     continue;
                 }
@@ -222,7 +207,7 @@ namespace Grouper2.Utility
                     }
 
                     // if we're showing defaults, just add it to the result and move on
-                    if (GlobalVar.IntLevelToShow == 0)
+                    if (interest == 0)
                     {
                         fileSystemRightsJArray.Add(right);
                         continue;
@@ -239,7 +224,7 @@ namespace Grouper2.Utility
                         continue;
                     }
                     // if it's neither boring nor interesting, add it if the 'interestlevel to show' value is low enough
-                    else if (GlobalVar.IntLevelToShow < 3)
+                    else if (interest < 3)
                     {
                         Utility.Output.DebugWrite(right + " was not labelled as boring or interesting.");
                         fileSystemRightsJArray.Add(right);
@@ -254,7 +239,7 @@ namespace Grouper2.Utility
                 if (fileSystemRightsJArray.HasValues)
                 {
                     // if the trustee isn't interesting and we're excluding low-level findings, bail out
-                    if ((!trusteeInteresting) && (GlobalVar.IntLevelToShow > 4))
+                    if (!trusteeInteresting && interest > 4)
                     {
                         return null;
                     }
@@ -277,321 +262,380 @@ namespace Grouper2.Utility
             return fileDaclsJObject;
         }
 
-        public static JObject InvestigatePath(string pathToInvestigate)
+        // TODO: move this to use the tree structure to make things easier
+        public static AuditedPath InvestigatePath(string pathToInvestigate)
         {
-            // general purpose method for returning some information about why a path might be interesting.
-            
-            // set up all our bools and empty JObjects so everything is boring until proven interesting.
-            JArray interestingFileExts = (JArray) JankyDb.Instance["interestingExtensions"];
-            bool fileExists = false;
-            bool fileWritable = false;
-            bool fileReadable = false;
-            bool dirExists = false;
-            bool dirWritable = false;
-            bool fileContentsInteresting = false;
-            bool isFilePath = false;
-            bool isDirPath = false;
-            bool parentDirExists = false;
-            bool parentDirWritable = false;
-            bool extIsInteresting = false;
-            string fileExt = "";
-            string extantParentDir = "";
-            string writableParentDir = "";
-            JObject parentDirDacls = new JObject();
-            JObject fileDacls = new JObject();
-            JObject dirDacls = new JObject();
-            JArray interestingWordsFromFile = new JArray();
-            string dirPath = "";
-            // remove quotes
-            string inPath = pathToInvestigate.Trim('\'','\"',',',';');
-            // and whitespace
-            inPath = inPath.Trim();
-
-            if (inPath.Length > 1)
-            {
-                try {
-                    dirPath = Path.GetDirectoryName(inPath);
-                    fileExt = Path.GetExtension(inPath);
-                }
-                catch (ArgumentException)
-                {
-                    // can happen if "inPath" contains invalid characters (ex. '"') or does not look like a path (ex. "mailto:...")
-                    return new JObject(new JProperty("Not a path?", inPath));
-                }
-            }
-            else
-            {
-                return new JObject(new JProperty("Not a path?", inPath));
-            }
-
-            if (inPath.Contains("http://") || inPath.Contains("https://"))
-            {
-                return new JObject(new JProperty("HTTP/S URL?", inPath));
-            }
-
-            if (inPath.Contains("://") && !(inPath.Contains("http://")))
-            {
-                return new JObject(new JProperty("URI?", inPath));
-            }
-
-            if (inPath.Contains('%'))
-            {
-                return new JObject(new JProperty("Env var found in path", inPath));
-            }
-
-            if (inPath.StartsWith("C:") || inPath.StartsWith("D:"))
-            {
-                return new JObject(new JProperty("Local Drive?", inPath));
-            }
-
-            // if it doesn't seem to have any path separators it's probably a single file on sysvol.
-            if (!inPath.Contains('\\') && !inPath.Contains('/'))
-            {
-                return new JObject(new JProperty("No path separators, file in SYSVOL?", inPath));
-            }
-            // figure out if it's a file path or just a directory even if the file doesn't exist
-
-            string pathFileComponent = Path.GetFileName(inPath);
-
-            if (pathFileComponent == "")
-            {
-                isDirPath = true;
-                isFilePath = false;
-            }
-            else
-            {
-                isDirPath = false;
-                isFilePath = true;
-            }
-
-            if (isFilePath)
-            {
-                // check if the file exists
-                fileExists = DoesFileExist(inPath);
-
-                if (fileExists)
-                {
-                    // if it does, the parent Dir must exist.
-                    dirExists = true;
-                    // check if we can read it
-                    fileReadable = CanIRead(inPath);
-                    // check if we can write it
-                    fileWritable = CanIWrite(inPath);
-                    // see what the file extension is and if it's interesting
-                    fileExt = Path.GetExtension(inPath);
-                    foreach (string intExt in interestingFileExts)
-                    {
-                        if ((fileExt.ToLower().Trim('.')) == (intExt.ToLower()))
-                        {
-                            extIsInteresting = true;
-                        }
-                    }
-
-                    // if we can read it, have a look if it has interesting strings in it.
-                    if (fileReadable)
-                    {
-                        // make sure the file isn't massive so we don't waste ages grepping whole disk images over the network
-                        long fileSize = new FileInfo(inPath).Length;
-
-                        if (fileSize < 1048576) // 1MB for now. Can tune if too slow.
-                        {
-                            interestingWordsFromFile = GetInterestingWordsFromFile(inPath);
-                            if (interestingWordsFromFile.Count > 0)
-                            {
-                                fileContentsInteresting = true;
-                            }
-                        }
-                    }
-
-                    // get the file permissions
-                    fileDacls = GetFileDaclJObject(inPath);
-                }
-                
-            }
-
-            if (isDirPath)
-            {
-                dirExists = DoesDirExist(inPath);
-            }
-            else if (!isDirPath && !fileExists)
-            {
-                dirExists = DoesDirExist(dirPath);
-            }
-
-            if (dirExists)
-            {
-                dirDacls = GetFileDaclJObject(dirPath);
-                dirWritable = CanIWrite(dirPath);
-            }
-            // if the dir doesn't exist, iterate up the file path checking if any exist and if we can write to any of them.
-            if (!dirExists)
-            {
-                // we want to allow a path like C: but not one like "\"
-                if ((dirPath != null) && (dirPath.Length > 1))
-                {
-                    // get the root of the path
-                    try
-                    {
-                        // ReSharper disable once UnusedVariable
-                        string pathRoot = Path.GetPathRoot(dirPath);
-                    }
-                    catch (ArgumentException e)
-                    {
-                        Utility.Output.DebugWrite(e.ToString());
-                        
-                        return new JObject(new JProperty("Not a path?", inPath));
-                    }
-
-                    // get the first parent dir
-                    string dirPathParent = "";
-
-                    try
-                    {
-                        if (GetParentDirPath(dirPath) != null)
-                        {
-                            dirPathParent = GetParentDirPath(dirPath);
-                        }
-                    }
-                    catch (ArgumentException e)
-                    {
-                        Utility.Output.DebugWrite(e.ToString());
-                        
-                        return new JObject(new JProperty("Not a path?", inPath));
-                    }
-
-                    // iterate until the path root 
-                    while ((dirPathParent != null) && (dirPathParent != "\\\\") && (dirPathParent != "\\"))
-                    {
-                        // check if the parent dir exists
-                        parentDirExists = DoesDirExist(dirPathParent);
-                        // if it does
-                        if (parentDirExists)
-                        {
-                            // get the dir dacls
-                            parentDirDacls = GetFileDaclJObject(dirPathParent);
-                            // check if it's writable
-                            parentDirWritable = CanIWrite(dirPathParent);
-                            if (parentDirWritable)
-                            {
-                                writableParentDir = dirPathParent;
-                            }
-
-                            break;
-                        }
-
-                        //prepare for next iteration by aiming at the parent dir
-                        if (GetParentDirPath(dirPathParent) != null)
-                        {
-                            dirPathParent = GetParentDirPath(dirPathParent);
-                        }
-                        else break;
-                    }
-                }
-            }
-
-            // put all the values we just collected into a jobject for reporting and calculate how interesting it is.
-            JObject filePathAssessment = new JObject();
+            AuditedPath filePathAssessment;
             int interestLevel = 1;
-            filePathAssessment.Add("Path assessed", inPath);
-            if (isFilePath)
+            try
             {
-                if (fileExists)
+                // general purpose method for returning some information about why a path might be interesting.
+
+                // set up all our bools and empty JObjects so everything is boring until proven interesting.
+                JArray interestingFileExts = JArray.FromObject(JankyDb.Db.InterestingExtensions);
+                bool fileExists = false;
+                bool fileWritable = false;
+                bool fileReadable = false;
+                bool dirExists = false;
+                bool dirWritable = false;
+                bool fileContentsInteresting = false;
+                bool isFilePath = false;
+                bool isDirPath = false;
+                bool parentDirExists = false;
+                bool parentDirWritable = false;
+                bool extIsInteresting = false;
+                string fileExt = "";
+                string extantParentDir = "";
+                string writableParentDir = "";
+                JObject parentDirDacls = new JObject();
+                JObject fileDacls = new JObject();
+                JObject dirDacls = new JObject();
+                List<string> interestingWordsFromFile = new List<string>();
+                string dirPath = "";
+                // remove quotes
+                string inPath = pathToInvestigate.Trim('\'', '\"', ',', ';');
+                // and whitespace
+                inPath = inPath.Trim();
+
+                // return obj
+                filePathAssessment = new AuditedPath();
+
+                if (inPath.Length > 1)
                 {
-                    filePathAssessment.Add("File exists", true);
-                    if (extIsInteresting)
+                    try
                     {
-                        interestLevel = interestLevel + 2;
-                        filePathAssessment.Add("File extension interesting", extIsInteresting);
+                        dirPath = Path.GetDirectoryName(inPath);
+                        fileExt = Path.GetExtension(inPath);
                     }
-                    filePathAssessment.Add("File readable", fileReadable);
-                    if (fileContentsInteresting)
+                    catch (ArgumentException)
                     {
-                        filePathAssessment.Add("File contents interesting", "True");
-                        filePathAssessment.Add("Interesting strings found", interestingWordsFromFile );
-                        interestLevel = interestLevel + 2;
-                    }
-                    filePathAssessment.Add("File writable", fileWritable);
-                    if (fileWritable) interestLevel = interestLevel + 10;
-                    if ((fileDacls != null) && fileDacls.HasValues)
-                    {
-                        filePathAssessment.Add("File DACLs", fileDacls);
+                        // can happen if "inPath" contains invalid characters (ex. '"') or does not look like a path (ex. "mailto:...")
+                        return new AuditedPath() {NotAPath = inPath};
                     }
                 }
                 else
                 {
-                    filePathAssessment.Add("File exists", false);
-                    filePathAssessment.Add("Directory exists", dirExists);
+                    return new AuditedPath() {NotAPath = inPath};
+                }
+
+                if (inPath.Contains("http://") || inPath.Contains("https://"))
+                {
+                    return new AuditedPath() {NotAPathHttps = inPath};
+                }
+
+                if (inPath.Contains("://") && !inPath.Contains("http://"))
+                {
+                    return new AuditedPath() {NotAPathUri = inPath};
+                }
+
+                if (inPath.Contains('%'))
+                {
+                    return new AuditedPath() {NotAPathEnv = inPath};
+                }
+
+                if (inPath.StartsWith("C:") || inPath.StartsWith("D:"))
+                {
+                    return new AuditedPath() {NotAPathDrive = inPath};
+                }
+
+                // if it doesn't seem to have any path separators it's probably a single file on sysvol.
+                if (!inPath.Contains('\\') && !inPath.Contains('/'))
+                {
+                    return new AuditedPath() {NoSep = inPath};
+                }
+                // figure out if it's a file path or just a directory even if the file doesn't exist
+
+                string pathFileComponent = Path.GetFileName(inPath);
+
+                if (pathFileComponent == "")
+                {
+                    isDirPath = true;
+                    isFilePath = false;
+                }
+                else
+                {
+                    isDirPath = false;
+                    isFilePath = true;
+                }
+
+                if (isFilePath)
+                {
+                    // check if the file exists
+                    fileExists = DoesFileExist(inPath);
+
+                    if (fileExists)
+                    {
+                        // if it does, the parent Dir must exist.
+                        dirExists = true;
+                        // check if we can read it
+                        fileReadable = CurrentUser.Query.CanReadFrom(inPath);
+                        // check if we can write it
+                        fileWritable = CurrentUser.Query.CanWriteTo(inPath);
+                        // see what the file extension is and if it's interesting
+                        fileExt = Path.GetExtension(inPath);
+                        foreach (string intExt in interestingFileExts)
+                        {
+                            if (fileExt.ToLower().Trim('.') == intExt.ToLower())
+                            {
+                                extIsInteresting = true;
+                            }
+                        }
+
+                        // if we can read it, have a look if it has interesting strings in it.
+                        if (fileReadable)
+                        {
+                            // make sure the file isn't massive so we don't waste ages grepping whole disk images over the network
+                            long fileSize = new FileInfo(inPath).Length;
+
+                            if (fileSize < 1048576) // 1MB for now. Can tune if too slow.
+                            {
+                                interestingWordsFromFile = GetInterestingWordsFromFile(inPath);
+                                if (interestingWordsFromFile.Count > 0)
+                                {
+                                    fileContentsInteresting = true;
+                                }
+                            }
+                        }
+
+                        // get the file permissions
+                        fileDacls = GetFileDaclJObject(inPath);
+                    }
+
+                }
+
+                if (isDirPath)
+                {
+                    dirExists = DoesDirExist(inPath);
+                }
+                else if (!fileExists)
+                {
+                    dirExists = DoesDirExist(dirPath);
+                }
+
+                if (dirExists)
+                {
+                    dirDacls = GetFileDaclJObject(dirPath);
+                    dirWritable = CurrentUser.Query.CanWriteTo(dirPath);
+                }
+
+                // if the dir doesn't exist, iterate up the file path checking if any exist and if we can write to any of them.
+                if (!dirExists)
+                {
+                    // we want to allow a path like C: but not one like "\"
+                    if (dirPath != null && dirPath.Length > 1)
+                    {
+                        // get the root of the path
+                        try
+                        {
+                            // ReSharper disable once UnusedVariable
+                            string pathRoot = Path.GetPathRoot(dirPath);
+                        }
+                        catch (ArgumentException e)
+                        {
+                            Utility.Output.DebugWrite(e.ToString());
+
+                            return new AuditedPath() {NotAPath = inPath};
+                        }
+
+                        // get the first parent dir
+                        string dirPathParent = "";
+
+                        try
+                        {
+                            if (GetParentDirPath(dirPath) != null)
+                            {
+                                dirPathParent = GetParentDirPath(dirPath);
+                            }
+                        }
+                        catch (ArgumentException e)
+                        {
+                            Utility.Output.DebugWrite(e.ToString());
+
+                            return new AuditedPath() {NotAPath = inPath};
+                        }
+
+                        // iterate until the path root 
+                        while (dirPathParent != null && dirPathParent != "\\\\" && dirPathParent != "\\")
+                        {
+                            // check if the parent dir exists
+                            parentDirExists = DoesDirExist(dirPathParent);
+                            // if it does
+                            if (parentDirExists)
+                            {
+                                // get the dir dacls
+                                parentDirDacls = GetFileDaclJObject(dirPathParent);
+                                // check if it's writable
+                                parentDirWritable = CurrentUser.Query.CanWriteTo(dirPathParent);
+                                if (parentDirWritable)
+                                {
+                                    writableParentDir = dirPathParent;
+                                }
+
+                                break;
+                            }
+
+                            //prepare for next iteration by aiming at the parent dir
+                            if (GetParentDirPath(dirPathParent) != null)
+                            {
+                                dirPathParent = GetParentDirPath(dirPathParent);
+                            }
+                            else break;
+                        }
+                    }
+                }
+
+                // put all the values we just collected into a jobject for reporting and calculate how interesting it is.
+                //JObject filePathAssessment = new JObject();
+
+                //filePathAssessment.Add("Path assessed", inPath);
+                if (isFilePath)
+                {
+                    // prepare an audited file path to return
+                    filePathAssessment.FileData = new AuditedPathFile {FileExists = fileExists};
+                    if (fileExists)
+                    {
+
+                        //filePathAssessment.Add("File exists", true);
+
+                        // extension stuff
+                        filePathAssessment.FileData.ExtIsInteresting = extIsInteresting;
+                        if (extIsInteresting)
+                        {
+                            interestLevel = interestLevel + 2;
+                            //filePathAssessment.Add("File extension interesting", extIsInteresting);
+                        }
+
+                        // contents stuff
+                        filePathAssessment.FileData.Readable = fileReadable;
+                        //filePathAssessment.Add("File readable", fileReadable);
+                        filePathAssessment.FileData.ContentsInteresting = fileContentsInteresting;
+                        if (fileContentsInteresting)
+                        {
+                            interestLevel = interestLevel + 2;
+                            //filePathAssessment.Add("File contents interesting", "True");
+                            filePathAssessment.FileData.ContentsStringsOfInterest = interestingWordsFromFile;
+                            //filePathAssessment.Add("Interesting strings found", interestingWordsFromFile);
+                        }
+
+                        // writable stuff !!!!
+                        filePathAssessment.FileData.Writable = fileWritable;
+                        //filePathAssessment.Add("File writable", fileWritable);
+                        if (fileWritable) interestLevel = interestLevel + 10;
+                        if (fileDacls != null && fileDacls.HasValues)
+                        {
+                            filePathAssessment.FileData.FileDacls = fileDacls;
+                            //filePathAssessment.Add("File DACLs", fileDacls);
+                        }
+                    }
+                    else
+                    {
+                        //filePathAssessment.Add("File exists", false);
+                        //filePathAssessment.Add("Directory exists", dirExists);
+                        filePathAssessment.DirData = new AuditedPathDir() {DirExists = dirExists};
+                        if (dirExists)
+                        {
+                            filePathAssessment.DirData.Writable = dirWritable;
+                            //filePathAssessment.Add("Directory writable", dirWritable);
+                            if (!(inPath.StartsWith("C:") || inPath.StartsWith("D:")))
+                            {
+                                if (dirWritable) interestLevel = interestLevel + 10;
+                            }
+
+                            if (dirDacls != null && dirDacls.HasValues)
+                            {
+                                filePathAssessment.DirData.Dacls = dirDacls;
+                                //filePathAssessment.Add("Directory DACL", dirDacls);
+                            }
+                        }
+                        else if (parentDirExists)
+                        {
+                            filePathAssessment.DirData.Parent = new AuditedPathDir {DirExists = parentDirExists};
+                            //filePathAssessment.Add("Parent dir exists", true);
+                            if (parentDirWritable)
+                            {
+                                filePathAssessment.DirData.Parent.Writable = parentDirWritable;
+                                //filePathAssessment.Add("Parent dir writable", "True");
+
+                                if (!(inPath.StartsWith("C:") || inPath.StartsWith("D:")))
+                                {
+                                    interestLevel = interestLevel + 10;
+                                }
+
+                                filePathAssessment.DirData.Parent.Path = writableParentDir;
+                                //filePathAssessment.Add("Writable parent dir", writableParentDir);
+                            }
+                            else
+                            {
+                                filePathAssessment.DirData.Parent.ExtantParentDir = extantParentDir;
+                                filePathAssessment.DirData.Parent.Dacls = parentDirDacls;
+                                //filePathAssessment.Add("Extant parent dir", extantParentDir);
+                                //filePathAssessment.Add("Parent dir DACLs", parentDirDacls);
+                            }
+                        }
+                    }
+                }
+                else if (isDirPath)
+                {
+                    filePathAssessment.DirData = new AuditedPathDir() {DirExists = dirExists};
+                    //filePathAssessment.Add("Directory exists", dirExists);
                     if (dirExists)
                     {
-                        filePathAssessment.Add("Directory writable", dirWritable);
+                        filePathAssessment.DirData.Writable = dirWritable;
+                        //filePathAssessment.Add("Directory is writable", dirWritable);
+                        // quick n dirty way of excluding local drives while keeping mapped network drives.
                         if (!(inPath.StartsWith("C:") || inPath.StartsWith("D:")))
                         {
                             if (dirWritable) interestLevel = interestLevel + 10;
                         }
 
-                        if ((dirDacls != null) && dirDacls.HasValues)
-                        {
-                            filePathAssessment.Add("Directory DACL", dirDacls);
-                        }
+                        filePathAssessment.DirData.Dacls = dirDacls;
+                        //filePathAssessment.Add("Directory DACLs", dirDacls);
                     }
                     else if (parentDirExists)
                     {
-                        filePathAssessment.Add("Parent dir exists", true);
+                        filePathAssessment.DirData.Parent = new AuditedPathDir() {DirExists = parentDirExists};
+                        //filePathAssessment.Add("Parent dir exists", true);
                         if (parentDirWritable)
                         {
-                            filePathAssessment.Add("Parent dir writable", "True");
+                            filePathAssessment.DirData.Parent.Writable = parentDirWritable;
+                            //filePathAssessment.Add("Parent dir writable", "True");
                             if (!(inPath.StartsWith("C:") || inPath.StartsWith("D:")))
                             {
                                 interestLevel = interestLevel + 10;
                             }
-                            filePathAssessment.Add("Writable parent dir", writableParentDir);
+
+                            filePathAssessment.DirData.Parent.Path = writableParentDir;
+                            //filePathAssessment.Add("Writable parent dir", writableParentDir);
                         }
                         else
                         {
-                            filePathAssessment.Add("Extant parent dir", extantParentDir);
-                            filePathAssessment.Add("Parent dir DACLs", parentDirDacls);
+                            filePathAssessment.DirData.Parent.ExtantParentDir = extantParentDir;
+                            filePathAssessment.DirData.Parent.Dacls = parentDirDacls;
+                            //filePathAssessment.Add("Extant parent dir", extantParentDir);
+                            //filePathAssessment.Add("Parent dir DACLs", parentDirDacls);
                         }
                     }
                 }
             }
-            else if (isDirPath)
+            catch(Exception e)
             {
-                filePathAssessment.Add("Directory exists", dirExists);
-                if (dirExists)
-                {
-                    filePathAssessment.Add("Directory is writable", dirWritable);
-                    // quick n dirty way of excluding local drives while keeping mapped network drives.
-                    if (!(inPath.StartsWith("C:") || inPath.StartsWith("D:")))
-                    {
-                        if (dirWritable) interestLevel = interestLevel + 10;
-                    }
-                    filePathAssessment.Add("Directory DACLs", dirDacls);
-                }
-                else if (parentDirExists)
-                {
-                    filePathAssessment.Add("Parent dir exists", true);
-                    if (parentDirWritable)
-                    {
-                        filePathAssessment.Add("Parent dir writable", "True");
-                        if (!(inPath.StartsWith("C:") || inPath.StartsWith("D:")))
-                        {
-                            interestLevel = interestLevel + 10;
-                        }
-                        filePathAssessment.Add("Writable parent dir", writableParentDir);
-                    }
-                    else
-                    {
-                        filePathAssessment.Add("Extant parent dir", extantParentDir);
-                        filePathAssessment.Add("Parent dir DACLs", parentDirDacls);
-                    }
-                }
+                Log.Degub("unable to build a filepath assessment");
+                filePathAssessment = null;
             }
-            filePathAssessment.Add("InterestLevel", interestLevel.ToString());
-            return filePathAssessment;
+
+            if (filePathAssessment != null)
+            {
+                filePathAssessment.Interest = interestLevel;
+                //filePathAssessment.Add("InterestLevel", interestLevel.ToString());
+                return filePathAssessment;
+            }
+
+            return null;
+
         }
 
 
-        public static JArray GetInterestingWordsFromFile(string inPath)
+        public static List<string> GetInterestingWordsFromFile(string inPath)
         {
             // validate if the file exists
             bool fileExists = FileSystem.DoesFileExist(inPath);
@@ -601,7 +645,7 @@ namespace Grouper2.Utility
             }
 
             // get our list of interesting words
-            JArray interestingWords = (JArray)JankyDb.Instance["interestingWords"];
+            JArray interestingWords = JArray.FromObject(JankyDb.Db.InterestingWords);
 
             // get contents of the file and smash case
             string fileContents = "";
@@ -615,7 +659,7 @@ namespace Grouper2.Utility
             }
 
             // set up output object
-            JArray interestingWordsFound = new JArray();
+            List<string> interestingWordsFound = new List<string>();
 
             foreach (string word in interestingWords)
             {
@@ -646,7 +690,7 @@ namespace Grouper2.Utility
 
         public static bool DoesFileExist(string inPath)
         {
-            if (!GlobalVar.OnlineChecks)
+            if (!JankyDb.Vars.OnlineMode)
             {
                 return false;
             }
@@ -670,7 +714,7 @@ namespace Grouper2.Utility
 
         public static bool DoesDirExist(string inPath)
         {
-            if (!GlobalVar.OnlineChecks)
+            if (!JankyDb.Vars.OnlineMode)
             {
                 return false;
             }
@@ -686,105 +730,30 @@ namespace Grouper2.Utility
             return dirExists;
         }
 
-        public static bool CanIRead(string inPath)
+        public static AuditedFileContents InvestigateFileContents(string inString, int desiredInterestLevel)
         {
-            bool canRead = false;
-            if (!GlobalVar.OnlineChecks)
-            {
-                return false;
-            }
-            try
-            {
-                FileStream stream = File.OpenRead(inPath);
-                canRead = stream.CanRead;
-                stream.Close();
-            }
-            catch (UnauthorizedAccessException)
-            {
-                Utility.Output.DebugWrite("Tested read perms for " + inPath + " and couldn't read.");
-            }
-            catch (ArgumentException)
-            {
-                Utility.Output.DebugWrite("Tested read perms for " + inPath + " but it doesn't seem to be a valid file path.");
-            }
-            catch (Exception e)
-            {
-                Utility.Output.DebugWrite(e.ToString());
-            }
-            return canRead;
-        }
+            AuditedFileContents investigated = new AuditedFileContents();
 
-        public static bool CanIWrite(string inPath)
-        {
-            // this will return true if write or modify or take ownership or any of those other good perms are available.
-            
-            CurrentUserSecurity currentUserSecurity = new CurrentUserSecurity();
-
-            FileSystemRights[] fsRights = {
-                FileSystemRights.Write,
-                FileSystemRights.Modify,
-                FileSystemRights.FullControl,
-                FileSystemRights.TakeOwnership,
-                FileSystemRights.ChangePermissions,
-                FileSystemRights.AppendData,
-                FileSystemRights.CreateFiles,
-                FileSystemRights.CreateDirectories,
-                FileSystemRights.WriteData
-            };
-
-            try
-            {
-                FileAttributes attr = File.GetAttributes(inPath);
-                foreach (FileSystemRights fsRight in fsRights)
-                {
-                    if (attr.HasFlag(FileAttributes.Directory))
-                    {
-                        DirectoryInfo dirInfo = new DirectoryInfo(inPath);
-                        return currentUserSecurity.HasAccess(dirInfo, fsRight);
-                    }
-
-                    FileInfo fileInfo = new FileInfo(inPath);
-                    return currentUserSecurity.HasAccess(fileInfo, fsRight);
-                }
-            }
-            catch (FileNotFoundException)
-            {
-                return false;
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return false;
-            }
-            catch (ArgumentNullException)
-            {
-                return false;
-            }
-            return false;
-        }
-
-        public static JObject InvestigateFileContents(string inString)
-        {
             string fileString;
-            JObject investigatedFileContents = new JObject();
+            //JObject investigatedFileContents = new JObject();
             try
             {
                 fileString = File.ReadAllText(inString).ToLower();
 
                 // feed the whole thing through FileSystem.InvestigateString
-                investigatedFileContents = FileSystem.InvestigateString(fileString);
+                investigated.AuditedString = FileSystem.InvestigateString(fileString, desiredInterestLevel);
             }
             catch (UnauthorizedAccessException e)
             {
                 Utility.Output.DebugWrite(e.ToString());
             }
             
-            if (investigatedFileContents["InterestLevel"] != null)
+            if (investigated.AuditedString != null)
             {
-                if (((int)investigatedFileContents["InterestLevel"]) >= GlobalVar.IntLevelToShow)
+                if (investigated.Interest >= desiredInterestLevel)
                 {
-                    investigatedFileContents.Remove("Value");
-                    investigatedFileContents.AddFirst(new JProperty("File Path", inString));
-                    return investigatedFileContents;
+                    investigated.Path = inString;
+                    return investigated;
                 }
             }
 

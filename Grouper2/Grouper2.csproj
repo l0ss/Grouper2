@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\NUnit.3.12.0\build\NUnit.props" Condition="Exists('..\packages\NUnit.3.12.0\build\NUnit.props')" />
   <Import Project="..\packages\Costura.Fody.3.3.0\build\Costura.Fody.props" Condition="Exists('..\packages\Costura.Fody.3.3.0\build\Costura.Fody.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -34,12 +35,15 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>true</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -84,8 +88,8 @@
     <Reference Include="Alba.CsConsoleFormat, Version=1.0.0.89, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Alba.CsConsoleFormat.1.0.0\lib\net40\Alba.CsConsoleFormat.dll</HintPath>
     </Reference>
-    <Reference Include="CommandLineArgumentsParser, Version=3.0.19.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CommandLineArgumentsParser.3.0.19\lib\net40\CommandLineArgumentsParser.dll</HintPath>
+    <Reference Include="CommandLineArgumentsParser, Version=3.0.20.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CommandLineArgumentsParser.3.0.20\lib\net40\CommandLineArgumentsParser.dll</HintPath>
     </Reference>
     <Reference Include="Costura, Version=3.3.0.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
       <HintPath>..\packages\Costura.Fody.3.3.0\lib\net40\Costura.dll</HintPath>
@@ -94,9 +98,13 @@
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="nunit.framework, Version=3.12.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.12.0\lib\net40\nunit.framework.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.DirectoryServices.AccountManagement" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data" />
@@ -104,36 +112,83 @@
     <Reference Include="mscorlib" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Utility\CurrentUserSecurity.cs" />
+    <Compile Include="Auditor\GrouperAuditor.Assessors.Pol.cs" />
+    <Compile Include="Auditor\GrouperAuditor.AuditUtils.cs" />
+    <Compile Include="Auditor\GrouperAuditor.FileEntryLogic.cs" />
+    <Compile Include="Auditor\Report\AuditReport.cs" />
+    <Compile Include="Auditor\Report\AdPolicy.cs" />
+    <Compile Include="Auditor\GrouperAuditor.Assessor.XML.cs" />
+    <Compile Include="Auditor\GrouperAuditor.Assessors.INF.cs" />
+    <Compile Include="Auditor\GrouperAuditor.Assessors.INI.cs" />
+    <Compile Include="Auditor\GrouperAuditor.cs" />
+    <Compile Include="GrouperPlanTasks.cs" />
+    <Compile Include="Host\DcConnection\LdapConnection.DomainSearchers.cs" />
+    <Compile Include="Host\DcConnection\LdapConnection.static.cs" />
+    <Compile Include="Host\DcConnection\LdapConnection.w32.cs" />
+    <Compile Include="Host\SysVol\Dirs\FolderFactories.cs" />
+    <Compile Include="Host\SysVol\Dirs\GenericDirectory.cs" />
+    <Compile Include="Host\SysVol\Dirs\ISysvolDirectory.cs" />
+    <Compile Include="Host\SysVol\Files\DotXml\XmlFileSchemaDefs\StubbedOutXmlBullshit.cs" />
+    <Compile Include="Host\SysVol\Files\Unwanted\UnwantedFile.cs" />
+    <Compile Include="Host\SysVol\SysvolObjectType.cs" />
+    <Compile Include="Host\SysVol\Files\DotAas\AasSysvolFile.cs" />
+    <Compile Include="Host\SysVol\Files\SysvolFile.cs" />
+    <Compile Include="Host\SysVol\Dacl.cs" />
+    <Compile Include="Host\SysVol\Files\FileFactory.cs" />
+    <Compile Include="Host\SysVol\Files\EnumFileType.cs" />
+    <Compile Include="Host\SysVol\Files\IFile.cs" />
+    <Compile Include="Host\SysVol\Files\DotInf\InfSysvolFile.cs" />
+    <Compile Include="Host\SysVol\Files\DotIni\IniSysvolFile.cs" />
+    <Compile Include="Host\SysVol\Files\DotPol\PolSysvolFile.cs" />
+    <Compile Include="Host\SysVol\Files\DotXml\SysvolXmlData.cs" />
+    <Compile Include="Host\SysVol\Files\DotXml\XmlSysvolFile.cs" />
+    <Compile Include="Host\SysVol\Files\Scripts\Script.cs" />
+    <Compile Include="Host\SysVol\Sysvol.static.cs" />
+    <Compile Include="Host\SysVol\Dirs\SysvolDirectory.cs" />
+    <Compile Include="Host\SysVol\SysvolMapper.cs" />
+    <Compile Include="Host\SysVol\Dirs\SysvolRoot.cs" />
+    <Compile Include="JankyDB\JankyDbDataModel.cs" />
+    <Compile Include="GrouperPlan.cs" />
+    <Compile Include="JankyDB\JankyDb.cs" />
+    <Compile Include="Host\SysVol\Dirs\PolicyAndScript\GPOs\Gpo.OnlineData.cs" />
+    <Compile Include="Host\DcConnection\GpoPackage.cs" />
+    <Compile Include="Host\DcConnection\Ldap.cs" />
+    <Compile Include="Host\SidStatic.cs" />
+    <Compile Include="Host\SysVol\Dirs\PolicyAndScript\GPOs\Gpo.OfflineData.cs" />
+    <Compile Include="Host\SysVol\Dirs\PolicyAndScript\GPOs\UserAndMachine\GpoMachineSubDir.cs" />
+    <Compile Include="Host\SysVol\Dirs\PolicyAndScript\PolicyDirectory.cs" />
+    <Compile Include="Host\SysVol\Dirs\PolicyAndScript\ScriptDirectory.cs" />
+    <Compile Include="Host\SysVol\Sysvol.cs" />
+    <Compile Include="Host\SysVol\Dirs\PolicyAndScript\GPOs\UserAndMachine\GpoUserSubDir.cs" />
+    <Compile Include="Host\Host.cs" />
+    <Compile Include="Host\CurrentUser.cs" />
+    <Compile Include="LimitedConcurrencyLevelTaskScheduler.cs" />
+    <Compile Include="Utility\Extensions.cs" />
     <Compile Include="Utility\FileSystem.cs" />
-    <Compile Include="Assess\GPPAssess\AssessGpp.cs" />
-    <Compile Include="Assess\AssessHandlers.cs" />
     <Compile Include="Utility\JUtil.cs" />
+    <Compile Include="Utility\Log.cs" />
     <Compile Include="Utility\Output.cs" />
-    <Compile Include="Assess\PackageAssess\PackageAssess.cs" />
-    <Compile Include="Utility\SddlParser\ParseSDDL.cs" />
-    <Compile Include="Assess\ScriptsIniAssess\AssessScriptsIni.cs" />
-    <Compile Include="Assess\GPPAssess\AssessDataSources.cs" />
-    <Compile Include="Assess\GPPAssess\AssessDrives.cs" />
-    <Compile Include="Assess\GPPAssess\AssessEnvVars.cs" />
-    <Compile Include="Assess\GPPAssess\AssessFiles.cs" />
-    <Compile Include="Assess\GPPAssess\AssessIniFiles.cs" />
-    <Compile Include="Assess\GPPAssess\AssessNetworkOptions.cs" />
-    <Compile Include="Assess\GPPAssess\AssessNetworkShares.cs" />
-    <Compile Include="Assess\GPPAssess\AssessNTServices.cs" />
-    <Compile Include="Assess\GPPAssess\AssessPrinters.cs" />
-    <Compile Include="Assess\GPPAssess\AssessRegSettings.cs" />
-    <Compile Include="Assess\GPPAssess\AssessSchedTasks.cs" />
-    <Compile Include="Assess\GPPAssess\AssessShortcuts.cs" />
-    <Compile Include="Assess\GPPAssess\AssessUsersAndGroups.cs" />
-    <Compile Include="Assess\InfAssess\AssessGroupMembership.cs" />
-    <Compile Include="Assess\InfAssess\AssessKerbPolicy.cs" />
-    <Compile Include="Assess\InfAssess\AssessPrivRights.cs" />
-    <Compile Include="Assess\InfAssess\AssessRegKeys.cs" />
-    <Compile Include="Assess\InfAssess\AssessRegValues.cs" />
-    <Compile Include="Assess\InfAssess\AssessServiceGenSetting.cs" />
-    <Compile Include="Assess\InfAssess\AssessSysAccess.cs" />
-    <Compile Include="LDAPstuff.cs" />
+    <Compile Include="Host\DcConnection\Sddl\ParseSDDL.cs" />
+    <Compile Include="Auditor\GPPAssess\AssessDataSources.cs" />
+    <Compile Include="Auditor\GPPAssess\AssessDrives.cs" />
+    <Compile Include="Auditor\GPPAssess\AssessEnvVars.cs" />
+    <Compile Include="Auditor\GPPAssess\AssessFiles.cs" />
+    <Compile Include="Auditor\GPPAssess\AssessIniFiles.cs" />
+    <Compile Include="Auditor\GPPAssess\AssessNetworkOptions.cs" />
+    <Compile Include="Auditor\GPPAssess\AssessNetworkShares.cs" />
+    <Compile Include="Auditor\GPPAssess\AssessNTServices.cs" />
+    <Compile Include="Auditor\GPPAssess\AssessPrinters.cs" />
+    <Compile Include="Auditor\GPPAssess\AssessRegSettings.cs" />
+    <Compile Include="Auditor\GPPAssess\AssessSchedTasks.cs" />
+    <Compile Include="Auditor\GPPAssess\AssessShortcuts.cs" />
+    <Compile Include="Auditor\GPPAssess\AssessUsersAndGroups.cs" />
+    <Compile Include="Auditor\InfAssess\AssessGroupMembership.cs" />
+    <Compile Include="Auditor\InfAssess\AssessKerbPolicy.cs" />
+    <Compile Include="Auditor\InfAssess\AssessPrivRights.cs" />
+    <Compile Include="Auditor\InfAssess\AssessRegKeys.cs" />
+    <Compile Include="Auditor\InfAssess\AssessRegValues.cs" />
+    <Compile Include="Auditor\InfAssess\AssessServiceGenSetting.cs" />
+    <Compile Include="Auditor\InfAssess\AssessSysAccess.cs" />
     <Compile Include="Parsers.cs" />
     <Compile Include="Grouper2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -142,20 +197,21 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Utility\SddlParser\Ace.cs" />
-    <Compile Include="Utility\SddlParser\Acl.cs" />
-    <Compile Include="Utility\SddlParser\Format.cs" />
-    <Compile Include="Utility\SddlParser\Match.cs" />
-    <Compile Include="Utility\SddlParser\Sddl.cs" />
-    <Compile Include="Utility\SddlParser\SecurableObjectType.cs" />
-    <Compile Include="Utility\SddlParser\Sid.cs" />
-    <Compile Include="Utility\SddlParser\StringBuilderExtensions.cs" />
-    <Compile Include="Utility\Sid.cs" />
+    <Compile Include="Host\DcConnection\Sddl\Ace.cs" />
+    <Compile Include="Host\DcConnection\Sddl\Acl.cs" />
+    <Compile Include="Host\DcConnection\Sddl\Format.cs" />
+    <Compile Include="Host\DcConnection\Sddl\Match.cs" />
+    <Compile Include="Host\DcConnection\Sddl\Sddl.cs" />
+    <Compile Include="Host\DcConnection\Sddl\SecurableObjectType.cs" />
+    <Compile Include="Host\DcConnection\Sddl\Sid.cs" />
+    <Compile Include="Host\DcConnection\Sddl\StringBuilderExtensions.cs" />
+    <Compile Include="Host\Sid.cs" />
     <Compile Include="Utility\Util.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+    <Compile Include="Host\SysVol\Files\DotPol\RegistryEntry.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6">
@@ -171,7 +227,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="aroo_gjh_icon.ico" />
-    <None Include="Resources\PolData.txt" />
+    <EmbeddedResource Include="Resources\PolData.txt" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -179,7 +235,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <MonoDevelop>
@@ -199,5 +254,6 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Fody.3.3.5\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.3.3.5\build\Fody.targets'))" />
     <Error Condition="!Exists('..\packages\Costura.Fody.3.3.0\build\Costura.Fody.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Costura.Fody.3.3.0\build\Costura.Fody.props'))" />
+    <Error Condition="!Exists('..\packages\NUnit.3.12.0\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit.3.12.0\build\NUnit.props'))" />
   </Target>
 </Project>

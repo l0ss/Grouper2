@@ -1,4 +1,5 @@
-DEV
+# DEV BRANCH - DOES NOT REALLY WORK - HERE BE DRAGONS
+
 ![A picture of the Grouper2 banner](./G2-banner.png)
 
 C# rewrite of Grouper - *WAY* better than the original.
@@ -65,7 +66,7 @@ OK have a look at this:
 
 ![A picture of some Grouper2 output](./G2-example1.png)
 
-In the screenshot above we can see an "Assigned Application" policy that is still being pushed to computers, but the MSI file to install is missing, and the directory it's being installed from is writable by the current user. 
+In the screenshot above we can see an "Assigned Application" policy that is still being pushed to computers, but the MSI file to install is missing, and the directory it's being installed from is writable by the current user.
 
 If you created a hacked up MSI (e.g. with msfvenom) and then modified it to match the UIDs at the bottom of the picture, it would get executed on machines targeted by the GPO. Sweet!
 
@@ -82,6 +83,7 @@ If you want to discuss via Slack you can ping me (l0ss) on the BloodHound Slack,
 
 ## Credits and Thanks
 
+ - @Sh3r4 for entirely reworking my nightmare shitheap code into something other people could work on
  - Much assistance and code cleanup from @liamosaur
  - SDDL parsing from https://github.com/zacateras/
  - Thanks to @skorov8 for providing some useful registry key data.
