@@ -22,7 +22,7 @@ namespace Grouper2.Auditor
         /// <param name="regKeys"></param>
         /// <param name="desiredInterestLevel"></param>
         /// <returns></returns>
-        private Dictionary<string, AuditedRegistryKeys> AssessRegKeys(JToken regKeys)
+        public Dictionary<string, AuditedRegistryKeys> AssessRegKeys(JToken regKeys)
         {
             if (regKeys == null) 
                 throw new ArgumentNullException(nameof(regKeys));

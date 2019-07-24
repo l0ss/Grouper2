@@ -26,6 +26,22 @@ namespace Grouper2.Utility
             }
         }
 #endif
+
+        public static void Progress(int total, int current, int faulted = 0) {
+            
+            int percentage = (int)Math.Round((double)(100 * current) / total);
+            
+            lock (_lock)
+            {
+                Console.Error.Write("\r" + current.ToString() + "/" + total.ToString() +
+                                    " jobs processed. " + percentage.ToString() + "% complete. ");
+                if (faulted > 0)
+                {
+                    Console.Error.Write(faulted.ToString() + " jobs failed.");
+                }
+                Console.Error.Write("");
+            }
+        }
         
         public static void Verbose(string message, Exception e = null, object sender = null)
         {

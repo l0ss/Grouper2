@@ -529,6 +529,7 @@ namespace Grouper2
                 }
             }
 
+
             // wait for tasks to finish
             // put 'em all in a happy little array
             ReportingLoop(gpoWaitGroup.ToArray());
@@ -547,30 +548,19 @@ namespace Grouper2
         {
             // create a little counter to provide status updates
             int totalGpoTasksCount = gpoTaskArray.Length;
-            int incompleteTaskCount = gpoTaskArray.Length;
             int remainingTaskCount = gpoTaskArray.Length;
 
             while (remainingTaskCount > 0)
             {
                 Task[] incompleteTasks =
                     Array.FindAll(gpoTaskArray, element => element.Status != TaskStatus.RanToCompletion);
-                incompleteTaskCount = incompleteTasks.Length;
+                int incompleteTaskCount = incompleteTasks.Length;
                 Task[] faultedTasks = Array.FindAll(gpoTaskArray,
                     element => element.Status == TaskStatus.Faulted);
                 int faultedTaskCount = faultedTasks.Length;
                 int completeTaskCount = totalGpoTasksCount - incompleteTaskCount - faultedTaskCount;
-                int percentage = (int)Math.Round((double)(100 * completeTaskCount) / totalGpoTasksCount);
-                string percentageString = percentage.ToString();
-                Console.Error.Write("");
-
-                Console.Error.Write("\r" + completeTaskCount.ToString() + "/" + totalGpoTasksCount.ToString() +
-                                    " jobs processed. " + percentageString + "% complete. ");
-                if (faultedTaskCount > 0)
-                {
-                    Console.Error.Write(faultedTaskCount.ToString() + " jobs failed.");
-                }
-
-                remainingTaskCount = incompleteTaskCount - faultedTaskCount;
+                Log.Progress(completeTaskCount, totalGpoTasksCount, faultedTaskCount);
+                remainingTaskCount = gpoTaskArray.Length;
             }
         }
     }

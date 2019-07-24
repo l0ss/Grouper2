@@ -13,7 +13,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Grouper2.Utility
 {
-    class FileSystem
+    public class FileSystem
     {
         
 
@@ -619,7 +619,7 @@ namespace Grouper2.Utility
             }
             catch(Exception e)
             {
-                Log.Degub("unable to build a filepath assessment", e);
+                Log.Degub("unable to build a filepath assessment");
                 filePathAssessment = null;
             }
 

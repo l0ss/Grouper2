@@ -7,7 +7,7 @@ using Grouper2.Host.SysVol.Files;
 
 namespace Grouper2.Host.SysVol.Dirs
 {
-    class GenericDirectory : SysvolDirectory
+    public class GenericDirectory : SysvolDirectory
     {
         public GenericDirectory(string path) : base(path, SysvolObjectType.UselessFluffDirectory)
         {

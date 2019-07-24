@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Grouper2.Utility
 {
-    class Util
+    public class Util
     {
         public static List<string> DedupeList(List<string> listStrings)
         {

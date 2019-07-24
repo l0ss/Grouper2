@@ -3,7 +3,7 @@ using System;
 
 namespace Grouper2.Utility
 {
-    class JUtil
+    public class JUtil
     {
         public static JToken GetSafeJProp(string propName, JToken inToken, string inString)
         {
