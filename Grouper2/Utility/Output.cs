@@ -11,16 +11,18 @@ namespace Grouper2.Utility
         public static Document GetG2BannerDocument()
         {
             Document outputDocument = new Document();
-            string barf = @"  .,-:::::/::::::..      ..     ...   ::::::::::::..,::::::::::::..  ,;'``;. 
-,;;-'````' ;;;``;;;;  .;;;;;;.  ;;    ;;;`;;;```.;;;;;;'''';;;``;;;; ''  ,[[ 
-[[[   [[[[[[[[,/[[[' ,[[    \[[[['    [[[ `]]nnn]]' [[cccc  [[,/[[['  .c$P'  
-'$$c.    '$$$$$$$c   $$$,    $$$$     $$$  $$$''    $$''''  $$$$$c   d8MMMUP*
- `Y8bo,,,o8888b '88bo'888,__,8888   .d888  888o     888oo,__88b '88bo        
-   `'YMUP'YMMMM   'W'  'YMMMMP' 'YmMMMM''  YMMMb    ''''YUMMMMM   'W'        
-                                                    Now even Grouperer.      
-                                                    github.com/l0ss/Grouper2 
-                                                    @mikeloss                ";
-            string[] barfLines = barf.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+            string[] barfLines = new string[] {
+                @"  .,-:::::/::::::..      ..     ...   ::::::::::::..,::::::::::::..  ,;'``;. ", 
+                @",;;-'````' ;;;``;;;;  .;;;;;;.  ;;    ;;;`;;;```.;;;;;;'''';;;``;;;; ''  ,[[ ",
+                @"[[[   [[[[[[[[,/[[[' ,[[    \[[[['    [[[ `]]nnn]]' [[cccc  [[,/[[['  .c$P'  ",
+                @"'$$c.    '$$$$$$$c   $$$,    $$$$     $$$  $$$''    $$''''  $$$$$c   d8MMMUP*",
+                @" `Y8bo,,,o8888b '88bo'888,__,8888   .d888  888o     888oo,__88b '88bo        ",
+                @"   `'YMUP'YMMMM   'W'  'YMMMMP' 'YmMMMM''  YMMMb    ''''YUMMMMM   'W'        ",
+                @"                                                    Now even Grouperer.      ",
+                @"                                                    github.com/l0ss/Grouper2 ",
+                @"                                                    @mikeloss                "
+        };
+
 
             ConsoleColor[] patternOne = { ConsoleColor.White, ConsoleColor.Yellow, ConsoleColor.Red, ConsoleColor.Red, ConsoleColor.DarkRed, ConsoleColor.DarkRed, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White };
             ConsoleColor[] patternTwo =
@@ -604,16 +606,17 @@ namespace Grouper2.Utility
 
         public static void PrintBanner()
         {
-            string barf = @"  .,-:::::/::::::..      ..     ...   ::::::::::::..,::::::::::::..  ,;'``;. 
-,;;-'````' ;;;``;;;;  .;;;;;;.  ;;    ;;;`;;;```.;;;;;;'''';;;``;;;; ''  ,[[ 
-[[[   [[[[[[[[,/[[[' ,[[    \[[[['    [[[ `]]nnn]]' [[cccc  [[,/[[['  .c$P'  
-'$$c.    '$$$$$$$c   $$$,    $$$$     $$$  $$$''    $$''''  $$$$$c   d8MMMUP*
- `Y8bo,,,o8888b '88bo'888,__,8888   .d888  888o     888oo,__88b '88bo        
-   `'YMUP'YMMMM   'W'  'YMMMMP' 'YmMMMM''  YMMMb    ''''YUMMMMM   'W'        
-                                                    Now even Grouperer.      
-                                                    github.com/l0ss/Grouper2 
-                                                    @mikeloss                ";
-            string[] barfLines = barf.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+            string[] barfLines = new string[] {
+                @"  .,-:::::/::::::..      ..     ...   ::::::::::::..,::::::::::::..  ,;'``;. ",
+                @",;;-'````' ;;;``;;;;  .;;;;;;.  ;;    ;;;`;;;```.;;;;;;'''';;;``;;;; ''  ,[[ ",
+                @"[[[   [[[[[[[[,/[[[' ,[[    \[[[['    [[[ `]]nnn]]' [[cccc  [[,/[[['  .c$P'  ",
+                @"'$$c.    '$$$$$$$c   $$$,    $$$$     $$$  $$$''    $$''''  $$$$$c   d8MMMUP*",
+                @" `Y8bo,,,o8888b '88bo'888,__,8888   .d888  888o     888oo,__88b '88bo        ",
+                @"   `'YMUP'YMMMM   'W'  'YMMMMP' 'YmMMMM''  YMMMb    ''''YUMMMMM   'W'        ",
+                @"                                                    Now even Grouperer.      ",
+                @"                                                    github.com/l0ss/Grouper2 ",
+                @"                                                    @mikeloss                "
+            };
 
             ConsoleColor[] patternOne = { ConsoleColor.White, ConsoleColor.Yellow, ConsoleColor.Red, ConsoleColor.Red, ConsoleColor.DarkRed, ConsoleColor.DarkRed, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White };
             ConsoleColor[] patternTwo =
