@@ -553,7 +553,7 @@ namespace Grouper2
                 int faultedTaskCount = faultedTasks.Length;
                 int completeTaskCount = totalGpoTasksCount - incompleteTaskCount - faultedTaskCount;
                 Log.Progress(completeTaskCount, totalGpoTasksCount, faultedTaskCount);
-                remainingTaskCount = gpoTaskArray.Length;
+                remainingTaskCount = incompleteTasks.Length;
             }
         }
     }

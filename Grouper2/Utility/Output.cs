@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Alba.CsConsoleFormat;
 using Grouper2.Auditor;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Grouper2.Utility
@@ -51,7 +52,8 @@ namespace Grouper2.Utility
             // dump the json if we are in a basic output mode
             if (!plan.PrettyOutput && !plan.HtmlOut)
             {
-                Console.WriteLine(report.ToString());
+                string jsonReport = JsonConvert.SerializeObject(report, Formatting.Indented);
+                Console.WriteLine(jsonReport);
                 Console.Error.WriteLine(
                     "If you find yourself thinking 'wtf this is very ugly and hard to read', consider trying the -g argument.");
                 return;
@@ -60,7 +62,7 @@ namespace Grouper2.Utility
             
             // gotta add a line feed to make sure we're clear to write the nice output.
             Console.Error.WriteLine("\n");
-
+            /*
             if (this.HtmlOut)
             {
                 try
