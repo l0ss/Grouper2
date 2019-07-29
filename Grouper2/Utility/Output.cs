@@ -12,16 +12,17 @@ namespace Grouper2.Utility
         public static Document GetG2BannerDocument()
         {
             Document outputDocument = new Document();
-            string barf = @"  .,-:::::/::::::..      ..     ...   ::::::::::::..,::::::::::::..  ,;'``;. 
-,;;-'````' ;;;``;;;;  .;;;;;;.  ;;    ;;;`;;;```.;;;;;;'''';;;``;;;; ''  ,[[ 
-[[[   [[[[[[[[,/[[[' ,[[    \[[[['    [[[ `]]nnn]]' [[cccc  [[,/[[['  .c$P'  
-'$$c.    '$$$$$$$c   $$$,    $$$$     $$$  $$$''    $$''''  $$$$$c   d8MMMUP*
- `Y8bo,,,o8888b '88bo'888,__,8888   .d888  888o     888oo,__88b '88bo        
-   `'YMUP'YMMMM   'W'  'YMMMMP' 'YmMMMM''  YMMMb    ''''YUMMMMM   'W'        
-                                                    Now even Grouperer.      
-                                                    github.com/l0ss/Grouper2 
-                                                    @mikeloss                ";
-            string[] barfLines = barf.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+            string[] barfLines = new string[] {
+                @"  .,-:::::/::::::..      ..     ...   ::::::::::::..,::::::::::::..  ,;'``;. ",
+                @",;;-'````' ;;;``;;;;  .;;;;;;.  ;;    ;;;`;;;```.;;;;;;'''';;;``;;;; ''  ,[[ ",
+                @"[[[   [[[[[[[[,/[[[' ,[[    \[[[['    [[[ `]]nnn]]' [[cccc  [[,/[[['  .c$P'  ",
+                @"'$$c.    '$$$$$$$c   $$$,    $$$$     $$$  $$$''    $$''''  $$$$$c   d8MMMUP*",
+                @" `Y8bo,,,o8888b '88bo'888,__,8888   .d888  888o     888oo,__88b '88bo        ",
+                @"   `'YMUP'YMMMM   'W'  'YMMMMP' 'YmMMMM''  YMMMb    ''''YUMMMMM   'W'        ",
+                @"                                                    Now even Grouperer.      ",
+                @"                                                    github.com/l0ss/Grouper2 ",
+                @"                                                    @mikeloss                "
+            };
 
             ConsoleColor[] patternOne = { ConsoleColor.White, ConsoleColor.Yellow, ConsoleColor.Red, ConsoleColor.Red, ConsoleColor.DarkRed, ConsoleColor.DarkRed, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White };
             ConsoleColor[] patternTwo =
@@ -43,16 +44,14 @@ namespace Grouper2.Utility
             return outputDocument;
         }
 
-        public static void OutputAuditReport(AuditReport report)
+        public static void OutputAuditReport(AuditReport report, GrouperPlan plan)
         {
-            // TODO: Actually do the output of the report!!!!!!!!!!!
-            /*
-             * // Final output is finally happening finally here:
+            // Final output is finally happening finally here:
 
             // dump the json if we are in a basic output mode
-            if (!this.PrettyOutput && !this.HtmlOut)
+            if (!plan.PrettyOutput && !plan.HtmlOut)
             {
-                Console.WriteLine(this.Results.ToString());
+                Console.WriteLine(report.ToString());
                 Console.Error.WriteLine(
                     "If you find yourself thinking 'wtf this is very ugly and hard to read', consider trying the -g argument.");
                 return;
@@ -663,16 +662,17 @@ namespace Grouper2.Utility
 
         public static void PrintBanner()
         {
-            string barf = @"  .,-:::::/::::::..      ..     ...   ::::::::::::..,::::::::::::..  ,;'``;. 
-,;;-'````' ;;;``;;;;  .;;;;;;.  ;;    ;;;`;;;```.;;;;;;'''';;;``;;;; ''  ,[[ 
-[[[   [[[[[[[[,/[[[' ,[[    \[[[['    [[[ `]]nnn]]' [[cccc  [[,/[[['  .c$P'  
-'$$c.    '$$$$$$$c   $$$,    $$$$     $$$  $$$''    $$''''  $$$$$c   d8MMMUP*
- `Y8bo,,,o8888b '88bo'888,__,8888   .d888  888o     888oo,__88b '88bo        
-   `'YMUP'YMMMM   'W'  'YMMMMP' 'YmMMMM''  YMMMb    ''''YUMMMMM   'W'        
-                                                    Now even Grouperer.      
-                                                    github.com/l0ss/Grouper2 
-                                                    @mikeloss                ";
-            string[] barfLines = barf.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+            string[] barfLines = new string[] {
+                @"  .,-:::::/::::::..      ..     ...   ::::::::::::..,::::::::::::..  ,;'``;. ",
+                @",;;-'````' ;;;``;;;;  .;;;;;;.  ;;    ;;;`;;;```.;;;;;;'''';;;``;;;; ''  ,[[ ",
+                @"[[[   [[[[[[[[,/[[[' ,[[    \[[[['    [[[ `]]nnn]]' [[cccc  [[,/[[['  .c$P'  ",
+                @"'$$c.    '$$$$$$$c   $$$,    $$$$     $$$  $$$''    $$''''  $$$$$c   d8MMMUP*",
+                @" `Y8bo,,,o8888b '88bo'888,__,8888   .d888  888o     888oo,__88b '88bo        ",
+                @"   `'YMUP'YMMMM   'W'  'YMMMMP' 'YmMMMM''  YMMMb    ''''YUMMMMM   'W'        ",
+                @"                                                    Now even Grouperer.      ",
+                @"                                                    github.com/l0ss/Grouper2 ",
+                @"                                                    @mikeloss                "
+            };
 
             ConsoleColor[] patternOne = { ConsoleColor.White, ConsoleColor.Yellow, ConsoleColor.Red, ConsoleColor.Red, ConsoleColor.DarkRed, ConsoleColor.DarkRed, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White };
             ConsoleColor[] patternTwo =

@@ -193,22 +193,22 @@ namespace Grouper2.Auditor
                     }
                 }
 
-                JObject strongbad;
+                JObject schedTaskEmailAction;
                 try
                 {
-                    strongbad = scheduledTask["Properties"]["Task"]["Actions"]["SendEmail"] as JObject;
+                    schedTaskEmailAction = scheduledTask["Properties"]["Task"]["Actions"]["SendEmail"] as JObject;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
-                    strongbad = null;
+                    schedTaskEmailAction = null;
                 }
                 
 
-                if (strongbad != null)
+                if (schedTaskEmailAction != null)
                 {
                     string attachmentString =
                         JUtil.GetSafeString(
-                            strongbad, "File");
+                            schedTaskEmailAction, "File");
 
                     AuditedString attachment = null;
                     var settings = JankyDb.Vars;
@@ -222,13 +222,13 @@ namespace Grouper2.Auditor
                     }
                     
                     var emailSend = new SendEmailAction();
-                    emailSend.From = JUtil.GetSafeString(strongbad,"From");
-                    emailSend.To = JUtil.GetSafeString(strongbad, "To");
-                    emailSend.Subject = JUtil.GetSafeString(strongbad, "Subject");
-                    emailSend.Body = JUtil.GetSafeString(strongbad,"Body");
-                    emailSend.Headers = JUtil.GetSafeString(strongbad, "HeaderFields");
+                    emailSend.From = JUtil.GetSafeString(schedTaskEmailAction,"From");
+                    emailSend.To = JUtil.GetSafeString(schedTaskEmailAction, "To");
+                    emailSend.Subject = JUtil.GetSafeString(schedTaskEmailAction, "Subject");
+                    emailSend.Body = JUtil.GetSafeString(schedTaskEmailAction,"Body");
+                    emailSend.Headers = JUtil.GetSafeString(schedTaskEmailAction, "HeaderFields");
                     emailSend.Attachment = attachment;
-                    emailSend.Server = JUtil.GetSafeString(strongbad,"Server");
+                    emailSend.Server = JUtil.GetSafeString(schedTaskEmailAction,"Server");
 
                     assessedScheduledTask.Add(new 
                         JProperty("Action - Send Email", 
@@ -309,7 +309,7 @@ namespace Grouper2.Auditor
             {
                 Uid = uid,
                 Interest = interestLevel,
-                WORKAROUND = assessedScheduledTask
+                SchedTaskJObject = assessedScheduledTask
             };
 
             // only return the object if interest is high enough, otherwise null
