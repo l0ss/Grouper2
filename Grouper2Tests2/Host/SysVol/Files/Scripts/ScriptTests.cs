@@ -7,16 +7,16 @@ using System.Text;
 
 namespace Grouper2.Host.SysVol.Files.Tests
 {
-    [TestFixture()]
+    
     public class ScriptTests
     {
-        [Test()]
+        [Test(), Category("TODO")]
         public void ScriptTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void AuditTest()
         {
             Assert.Fail();

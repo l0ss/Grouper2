@@ -7,16 +7,16 @@ using System.Text;
 
 namespace Grouper2.Host.SysVol.Tests
 {
-    [TestFixture()]
+    
     public class GpoTests
     {
-        [Test()]
+        [Test(), Category("TODO")]
         public void GpoTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void UidFromPathTest()
         {
             Assert.Fail();

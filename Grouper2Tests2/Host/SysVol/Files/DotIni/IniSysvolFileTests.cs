@@ -7,22 +7,22 @@ using System.Text;
 
 namespace Grouper2.Host.SysVol.Files.Tests
 {
-    [TestFixture()]
+    
     public class IniSysvolFileTests
     {
-        [Test()]
+        [Test(), Category("TODO")]
         public void IniSysvolFileTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void GetScriptNumTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void ParseTest()
         {
             Assert.Fail();

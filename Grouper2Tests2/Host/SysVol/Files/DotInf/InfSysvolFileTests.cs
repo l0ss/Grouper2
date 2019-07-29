@@ -7,16 +7,16 @@ using System.Text;
 
 namespace Grouper2.Host.SysVol.Files.Tests
 {
-    [TestFixture()]
+    
     public class InfSysvolFileTests
     {
-        [Test()]
+        [Test(), Category("TODO")]
         public void InfSysvolFileTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void ParseAsJsonObjectTest()
         {
             Assert.Fail();

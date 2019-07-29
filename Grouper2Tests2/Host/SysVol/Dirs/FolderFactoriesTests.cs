@@ -7,16 +7,16 @@ using System.Text;
 
 namespace Grouper2.Host.SysVol.Tests
 {
-    [TestFixture()]
+    
     public class FolderFactoriesTests
     {
-        [Test()]
+        [Test(), Category("TODO")]
         public void ManufactureTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void MakeRootSysvolDirectoryTest()
         {
             Assert.Fail();

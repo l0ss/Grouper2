@@ -7,10 +7,9 @@ using System.Text;
 
 namespace Grouper2.Auditor.GrouperAuditor.Tests
 {
-    [TestFixture()]
     public class GrouperAuditorAssessRegKeysTests
     {
-        [Test()]
+        [Test(), Category("TODO")]
         public void AssessRegKeysTest()
         {
             Assert.Fail();

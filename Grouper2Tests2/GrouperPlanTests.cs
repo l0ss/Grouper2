@@ -7,10 +7,10 @@ using System.Text;
 
 namespace Grouper2.Tests
 {
-    [TestFixture()]
+    
     public class GrouperPlanTests
     {
-        [Test()]
+        [Test(), Category("TODO")]
         public void GrouperPlanTest()
         {
             // TODO: ensure that the correct flags are set based on the user provided **kwargs

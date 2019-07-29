@@ -7,7 +7,6 @@ using System.Text;
 
 namespace Grouper2.Utility.Extensions.Tests
 {
-    [TestFixture()]
     public class ExtensionsPwshRngTests
     {
         [Test()]
