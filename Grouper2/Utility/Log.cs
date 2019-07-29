@@ -33,6 +33,7 @@ namespace Grouper2.Utility
             
             lock (_lock)
             {
+                
                 Console.Error.Write("\r" + current.ToString() + "/" + total.ToString() +
                                     " jobs processed. " + percentage.ToString() + "% complete. ");
                 if (faulted > 0)
@@ -40,6 +41,8 @@ namespace Grouper2.Utility
                     Console.Error.Write(faulted.ToString() + " jobs failed.");
                 }
                 Console.Error.Write("");
+                
+
             }
         }
         

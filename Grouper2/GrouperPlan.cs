@@ -127,17 +127,10 @@ namespace Grouper2
             try
             {
                 parser.ParseCommandLine(args);
-                // Print help and exit here on help arg
-                if (helpArg.Parsed)
+                // extra checks to handle builtin behaviour from cmd line arg parser
+                if ((args.Contains("--help") || args.Contains("/?") || args.Contains("-h")))
                 {
-                    foreach (Argument arg in parser.Arguments)
-                    {
-                        Console.Error.Write("-");
-                        Console.Error.Write(arg.ShortName);
-                        Console.Error.Write(" " + arg.LongName);
-                        Console.Error.WriteLine(" - " + arg.Description);
-                    }
-
+                    parser.ShowUsage();
                     Environment.Exit(0);
                 }
 
@@ -560,7 +553,7 @@ namespace Grouper2
                 int faultedTaskCount = faultedTasks.Length;
                 int completeTaskCount = totalGpoTasksCount - incompleteTaskCount - faultedTaskCount;
                 Log.Progress(completeTaskCount, totalGpoTasksCount, faultedTaskCount);
-                remainingTaskCount = gpoTaskArray.Length;
+                remainingTaskCount = incompleteTasks.Length;
             }
         }
     }

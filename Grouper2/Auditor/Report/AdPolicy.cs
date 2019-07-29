@@ -195,7 +195,7 @@ namespace Grouper2.Auditor
         [JsonProperty("Action")] public string Action { get; set; }
         [JsonProperty("SID")] public string Sid { get; set; }
         [JsonProperty("Display Name From SID")] public string DisplayName { get; set; }
-        [JsonProperty("Quick Workaround")] public JObject WORKAROUND { get; set; }
+        [JsonProperty("Scheduled Task Details")] public JObject SchedTaskJObject { get; set; }
     }
     
     
