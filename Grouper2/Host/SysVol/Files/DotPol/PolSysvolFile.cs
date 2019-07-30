@@ -39,7 +39,7 @@ namespace Grouper2.Host.SysVol.Files
             return null;
         }
 
-        public DotPolFileContents GetFileData()
+        public DotPolFileContents GetPolFileData()
         {
             /*
              * The general idea here is to extract data from a ridiculous file.

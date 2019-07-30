@@ -13,7 +13,7 @@ namespace Grouper2.Auditor
             DotPolFileContents data;
             try
             {
-                data = file.GetFileData();
+                data = file.GetPolFileData();
             }
             catch (Exception e)
             {
