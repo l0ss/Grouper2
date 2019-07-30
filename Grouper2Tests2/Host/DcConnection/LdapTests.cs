@@ -7,22 +7,21 @@ using System.Text;
 
 namespace Grouper2.Host.DcConnection.Tests
 {
-    [TestFixture()]
     public class LdapTests
     {
-        [Test()]
+        [Test(), Category("TODO")]
         public void UseTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void GetTrusteeKvpTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void GetUserFromSidTest()
         {
             Assert.Fail();

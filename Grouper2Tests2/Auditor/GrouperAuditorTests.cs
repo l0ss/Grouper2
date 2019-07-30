@@ -7,28 +7,27 @@ using System.Text;
 
 namespace Grouper2.Auditor.Tests
 {
-    [TestFixture()]
     public class GrouperAuditorTests
     {
-        [Test()]
+        [Test(), Category("TODO")]
         public void GrouperAuditorTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void GetReportTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void AuditTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void AssessSysAccessTest()
         {
             Assert.Fail();

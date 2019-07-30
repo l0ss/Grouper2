@@ -5,7 +5,6 @@ using NUnit.Framework;
 
 namespace Grouper2Tests2.Host
 {
-    [TestFixture]
     public class SidTests
     {
         [Test]

@@ -7,16 +7,16 @@ using System.Text;
 
 namespace Grouper2.Host.SysVol.Files.Unwanted.Tests
 {
-    [TestFixture()]
+    
     public class UnwantedFileTests
     {
-        [Test()]
+        [Test(), Category("TODO")]
         public void UnwantedFileTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void DaclsTest()
         {
             Assert.Fail();

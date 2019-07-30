@@ -7,64 +7,64 @@ using System.Text;
 
 namespace Grouper2.Utility.Tests
 {
-    [TestFixture()]
+    
     public class FileSystemTests
     {
-        [Test()]
+        [Test(), Category("TODO")]
         public void FindFilePathsInStringTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void InvestigateStringTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void IsValidPathTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void GetFileDaclJObjectTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void InvestigatePathTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void GetInterestingWordsFromFileTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void GetParentDirPathTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void DoesFileExistTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void DoesDirExistTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void InvestigateFileContentsTest()
         {
             Assert.Fail();

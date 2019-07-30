@@ -7,10 +7,10 @@ using System.Text;
 
 namespace Grouper2.Host.SysVol.Tests
 {
-    [TestFixture()]
+    
     public class SysvolRootTests
     {
-        [Test()]
+        [Test(), Category("TODO")]
         public void SysvolRootTest()
         {
             Assert.Fail();

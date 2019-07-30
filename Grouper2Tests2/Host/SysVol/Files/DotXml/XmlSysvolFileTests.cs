@@ -7,16 +7,16 @@ using System.Text;
 
 namespace Grouper2.Host.SysVol.Files.Tests
 {
-    [TestFixture()]
+    
     public class XmlSysvolFileTests
     {
-        [Test()]
+        [Test(), Category("TODO")]
         public void XmlSysvolFileTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void ReadDataTest()
         {
             Assert.Fail();

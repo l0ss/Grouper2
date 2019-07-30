@@ -7,34 +7,34 @@ using System.Text;
 
 namespace Grouper2.Host.SysVol.SysvolMapper.Tests
 {
-    [TestFixture()]
+    
     public class TreeNodeTests
     {
-        [Test()]
+        [Test(), Category("TODO")]
         public void TreeNodeTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void AddChildTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void ToStringTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void FindTreeNodeTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void GetEnumeratorTest()
         {
             Assert.Fail();

@@ -7,28 +7,27 @@ using System.Text;
 
 namespace Grouper2.Host.Tests
 {
-    [TestFixture()]
     public class CurrentUserTests
     {
-        [Test()]
+        [Test(), Category("TODO")]
         public void CanReadFromTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void CanWriteToTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void HasAccessTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void HasAccessTest1()
         {
             Assert.Fail();
