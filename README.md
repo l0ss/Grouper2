@@ -74,13 +74,22 @@ In this one you can see that someone's done something absolutely insane to the A
 
 You get the picture.
 
-## What remains to be done?
+## How can I help?
 
-Stuff. Have a look in the Issues for the repo and just start chewing I guess.
-If you want to discuss via Slack you can ping me (l0ss) on the BloodHound Slack, joinable at https://bloodhoundgang.herokuapp.com/.
+Look at the dev branch, Sh3r4 has been working on a big refactor to make it easier to maintain and more efficient going forward.
+
+A rough roadmap ATM is:
+
+ - Get dev branch functioning at least as well as master does.
+   - If you want to help with this, look at issues tagged 'dev'.
+ - Finish basic unit tests of assessment and interest-level code blocks.
+ - Bring the big refactor over to master.
+ - Start actually working on the other issues and features and whatnot.
+
+If you want to discuss via Slack you can ping me (@l0ss) on the BloodHound Slack, joinable at https://bloodhoundgang.herokuapp.com/, or chat with a group of contributors in the #Grouper channel.
 
 ## Credits and Thanks
-
+ - Huge thanks to Sh3r4 for all her help, I have no idea how to write code and it would show way worse without her.
  - Much assistance and code cleanup from @liamosaur
  - SDDL parsing from https://github.com/zacateras/
  - Thanks to @skorov8 for providing some useful registry key data.
