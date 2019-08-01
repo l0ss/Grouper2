@@ -7,10 +7,10 @@ using System.Text;
 
 namespace Grouper2.Utility.Tests
 {
-    [TestFixture()]
+    
     public class ExtensionsTests
     {
-        [Test()]
+        [Test(), Category("TODO")]
         public void SliceTest()
         {
             Assert.Fail();

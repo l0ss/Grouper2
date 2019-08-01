@@ -7,28 +7,28 @@ using System.Text;
 
 namespace Grouper2.Utility.Tests
 {
-    [TestFixture()]
+    
     public class UtilTests
     {
-        [Test()]
+        [Test(), Category("TODO")]
         public void DedupeListTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void IsEmptyOrWhiteSpaceTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void IndexOfNthTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void DecryptCpasswordTest()
         {
             Assert.Fail();

@@ -7,34 +7,34 @@ using System.Text;
 
 namespace Grouper2.Utility.Tests
 {
-    [TestFixture()]
+    
     public class JUtilTests
     {
-        [Test()]
+        [Test(), Category("TODO")]
         public void GetSafeJPropTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void GetSafeJPropTest1()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void GetSafeJPropTest2()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void GetSafeStringTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void GetActionStringTest()
         {
             Assert.Fail();

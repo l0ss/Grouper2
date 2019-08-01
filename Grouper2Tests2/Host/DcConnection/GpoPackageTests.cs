@@ -7,10 +7,9 @@ using System.Text;
 
 namespace Grouper2.Host.DcConnection.Tests
 {
-    [TestFixture()]
     public class GpoPackageTests
     {
-        [Test()]
+        [Test(), Category("TODO")]
         public void GpoPackageTest()
         {
             Assert.Fail();

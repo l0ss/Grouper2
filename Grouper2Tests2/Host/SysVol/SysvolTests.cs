@@ -7,34 +7,34 @@ using System.Text;
 
 namespace Grouper2.Host.SysVol.Tests
 {
-    [TestFixture()]
+    
     public class SysvolTests
     {
-        [Test()]
+        [Test(), Category("TODO")]
         public void GetMapTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void GetImmediateChildFilesTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void GetImmediateChildDirsTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void GetRecursiveChildFilesTest()
         {
             Assert.Fail();
         }
 
-        [Test()]
+        [Test(), Category("TODO")]
         public void GetRecursiveChildDirsTest()
         {
             Assert.Fail();
