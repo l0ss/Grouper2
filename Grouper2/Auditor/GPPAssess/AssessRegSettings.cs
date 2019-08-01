@@ -27,29 +27,34 @@ namespace Grouper2.Auditor
 
             AuditedGppXmlRegSettings assessedGppRegSettingsOut = new AuditedGppXmlRegSettings();
 
-            if (gppCategory["Collection"] != null)
+            if (gppCategory["RegistrySettings"] != null)
             {
-                Dictionary<string, AuditedGppXmlRegCollection> assessedGppRegCollections = GetAssessedRegistryCollections(gppCategory["Collection"]);
-                if (assessedGppRegCollections != null)
-                {
-                    assessedGppRegSettingsOut.RegCollections = assessedGppRegCollections;
-                }
-            }
+                JToken gppRegistrySettings = gppCategory["RegistrySettings"];
 
-            if (gppCategory["Registry"] != null)
-            {
-                Dictionary<string, AuditedGppXmlRegSetting> assessedGppRegSettingses = GetAssessedRegistrySettingses(gppCategory["Registry"]);
-                if (assessedGppRegSettingses != null)
+                if (gppRegistrySettings["Collection"] != null)
                 {
-                    assessedGppRegSettingsOut.RegSetting = assessedGppRegSettingses;
+                    Dictionary<string, AuditedGppXmlRegCollection> assessedGppRegCollections =
+                        GetAssessedRegistryCollections(gppRegistrySettings["Collection"]);
+                    if (assessedGppRegCollections != null)
+                    {
+                        assessedGppRegSettingsOut.RegCollections = assessedGppRegCollections;
+                    }
                 }
-            }
 
-            // only return if there is something there, otherwise, null it
-            if (assessedGppRegSettingsOut.RegCollections.Count > 0 || assessedGppRegSettingsOut.RegSetting.Count > 0)
-            {
+                if (gppRegistrySettings["Registry"] != null)
+                {
+                    Dictionary<string, AuditedGppXmlRegSetting> assessedGppRegSettingses =
+                        GetAssessedRegistrySettingses(gppRegistrySettings["Registry"]);
+                    if (assessedGppRegSettingses != null)
+                    {
+                        assessedGppRegSettingsOut.RegSetting = assessedGppRegSettingses;
+                    }
+                }
+
                 return assessedGppRegSettingsOut;
+
             }
+
             return null;
         }
         

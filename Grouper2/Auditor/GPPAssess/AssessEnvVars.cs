@@ -29,8 +29,6 @@ namespace Grouper2.Auditor
             if (assessedGppEvs.Interest < this.InterestLevel)
                 return null;
 
-
-
             if (gppCategory["EnvironmentVariables"]["EnvironmentVariable"] is JArray)
             {
                 foreach (JToken gppEv in gppCategory["EnvironmentVariables"]["EnvironmentVariable"])
