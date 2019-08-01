@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using Alba.CsConsoleFormat;
 using Grouper2.Auditor;
 using Newtonsoft.Json;
@@ -17,17 +18,21 @@ namespace Grouper2.Utility
         {
             // Final output is finally happening finally here:
 
+            Console.Error.WriteLine("Baking it all into a big wad of JSON...");
+
+            // We make the json format either way cos we're going to use it to create the pretty version.
+            string jsonReportStr = JsonConvert.SerializeObject(report,
+                Newtonsoft.Json.Formatting.Indented,
+                new JsonSerializerSettings
+                {
+                    ContractResolver = new ShouldSerializeContractResolver(),
+                    NullValueHandling = NullValueHandling.Ignore
+                });
+
             // dump the json if we are in a basic output mode
             if (!plan.PrettyOutput && !plan.HtmlOut)
             {
-                string jsonReport = JsonConvert.SerializeObject(report,
-                    Newtonsoft.Json.Formatting.Indented,
-                    new JsonSerializerSettings
-                    {
-                        ContractResolver = new ShouldSerializeContractResolver(),
-                        NullValueHandling = NullValueHandling.Ignore
-                    });
-                Console.WriteLine(jsonReport);
+                Console.WriteLine(jsonReportStr);
                 Console.Error.WriteLine(
                     "If you find yourself thinking 'wtf this is very ugly and hard to read', consider trying the -g argument.");
                 return;
@@ -36,8 +41,10 @@ namespace Grouper2.Utility
             
             // gotta add a line feed to make sure we're clear to write the nice output.
             Console.Error.WriteLine("\n");
-            /*
-            if (this.HtmlOut)
+            
+            JObject jsonReport = JObject.Parse(jsonReportStr);
+
+            if (plan.HtmlOut)
             {
                 try
                 {
@@ -47,34 +54,40 @@ namespace Grouper2.Utility
 
                     htmlDoc.Children.Add(Output.GetG2BannerDocument());
 
-                    foreach (KeyValuePair<string, JToken> gpo in this.Results)
+                    //TODO handle policies that aren't current!
+
+                    JObject currentPolicies = JObject.FromObject(jsonReport);
+
+                    foreach (KeyValuePair<string, JToken> gpo in currentPolicies)
                     {
                         htmlDoc.Children.Add(Output.GetAssessedGpoOutput(gpo));
                     }
 
                     ConsoleRenderer.RenderDocument(htmlDoc,
-                        new HtmlRenderTarget( System.IO.File.Create(this.HtmlOutPath), new UTF8Encoding(false)));
+                        new HtmlRenderTarget( System.IO.File.Create(plan.HtmlOutPath), new UTF8Encoding(false)));
                 }
                 catch (UnauthorizedAccessException)
                 {
                     Console.Error.WriteLine("Tried to write html output file but I'm not allowed.");
                 }
             }
-
-            if (this.PrettyOutput)
+            
+            if (plan.PrettyOutput)
             {
                 Document prettyDoc = new Document();
 
                 prettyDoc.Children.Add(Output.GetG2BannerDocument());
 
-                foreach (KeyValuePair<string, JToken> gpo in this.Results)
+                //TODO handle policies that aren't current!
+                JObject currentPolicies = JObject.FromObject(jsonReport);
+
+                foreach (KeyValuePair<string, JToken> gpo in currentPolicies)
                 {
                     prettyDoc.Children.Add(Output.GetAssessedGpoOutput(gpo));
                 }
 
                 ConsoleRenderer.RenderDocument(prettyDoc);
             }
-             */
         }
 
         public static Document GetAssessedGpoOutput (KeyValuePair<string, JToken> inputKvp)
