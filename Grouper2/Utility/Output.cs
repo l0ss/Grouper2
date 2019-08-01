@@ -1,50 +1,18 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Alba.CsConsoleFormat;
 using Grouper2.Auditor;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 
 namespace Grouper2.Utility
 {
     class Output
     {
-        public static Document GetG2BannerDocument()
-        {
-            Document outputDocument = new Document();
-            string[] barfLines = new string[] {
-                @"  .,-:::::/::::::..      ..     ...   ::::::::::::..,::::::::::::..  ,;'``;. ",
-                @",;;-'````' ;;;``;;;;  .;;;;;;.  ;;    ;;;`;;;```.;;;;;;'''';;;``;;;; ''  ,[[ ",
-                @"[[[   [[[[[[[[,/[[[' ,[[    \[[[['    [[[ `]]nnn]]' [[cccc  [[,/[[['  .c$P'  ",
-                @"'$$c.    '$$$$$$$c   $$$,    $$$$     $$$  $$$''    $$''''  $$$$$c   d8MMMUP*",
-                @" `Y8bo,,,o8888b '88bo'888,__,8888   .d888  888o     888oo,__88b '88bo        ",
-                @"   `'YMUP'YMMMM   'W'  'YMMMMP' 'YmMMMM''  YMMMb    ''''YUMMMMM   'W'        ",
-                @"                                                    Now even Grouperer.      ",
-                @"                                                    github.com/l0ss/Grouper2 ",
-                @"                                                    @mikeloss                "
-            };
-
-            ConsoleColor[] patternOne = { ConsoleColor.White, ConsoleColor.Yellow, ConsoleColor.Red, ConsoleColor.Red, ConsoleColor.DarkRed, ConsoleColor.DarkRed, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White };
-            ConsoleColor[] patternTwo =
-            {
-                ConsoleColor.White, ConsoleColor.Cyan, ConsoleColor.Blue, ConsoleColor.DarkBlue, ConsoleColor.White,
-                ConsoleColor.White, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White
-            };
-            int i = 0;
-            foreach (string barfLine in barfLines)
-            {
-                string barfOne = barfLine.Substring(0, 69);
-                string barfTwo = barfLine.Substring(69, 8);
-                outputDocument.Children.Add(
-                    new Span(barfOne) { Color = patternOne[i] }, new Span(barfTwo) { Color = patternTwo[i] }, "\n"
-                );
-                i += 1;
-            }
-
-            return outputDocument;
-        }
-
         public static void OutputAuditReport(AuditReport report, GrouperPlan plan)
         {
             // Final output is finally happening finally here:
@@ -52,7 +20,13 @@ namespace Grouper2.Utility
             // dump the json if we are in a basic output mode
             if (!plan.PrettyOutput && !plan.HtmlOut)
             {
-                string jsonReport = JsonConvert.SerializeObject(report, Formatting.Indented);
+                string jsonReport = JsonConvert.SerializeObject(report,
+                    Newtonsoft.Json.Formatting.Indented,
+                    new JsonSerializerSettings
+                    {
+                        ContractResolver = new ShouldSerializeContractResolver(),
+                        NullValueHandling = NullValueHandling.Ignore
+                    });
                 Console.WriteLine(jsonReport);
                 Console.Error.WriteLine(
                     "If you find yourself thinking 'wtf this is very ugly and hard to read', consider trying the -g argument.");
@@ -691,6 +665,80 @@ namespace Grouper2.Utility
                 WriteColorLine(barfTwo, patternTwo[i]);
                 i += 1;
             }
+        }
+
+        public static Document GetG2BannerDocument()
+        {
+            Document outputDocument = new Document();
+            string[] barfLines = new string[] {
+                @"  .,-:::::/::::::..      ..     ...   ::::::::::::..,::::::::::::..  ,;'``;. ",
+                @",;;-'````' ;;;``;;;;  .;;;;;;.  ;;    ;;;`;;;```.;;;;;;'''';;;``;;;; ''  ,[[ ",
+                @"[[[   [[[[[[[[,/[[[' ,[[    \[[[['    [[[ `]]nnn]]' [[cccc  [[,/[[['  .c$P'  ",
+                @"'$$c.    '$$$$$$$c   $$$,    $$$$     $$$  $$$''    $$''''  $$$$$c   d8MMMUP*",
+                @" `Y8bo,,,o8888b '88bo'888,__,8888   .d888  888o     888oo,__88b '88bo        ",
+                @"   `'YMUP'YMMMM   'W'  'YMMMMP' 'YmMMMM''  YMMMb    ''''YUMMMMM   'W'        ",
+                @"                                                    Now even Grouperer.      ",
+                @"                                                    github.com/l0ss/Grouper2 ",
+                @"                                                    @mikeloss                "
+            };
+
+            ConsoleColor[] patternOne = { ConsoleColor.White, ConsoleColor.Yellow, ConsoleColor.Red, ConsoleColor.Red, ConsoleColor.DarkRed, ConsoleColor.DarkRed, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White };
+            ConsoleColor[] patternTwo =
+            {
+                ConsoleColor.White, ConsoleColor.Cyan, ConsoleColor.Blue, ConsoleColor.DarkBlue, ConsoleColor.White,
+                ConsoleColor.White, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White, ConsoleColor.White
+            };
+            int i = 0;
+            foreach (string barfLine in barfLines)
+            {
+                string barfOne = barfLine.Substring(0, 69);
+                string barfTwo = barfLine.Substring(69, 8);
+                outputDocument.Children.Add(
+                    new Span(barfOne) { Color = patternOne[i] }, new Span(barfTwo) { Color = patternTwo[i] }, "\n"
+                );
+                i += 1;
+            }
+
+            return outputDocument;
+        }
+    }
+    public class ShouldSerializeContractResolver : DefaultContractResolver
+    {
+        public new static readonly ShouldSerializeContractResolver Instance = new ShouldSerializeContractResolver();
+        protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
+        {
+            var property = base.CreateProperty(member, memberSerialization);
+
+            if (property.PropertyType != typeof(string) &&
+                typeof(IEnumerable).IsAssignableFrom(property.PropertyType))
+            {
+                property.ShouldSerialize = instance =>
+                {
+                    IEnumerable enumerable = null;
+                    // this value could be in a public field or public property
+                    switch (member.MemberType)
+                    {
+                        case MemberTypes.Property:
+                            enumerable = instance
+                                .GetType()
+                                .GetProperty(member.Name)
+                                ?.GetValue(instance, null) as IEnumerable;
+                            break;
+                        case MemberTypes.Field:
+                            enumerable = instance
+                                .GetType()
+                                .GetField(member.Name)
+                                .GetValue(instance) as IEnumerable;
+                            break;
+                    }
+
+                    return enumerable == null ||
+                           enumerable.GetEnumerator().MoveNext();
+                    // if the list is null, we defer the decision to NullValueHandling
+                };
+            }
+
+            return property;
         }
     }
 }
