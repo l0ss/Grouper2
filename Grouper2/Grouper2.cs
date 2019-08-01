@@ -38,6 +38,5 @@ namespace Grouper2
             Console.ReadKey();
 #endif
         }
-
     }
 }
