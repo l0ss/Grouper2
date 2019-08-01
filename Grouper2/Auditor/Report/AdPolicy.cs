@@ -261,16 +261,6 @@ namespace Grouper2.Auditor
         [JsonProperty("Args")] public AuditedString Args { get; set; }
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
     public class AuditedScriptsDotIni : Finding
     {

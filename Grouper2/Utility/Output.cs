@@ -29,6 +29,8 @@ namespace Grouper2.Utility
                     NullValueHandling = NullValueHandling.Ignore
                 });
 
+            Console.WriteLine(jsonReportStr);
+
             // dump the json if we are in a basic output mode
             if (!plan.PrettyOutput && !plan.HtmlOut)
             {
@@ -79,7 +81,7 @@ namespace Grouper2.Utility
                 prettyDoc.Children.Add(Output.GetG2BannerDocument());
 
                 //TODO handle policies that aren't current!
-                JObject currentPolicies = JObject.FromObject(jsonReport);
+                JObject currentPolicies = JObject.FromObject(jsonReport["CurrentPolicies"]);
 
                 foreach (KeyValuePair<string, JToken> gpo in currentPolicies)
                 {
@@ -519,11 +521,12 @@ namespace Grouper2.Utility
                     }
                     if (cat.Key == "Scripts")
                     {
+                        Console.WriteLine(cat.Value.ToString());
                         findingsDocument.Children.Add(
                             new Span("Scripts") { Color = findingColor }, "\n",
                             new Span("~~~~~~~") { Color = findingColor }
                         );
-                        foreach (JProperty scriptFindings in cat.Value)
+                        foreach (JProperty scriptFindings in cat.Value["Scripts"]["Interesting Findings"])
                         {
                             foreach (JProperty scriptFinding in scriptFindings.Value)
                             {

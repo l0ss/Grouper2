@@ -104,6 +104,15 @@ namespace Grouper2.Auditor
                 {
                     Output.DebugWrite(e.ToString());
                 }
+            else
+            {
+                gpoReport.GpoProperties.Created = "Unknown";
+                gpoReport.GpoProperties.DistinguishedName = "Unknown";
+                gpoReport.GpoProperties.EnabledStatus = "Unknown";
+                gpoReport.GpoProperties.Name = "Unknown";
+                gpoReport.GpoProperties.AclsReport = new JObject();
+                gpoReport.GpoPackages = new List<GpoPackage>();
+            }
 
             // add this gpo to the final report
             AuditReport.AddPolicyReport(gpo.Path, gpoReport);
