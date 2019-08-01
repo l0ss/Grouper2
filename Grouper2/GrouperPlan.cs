@@ -356,7 +356,9 @@ namespace Grouper2
                 Console.Error.WriteLine("\nSomething went wrong with parsing the path to sysvol and I gave up.");
                 Environment.Exit(1);
             }
-            
+
+            this.Domain = currentDomainString;
+
             // push some vars into the jankydb for singleton bullshit
             JankyDb.Vars = new SingletonVars(
                 this.SysVolDir, 
