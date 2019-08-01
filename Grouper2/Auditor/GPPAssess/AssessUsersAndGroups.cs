@@ -22,14 +22,27 @@ namespace Grouper2.Auditor
         private AuditedGppXmlGroups GetAssessedGroups(JObject gppCategory)
         {
             AuditedGppXmlGroups ret = new AuditedGppXmlGroups();
-
-            // first groups
-            if (gppCategory["Group"] != null)
+            if (gppCategory["Groups"] != null)
             {
-                if (gppCategory["Group"] is JArray)
+                JToken gppGroups = gppCategory["Groups"]; 
+
+                // first groups
+                if (gppGroups["Group"] != null)
                 {
-                    foreach (JObject gppGroup in gppCategory["Group"])
+                    if (gppGroups["Group"] is JArray)
                     {
+                        foreach (JObject gppGroup in gppGroups["Group"])
+                        {
+                            AuditedGppXmlGroupsGroup assessedGroup = GetAssessedGroup(gppGroup);
+                            if (assessedGroup != null)
+                            {
+                                ret.Groups.Add(gppGroup["@uid"].ToString(), assessedGroup);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        JObject gppGroup = (JObject) JToken.FromObject(gppGroups["Group"]);
                         AuditedGppXmlGroupsGroup assessedGroup = GetAssessedGroup(gppGroup);
                         if (assessedGroup != null)
                         {
@@ -37,39 +50,30 @@ namespace Grouper2.Auditor
                         }
                     }
                 }
-                else
-                {
-                    JObject gppGroup = (JObject) JToken.FromObject(gppCategory["Group"]);
-                    AuditedGppXmlGroupsGroup assessedGroup = GetAssessedGroup(gppGroup);
-                    if (assessedGroup != null)
-                    {
-                        ret.Groups.Add(gppGroup["@uid"].ToString(), assessedGroup);
-                    }
-                }
-            }
 
-            // now users
-            if (gppCategory["User"] != null)
-            {
-                if (gppCategory["User"] is JArray)
+                // now users
+                if (gppGroups["User"] != null)
                 {
-                    foreach (JToken jToken in gppCategory["User"])
+                    if (gppGroups["User"] is JArray)
                     {
-                        JObject gppUser = (JObject) jToken;
+                        foreach (JToken jToken in gppGroups["User"])
+                        {
+                            JObject gppUser = (JObject) jToken;
+                            AuditedGppXmlGroupsUser assessedUser = GetAssessedUser(gppUser);
+                            if (assessedUser != null)
+                            {
+                                ret.Users.Add(gppUser["@uid"].ToString(), assessedUser);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        JObject gppUser = (JObject) JToken.FromObject(gppGroups["User"]);
                         AuditedGppXmlGroupsUser assessedUser = GetAssessedUser(gppUser);
                         if (assessedUser != null)
                         {
                             ret.Users.Add(gppUser["@uid"].ToString(), assessedUser);
                         }
-                    }
-                }
-                else
-                {
-                    JObject gppUser = (JObject) JToken.FromObject(gppCategory["User"]);
-                    AuditedGppXmlGroupsUser assessedUser = GetAssessedUser(gppUser);
-                    if (assessedUser != null)
-                    {
-                        ret.Users.Add(gppUser["@uid"].ToString(), assessedUser);
                     }
                 }
             }
