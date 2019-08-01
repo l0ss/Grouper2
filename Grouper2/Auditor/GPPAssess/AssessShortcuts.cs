@@ -16,57 +16,68 @@ namespace Grouper2.Auditor
         {
             if (file == null) 
                 throw new ArgumentNullException(nameof(file));
+
             return GetAssessedShortcuts(file.JankyXmlStuff);
         }
         private AuditedShortcuts GetAssessedShortcuts(JObject gppCategory)
         {
             AuditedShortcuts shortcuts = new AuditedShortcuts();
 
-            if (gppCategory["Shortcut"] is JArray)
+            if (gppCategory["Shortcuts"] != null)
             {
-                foreach (JToken gppShortcuts in gppCategory["Shortcut"])
+                JToken gppShortcutsBlob = gppCategory["Shortcuts"];
+
+                if (gppShortcutsBlob["Shortcut"] is JArray)
                 {
-                    try
+                    foreach (JToken gppShortcuts in gppShortcutsBlob["Shortcut"])
                     {
-                        AuditedShortcut assessedShortcut = GetAssessedShortcut(gppShortcuts as JObject);
-                        if (assessedShortcut != null)
+                        try
                         {
-                            shortcuts.Contents.Add(gppShortcuts["@uid"].ToString(), assessedShortcut);
+                            AuditedShortcut assessedShortcut = GetAssessedShortcut(gppShortcuts as JObject);
+                            if (assessedShortcut != null)
+                            {
+                                shortcuts.Contents.Add(gppShortcuts["@uid"].ToString(), assessedShortcut);
+                            }
                         }
-                    }
-                    catch (Exception e)
-                    {
-                        Log.Degub($"unable to assess or add to the dict {shortcuts.Contents.ToString()}", e, this);
-                        continue;
+                        catch (Exception e)
+                        {
+                            Log.Degub($"unable to assess or add to the dict {shortcuts.Contents.ToString()}", e, this);
+                            continue;
+                        }
                     }
                 }
-            }
-            else
-            {
-                if (gppCategory["Shortcut"] != null)
+                else
                 {
-                    JObject gppShortcuts = (JObject)JToken.FromObject(gppCategory["Shortcut"]);
-                    try
+                    if (gppShortcutsBlob["Shortcut"] != null)
                     {
-                        AuditedShortcut assessedShortcut = GetAssessedShortcut(gppShortcuts as JObject);
-                        if (assessedShortcut != null)
+                        JObject gppShortcuts = (JObject) JToken.FromObject(gppShortcutsBlob["Shortcut"]);
+                        try
                         {
-                            shortcuts.Contents.Add(gppShortcuts["@uid"].ToString(), assessedShortcut);
+                            AuditedShortcut assessedShortcut = GetAssessedShortcut(gppShortcuts as JObject);
+                            if (assessedShortcut != null)
+                            {
+                                shortcuts.Contents.Add(gppShortcuts["@uid"].ToString(), assessedShortcut);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Log.Degub($"unable to assess or add to the dict {shortcuts.Contents.ToString()}", e, this);
+                            return null;
                         }
                     }
-                    catch (Exception e)
-                    {
-                        Log.Degub($"unable to assess or add to the dict {shortcuts.Contents.ToString()}", e, this);
-                        return null;
-                    }
+                }
+
+                if (shortcuts.Contents != null && shortcuts.Contents.Count > 0)
+                {
+                    return shortcuts;
+                }
+                else
+                {
+                    return null;
                 }
             }
 
-            if (shortcuts.Contents != null && shortcuts.Contents.Count > 0) {
-                return shortcuts;
-            } else {
-                return null;
-            }
+            return null;
         }
 
         private AuditedShortcut GetAssessedShortcut(JObject gppShortcut)
