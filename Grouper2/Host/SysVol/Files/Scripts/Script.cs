@@ -22,7 +22,7 @@ namespace Grouper2.Host.SysVol.Files
             // get the file info so we can check size
             FileInfo scriptFileInfo = new FileInfo(this.Path);
             // if it's not too big
-            if (scriptFileInfo.Length >= 200000) return null;
+            if (scriptFileInfo.Length >= 100000) return null;
 
             // feed the whole thing through Utility.InvestigateFileContents
             investigatedScript.Contents = FileSystem.InvestigateFileContents(this.Path, JankyDb.Vars.Interest);

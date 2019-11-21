@@ -112,7 +112,7 @@ namespace Grouper2.Auditor
                             try
                             {
                                 // audit the cmdline
-                                var cmdLine = GetCmdData(prop.Key);
+                                var cmdLine = GetCmdData(prop.Value);
 
                                 if (cmdLine != null && script.Commandline == null)
                                 {

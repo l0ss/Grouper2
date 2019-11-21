@@ -400,7 +400,8 @@ namespace Grouper2
             this.Auditor = new GrouperAuditor();
 
             // prep the GPOs for analysis
-            Console.Error.WriteLine(Environment.NewLine + sysvol.map.Children.Where(n => n.Data.Type == SysvolObjectType.GpoDirectory) + " GPOs to process.");
+            int numGpos = (sysvol.map.Descendants.Where(n => n.Data.Type == SysvolObjectType.GpoDirectory)).Count();
+            Console.Error.WriteLine(Environment.NewLine + numGpos.ToString() + " GPOs to process.");
             Console.Error.WriteLine(Environment.NewLine + "Starting processing GPOs with " +
                                     this.MaxThreads.ToString() + " threads.");
             // conduct the audit
@@ -460,6 +461,9 @@ namespace Grouper2
             gpoWaitGroup = new List<Task>();
 
             // get a list of all the machine folder files and make tasks
+
+            Console.Error.Write("\n\nMapping SYSVOL Policy dirs...\n\n");
+
             foreach (SysvolMapper.TreeNode<DaclProvider> node in sysvol.map.Where(n => n.IsRoot != true &&
                 n.Parent.Data.Type == SysvolObjectType.GpoDirectory))
             {
@@ -504,7 +508,7 @@ namespace Grouper2
             // if the map contains data about scripts
             if (!this.NoGrepScripts)
             {
-                Console.Error.Write("\n\nProcessing SYSVOL script dirs.\n\n");
+                Console.Error.Write("\n\nMapping SYSVOL script dirs.\n\n");
                 // iterate the folders we  marked as script directories
                 foreach (SysvolMapper.TreeNode<DaclProvider> scriptdirNode
                     in sysvol.map.Children.Where(n => n.Data.Type == SysvolObjectType.ScriptDirectory))
@@ -522,7 +526,6 @@ namespace Grouper2
                 }
             }
 
-
             // wait for tasks to finish
             // put 'em all in a happy little array
             ReportingLoop(gpoWaitGroup.ToArray());
@@ -533,8 +536,11 @@ namespace Grouper2
 
             // TODO: take the tasks from the bag and put them in the correct places
 
-            Console.Error.WriteLine("Errors in processing GPOs:");
-            Console.Error.WriteLine(taskErrors.ToString());
+            if (taskErrors.Count > 0)
+            {
+                Console.Error.WriteLine("Errors in processing GPOs:");
+                Console.Error.WriteLine(taskErrors.ToString());
+            }
         }
 
         private void ReportingLoop(Task[] gpoTaskArray)
@@ -552,7 +558,7 @@ namespace Grouper2
                     element => element.Status == TaskStatus.Faulted);
                 int faultedTaskCount = faultedTasks.Length;
                 int completeTaskCount = totalGpoTasksCount - incompleteTaskCount - faultedTaskCount;
-                Log.Progress(completeTaskCount, totalGpoTasksCount, faultedTaskCount);
+                Log.Progress(totalGpoTasksCount, completeTaskCount, faultedTaskCount);
                 remainingTaskCount = incompleteTasks.Length;
             }
         }

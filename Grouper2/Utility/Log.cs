@@ -28,8 +28,11 @@ namespace Grouper2.Utility
 #endif
 
         public static void Progress(int total, int current, int faulted = 0) {
-            
-            int percentage = (int)Math.Round((double)(100 * current) / total);
+
+            Double dubTotal = (double)total;
+            Double dubCurrent = (double)current;
+
+            int percentage = (int)Math.Round(100 * (dubCurrent / dubTotal));
             
             lock (_lock)
             {

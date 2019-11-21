@@ -526,9 +526,10 @@ namespace Grouper2.Utility
                             new Span("Scripts") { Color = findingColor }, "\n",
                             new Span("~~~~~~~") { Color = findingColor }
                         );
-                        foreach (JProperty scriptFindings in cat.Value["Scripts"]["Interesting Findings"])
+                        Console.WriteLine(cat.Value["Scripts"]);
+                        foreach (JProperty scriptFindings in cat.Value["Scripts"])
                         {
-                            foreach (JProperty scriptFinding in scriptFindings.Value)
+                            foreach (JProperty scriptFinding in scriptFindings)
                             {
                                 findingsDocument.Children.Add(JsonToGrid(scriptFinding.Value, 0));
                             }
