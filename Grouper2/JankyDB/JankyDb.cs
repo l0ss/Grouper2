@@ -13,9 +13,6 @@ namespace Grouper2
         public string Key { get; set; }
     }
     
-    
-    
-    
     // Create several singletons that contain our big GPO data blob so we can access it without reparsing it.
     public static class JankyDb
     {

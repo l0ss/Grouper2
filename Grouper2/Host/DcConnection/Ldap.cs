@@ -15,11 +15,10 @@ namespace Grouper2.Host.DcConnection
 {
     public partial class Ldap
     {
-        
+       
 
         // I honestly don't remember wtf this is for?
         public string CurrentUserSid { get; private set; }
-
 
         // stuff for ldap or whatever
         private readonly string _domain = string.Empty;
@@ -27,8 +26,6 @@ namespace Grouper2.Host.DcConnection
 
         // proper props
         private bool _packagesHaveBeenPopulated;
-
-
 
         protected Ldap(bool onlineMode, string domain, int desiredInterestLevel)
         {
@@ -87,8 +84,7 @@ namespace Grouper2.Host.DcConnection
             {
                 // collect packages and deal with a fucked up response
                 GpoPackages = CollectGpoPackages(_domain);
-                if (GpoPackages == null)
-                    throw new ActiveDirectoryOperationException("Unable to get any packages from the domain");
+                Log.Degub("No package data from the domain, but that's probably ok?");
 
                 // Get the GPOs and sort the packages.
                 DomainGpos = CollectDomainGpos(GpoPackages, DesiredInterestLevel);
@@ -98,7 +94,7 @@ namespace Grouper2.Host.DcConnection
             catch (Exception e)
             {
                 // error propagation. An error here indicates issues with the LDAP conn to the DC
-                Log.Degub("Unable to get any GPO or GPO Package data from the domain. Possible LDAP connection issues?", e);
+                Log.Degub("Unable to get any GPO data from the domain. Possible LDAP connection issues?", e);
                 throw;
             }
         }
@@ -249,9 +245,10 @@ namespace Grouper2.Host.DcConnection
         
         private ConcurrentBag<Gpo> CollectDomainGpos(ConcurrentBag<GpoPackage> packagesForDomain, int interest)
         {
-            if (packagesForDomain == null) throw new ArgumentNullException(nameof(packagesForDomain));
-            if (packagesForDomain.Count == 0)
-                throw new ArgumentException("Value cannot be an empty collection.", nameof(packagesForDomain));
+
+            //if (packagesForDomain == null) throw new ArgumentNullException(nameof(packagesForDomain));
+            //if (packagesForDomain.Count == 0)
+            //    throw new ArgumentException("Value cannot be an empty collection.", nameof(packagesForDomain));
 
             // if the killswitch is set, return a null
             if (!CanSendTraffic) return null;
@@ -291,8 +288,11 @@ namespace Grouper2.Host.DcConnection
                         // integrate the package data into the gpo
                         // doing it here may miss out on some packages because we release some shit above.
                         // TODO: l0ss, is this the intention? I think the previous code would have kept packages with duplicate parent-UIDs providing (maybe) incorrect results?
-                        gpoData.GpoPackages = packagesForDomain.Where(p => gpoData.Uid.Equals(p.ParentUid)).ToList();
 
+                        if (packagesForDomain != null)
+                        {
+                            gpoData.GpoPackages = packagesForDomain.Where(p => gpoData.Uid.Equals(p.ParentUid)).ToList();
+                        }
 
                         ////////////////
                         // Human-readify the GPO-Status flag
@@ -360,123 +360,130 @@ namespace Grouper2.Host.DcConnection
 
             //iterate through the apps we can find and build out their objects
             ConcurrentBag<GpoPackage> gpoPackages = new ConcurrentBag<GpoPackage>();
-            foreach (SearchResult package in CollectAllPackagesData(domain))
+
+            SearchResultCollection packages = CollectAllPackagesData(domain);
+
+            if (packages != null)
             {
-                string[] lvItems = new string[8];
 
-                try
+                foreach (SearchResult package in packages)
                 {
-                    // set up the vars for the package
-                    string cn = package.Properties["cn"][0].ToString();
-                    string msiPath = null;
-                    string changed = null;
-                    string created = null;
-                    string type = null;
-                    string parentGpoUid = null;
-                    string productCodeGuid = null;
-                    string upgradeCodeGuid = null;
-                    string displayName = package.Properties["displayName"][0].ToString();
+                    string[] lvItems = new string[8];
 
-                    //check to see if there are transforms
-                    if (package.Properties["msiFileList"].Count > 1)
+                    try
                     {
-                        for (int i = 0; i < package.Properties["msiFileList"].Count; i++)
+                        // set up the vars for the package
+                        string cn = package.Properties["cn"][0].ToString();
+                        string msiPath = null;
+                        string changed = null;
+                        string created = null;
+                        string type = null;
+                        string parentGpoUid = null;
+                        string productCodeGuid = null;
+                        string upgradeCodeGuid = null;
+                        string displayName = package.Properties["displayName"][0].ToString();
+
+                        //check to see if there are transforms
+                        if (package.Properties["msiFileList"].Count > 1)
                         {
-                            string[] splitPath = package.Properties["msiFileList"][i].ToString()
-                                .Split(':');
-                            if (splitPath[0] == "0")
+                            for (int i = 0; i < package.Properties["msiFileList"].Count; i++)
                             {
-                                msiPath = splitPath[1];
-                            }
-                            else
-                            {
-                                // if there is more than one transform, need to concatenate them
-                                if (package.Properties["msiFileList"].Count > 2)
-                                    lvItems[3] = splitPath[1] + ";" + lvItems[3];
+                                string[] splitPath = package.Properties["msiFileList"][i].ToString()
+                                    .Split(':');
+                                if (splitPath[0] == "0")
+                                {
+                                    msiPath = splitPath[1];
+                                }
                                 else
-                                    lvItems[3] = splitPath[1];
+                                {
+                                    // if there is more than one transform, need to concatenate them
+                                    if (package.Properties["msiFileList"].Count > 2)
+                                        lvItems[3] = splitPath[1] + ";" + lvItems[3];
+                                    else
+                                        lvItems[3] = splitPath[1];
+                                }
                             }
                         }
-                    }
-                    else
-                    {
-                        lvItems[2] = package.Properties["msiFileList"][0].ToString()
-                            .TrimStart('0', ':');
-                        lvItems[3] = "";
-                    }
-
-                    //the product code is a byte array, so we need to get the enum on it and iterate through the collection
-                    productCodeGuid = new
-                        Guid((byte[]) package.Properties["productCode"][0]).ToString();
-                    // and again for the upgradeCode
-                    upgradeCodeGuid = new
-                        Guid((byte[]) package.Properties["upgradeProductCode"][0]).ToString();
-
-
-                    //now do the whenChanged and whenCreated stuff
-                    created = ((DateTime) package.Properties["whenCreated"][0]).ToString("G");
-                    changed = ((DateTime) package.Properties["whenChanged"][0]).ToString("G");
-
-                    //Next we need to find the GPO this app is in
-                    string FQDN = "";
-                    string[] arrFQDN = package.Properties["adsPath"][0].ToString().Split(',');
-
-                    for (int i = 0; i != arrFQDN.Length; i++)
-                    {
-                        // skip the first 4 in the array
-                        if (i <= 3) continue;
-
-                        //if its the first one we want, don't put a comma in front of it
-                        if (i == 4)
-                            FQDN = arrFQDN[i];
                         else
-                            FQDN = FQDN + "," + arrFQDN[i];
-                    }
+                        {
+                            lvItems[2] = package.Properties["msiFileList"][0].ToString()
+                                .TrimStart('0', ':');
+                            lvItems[3] = "";
+                        }
 
-                    parentGpoUid = new
-                        DirectoryEntry($"LDAP://{FQDN}").Properties["Name"][0].ToString();
+                        //the product code is a byte array, so we need to get the enum on it and iterate through the collection
+                        productCodeGuid = new
+                            Guid((byte[])package.Properties["productCode"][0]).ToString();
+                        // and again for the upgradeCode
+                        upgradeCodeGuid = new
+                            Guid((byte[])package.Properties["upgradeProductCode"][0]).ToString();
 
-                    //now resolve whether the app is published or assigned
-                    if (arrFQDN[3] == "CN=User")
-                    {
-                        if (package.Properties["msiScriptName"][0].ToString() == "A")
-                            type = "User Assigned";
-                        if (package.Properties["msiScriptName"][0].ToString() == "P")
-                            type = "User Published";
-                        if (package.Properties["msiScriptName"][0].ToString() == "R")
+
+                        //now do the whenChanged and whenCreated stuff
+                        created = ((DateTime)package.Properties["whenCreated"][0]).ToString("G");
+                        changed = ((DateTime)package.Properties["whenChanged"][0]).ToString("G");
+
+                        //Next we need to find the GPO this app is in
+                        string FQDN = "";
+                        string[] arrFQDN = package.Properties["adsPath"][0].ToString().Split(',');
+
+                        for (int i = 0; i != arrFQDN.Length; i++)
+                        {
+                            // skip the first 4 in the array
+                            if (i <= 3) continue;
+
+                            //if its the first one we want, don't put a comma in front of it
+                            if (i == 4)
+                                FQDN = arrFQDN[i];
+                            else
+                                FQDN = FQDN + "," + arrFQDN[i];
+                        }
+
+                        parentGpoUid = new
+                            DirectoryEntry($"LDAP://{FQDN}").Properties["Name"][0].ToString();
+
+                        //now resolve whether the app is published or assigned
+                        if (arrFQDN[3] == "CN=User")
+                        {
+                            if (package.Properties["msiScriptName"][0].ToString() == "A")
+                                type = "User Assigned";
+                            if (package.Properties["msiScriptName"][0].ToString() == "P")
+                                type = "User Published";
+                            if (package.Properties["msiScriptName"][0].ToString() == "R")
+                                type = "Package Removed";
+                        }
+                        else if (package.Properties["msiScriptName"][0].ToString() == "R")
+                        {
                             type = "Package Removed";
-                    }
-                    else if (package.Properties["msiScriptName"][0].ToString() == "R")
-                    {
-                        type = "Package Removed";
-                    }
+                        }
 
-                    else
-                    {
-                        type = "Computer Assigned";
-                    }
-                    
-                    // get the package interest
-                    if (PackageInterest(msiPath) >= this.DesiredInterestLevel)
-                    {
-                        gpoPackages.Add(new GpoPackage(
-                            cn,
-                            displayName,
-                            msiPath,
-                            changed,
-                            created,
-                            type,
-                            productCodeGuid,
-                            upgradeCodeGuid,
-                            parentGpoUid
-                        ));
-                    }
+                        else
+                        {
+                            type = "Computer Assigned";
+                        }
 
-                    
-                }
-                catch (Exception e)
-                {
-                    Output.DebugWrite(e.ToString());
+                        // get the package interest
+                        if (PackageInterest(msiPath) >= this.DesiredInterestLevel)
+                        {
+                            gpoPackages.Add(new GpoPackage(
+                                cn,
+                                displayName,
+                                msiPath,
+                                changed,
+                                created,
+                                type,
+                                productCodeGuid,
+                                upgradeCodeGuid,
+                                parentGpoUid
+                            ));
+                        }
+
+
+                    }
+                    catch (Exception e)
+                    {
+                        Output.DebugWrite(e.ToString());
+                    }
                 }
             }
 
@@ -488,6 +495,7 @@ namespace Grouper2.Host.DcConnection
             }
             else
             {
+                // Sh3r4 should this be a true anyway? They've been populated there just weren't any results?
                 _packagesHaveBeenPopulated = false;
                 return null;
             }
