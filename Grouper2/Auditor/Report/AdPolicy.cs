@@ -276,7 +276,7 @@ namespace Grouper2.Auditor
     public class AuditedScriptsDotIniType : Finding
     {
         [JsonProperty("Type")] public string Type { get; set; }
-        [JsonProperty("Interesting Findings")] public List<AuditedScriptsDotIniScript> Findings { get; set; }
+        [JsonProperty("Assessed Scripts")] public List<AuditedScriptsDotIniScript> Findings { get; set; }
     }
 
     [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]

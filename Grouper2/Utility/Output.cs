@@ -223,322 +223,325 @@ namespace Grouper2.Utility
             {
                 foreach (KeyValuePair<string, JToken> cat in polFindingCat)
                 {
-                    if (cat.Key == "Drives")
+                    try
                     {
-                        findingsDocument.Children.Add(
-                            new Span("GPP Drive Mappings") { Color = findingColor }, "\n",
-                            new Span("~~~~~~~~~~~~~~~~~~") { Color = findingColor }
-                        );
-                        foreach (JToken findings in cat.Value)
+                        if (cat.Key == "Drives")
                         {
-                            foreach (JToken finding in findings)
+                            findingsDocument.Children.Add(
+                                new Span("GPP Drive Mappings") { Color = findingColor }, "\n",
+                                new Span("~~~~~~~~~~~~~~~~~~") { Color = findingColor }
+                            );
+                            foreach (JToken findings in cat.Value)
                             {
-                                findingsDocument.Children.Add(JsonToGrid(finding, 0));
+                                foreach (JToken finding in findings)
+                                {
+                                    findingsDocument.Children.Add(JsonToGrid(finding, 0));
+                                }
                             }
+                            continue;
                         }
-                        continue;
-                    }
-                    if (cat.Key == "Privilege Rights")
-                    {
-                        findingsDocument.Children.Add(
-                            new Span("OS Privileges") { Color = findingColor }, "\n",
-                            new Span("~~~~~~~~~~~~~") { Color = findingColor }
-                        );
-                        findingsDocument.Children.Add(JsonToGrid(cat.Value, 0));
-                        continue;
-                    }
-                    if (cat.Key == "Group Membership")
-                    {
-                        findingsDocument.Children.Add(
-                            new Span("Group Membership") { Color = findingColor }, "\n",
-                            new Span("~~~~~~~~~~~~~~~~") { Color = findingColor }
-                        );
-                        findingsDocument.Children.Add(JsonToGrid(cat.Value, 0));
-                        continue;
-                    }
-                    if (cat.Key == "Groups")
-                    {
-                        findingsDocument.Children.Add(
-                            new Span("GPP Users and Groups") { Color = findingColor }, "\n",
-                            new Span("~~~~~~~~~~~~~~~~~~~~") { Color = findingColor }
-                        );
-                        JToken gppUsers = cat.Value["GPP Users"];
-                        JToken gppGroups = cat.Value["GPP Groups"];
+                        if (cat.Key == "Privilege Rights")
+                        {
+                            findingsDocument.Children.Add(
+                                new Span("OS Privileges") { Color = findingColor }, "\n",
+                                new Span("~~~~~~~~~~~~~") { Color = findingColor }
+                            );
+                            findingsDocument.Children.Add(JsonToGrid(cat.Value, 0));
+                            continue;
+                        }
+                        if (cat.Key == "Group Membership")
+                        {
+                            findingsDocument.Children.Add(
+                                new Span("Group Membership") { Color = findingColor }, "\n",
+                                new Span("~~~~~~~~~~~~~~~~") { Color = findingColor }
+                            );
+                            findingsDocument.Children.Add(JsonToGrid(cat.Value, 0));
+                            continue;
+                        }
+                        if (cat.Key == "Groups")
+                        {
+                            findingsDocument.Children.Add(
+                                new Span("GPP Users and Groups") { Color = findingColor }, "\n",
+                                new Span("~~~~~~~~~~~~~~~~~~~~") { Color = findingColor }
+                            );
+                            JToken gppUsers = cat.Value["GPP Users"];
+                            JToken gppGroups = cat.Value["GPP Groups"];
 
-                        if (gppGroups != null)
-                        {
-                            findingsDocument.Children.Add(new Span("\nGPP Groups\n"), new Span("---------"));
-                            foreach (JProperty groupFinding in gppGroups)
+                            if (gppGroups != null)
                             {
-                                findingsDocument.Children.Add(JsonToGrid(groupFinding.Value, 0));
+                                findingsDocument.Children.Add(new Span("\nGPP Groups\n"), new Span("---------"));
+                                foreach (JProperty groupFinding in gppGroups)
+                                {
+                                    findingsDocument.Children.Add(JsonToGrid(groupFinding.Value, 0));
+                                }
                             }
-                        }
 
-                        if (gppUsers != null)
-                        {
-                            findingsDocument.Children.Add(new Span("\nGPP Users\n"), new Span("---------"));
-                            foreach (JProperty userFinding in gppUsers)
+                            if (gppUsers != null)
                             {
-                                findingsDocument.Children.Add(JsonToGrid(userFinding.Value, 0));
+                                findingsDocument.Children.Add(new Span("\nGPP Users\n"), new Span("---------"));
+                                foreach (JProperty userFinding in gppUsers)
+                                {
+                                    findingsDocument.Children.Add(JsonToGrid(userFinding.Value, 0));
+                                }
                             }
+                            continue;
                         }
-                        continue;
-                    }
-                    if (cat.Key == "DataSources")
-                    {
-                        findingsDocument.Children.Add(
-                            new Span("GPP Data Sources") { Color = findingColor }, "\n",
-                            new Span("~~~~~~~~~~~~~~~~") { Color = findingColor }
-                        );
-                        foreach (JProperty datasourceFinding in cat.Value)
+                        if (cat.Key == "DataSources")
                         {
-                            findingsDocument.Children.Add(JsonToGrid(datasourceFinding.Value, 0));
+                            findingsDocument.Children.Add(
+                                new Span("GPP Data Sources") { Color = findingColor }, "\n",
+                                new Span("~~~~~~~~~~~~~~~~") { Color = findingColor }
+                            );
+                            foreach (JProperty datasourceFinding in cat.Value)
+                            {
+                                findingsDocument.Children.Add(JsonToGrid(datasourceFinding.Value, 0));
+                            }
+                            continue;
                         }
-                        continue;
-                    }
-                    if (cat.Key == "NetworkShareSettings")
-                    {
-                        findingsDocument.Children.Add(
-                            new Span("GPP Network Shares") { Color = findingColor }, "\n",
-                            new Span("~~~~~~~~~~~~~~~~") { Color = findingColor }
-                        );
-                        foreach (JProperty netshareFinding in cat.Value)
+                        if (cat.Key == "NetworkShareSettings")
                         {
-                            findingsDocument.Children.Add(JsonToGrid(netshareFinding.Value, 0));
+                            findingsDocument.Children.Add(
+                                new Span("GPP Network Shares") { Color = findingColor }, "\n",
+                                new Span("~~~~~~~~~~~~~~~~") { Color = findingColor }
+                            );
+                            foreach (JProperty netshareFinding in cat.Value)
+                            {
+                                findingsDocument.Children.Add(JsonToGrid(netshareFinding.Value, 0));
+                            }
+                            continue;
                         }
-                        continue;
-                    }
-                    if (cat.Key == "Printers")
-                    {
-                        findingsDocument.Children.Add(
-                            new Span("GPP Printer Mappings") { Color = findingColor }, "\n",
-                            new Span("~~~~~~~~~~~~~~~~~~~~") { Color = findingColor }
-                        );
-                        //TODO validate this once my azure thing is back online
-                        foreach (JProperty printerFinding in cat.Value)
+                        if (cat.Key == "Printers")
                         {
-                            findingsDocument.Children.Add(JsonToGrid(printerFinding.Value, 0));
+                            findingsDocument.Children.Add(
+                                new Span("GPP Printer Mappings") { Color = findingColor }, "\n",
+                                new Span("~~~~~~~~~~~~~~~~~~~~") { Color = findingColor }
+                            );
+                            //TODO validate this once my azure thing is back online
+                            foreach (JProperty printerFinding in cat.Value)
+                            {
+                                findingsDocument.Children.Add(JsonToGrid(printerFinding.Value, 0));
+                            }
+                            continue;
                         }
-                        continue;
-                    }
-                    if (cat.Key == "Files")
-                    {
-                        findingsDocument.Children.Add(
-                            new Span("GPP Files") { Color = findingColor }, "\n",
-                            new Span("~~~~~~~~~") { Color = findingColor }
-                        );
-                        foreach (JProperty fileFinding in cat.Value)
+                        if (cat.Key == "Files")
                         {
-                            findingsDocument.Children.Add(JsonToGrid(fileFinding.Value, 0));
+                            findingsDocument.Children.Add(
+                                new Span("GPP Files") { Color = findingColor }, "\n",
+                                new Span("~~~~~~~~~") { Color = findingColor }
+                            );
+                            foreach (JProperty fileFinding in cat.Value)
+                            {
+                                findingsDocument.Children.Add(JsonToGrid(fileFinding.Value, 0));
+                            }
+                            continue;
                         }
-                        continue;
-                    }
-                    if (cat.Key == "ScheduledTasks")
-                    {
-                        findingsDocument.Children.Add(
-                            new Span("GPP Scheduled Tasks") { Color = findingColor }, "\n",
-                            new Span("~~~~~~~~~~~~~~~~~~~") { Color = findingColor }
-                        );
-                        foreach (JProperty schedtaskFinding in cat.Value)
+                        if (cat.Key == "ScheduledTasks")
                         {
-                            findingsDocument.Children.Add(JsonToGrid(schedtaskFinding.Value, 0));
+                            findingsDocument.Children.Add(
+                                new Span("GPP Scheduled Tasks") { Color = findingColor }, "\n",
+                                new Span("~~~~~~~~~~~~~~~~~~~") { Color = findingColor }
+                            );
+                            foreach (JProperty schedtaskFinding in cat.Value)
+                            {
+                                findingsDocument.Children.Add(JsonToGrid(schedtaskFinding.Value, 0));
+                            }
+                            continue;
                         }
-                        continue;
-                    }
-                    if (cat.Key == "Service General Setting")
-                    {
-                        findingsDocument.Children.Add(
-                            new Span("Windows Services") { Color = findingColor }, "\n",
-                            new Span("~~~~~~~~~~~~~~~~") { Color = findingColor }
-                        );
-                        foreach (JProperty sgsFinding in cat.Value)
+                        if (cat.Key == "Service General Setting")
                         {
-                            findingsDocument.Children.Add(JsonToGrid(sgsFinding.Value, 0));
+                            findingsDocument.Children.Add(
+                                new Span("Windows Services") { Color = findingColor }, "\n",
+                                new Span("~~~~~~~~~~~~~~~~") { Color = findingColor }
+                            );
+                            foreach (JProperty sgsFinding in cat.Value)
+                            {
+                                findingsDocument.Children.Add(JsonToGrid(sgsFinding.Value, 0));
+                            }
+                            continue;
                         }
-                        continue;
-                    }
-                    if (cat.Key == "NTServices")
-                    {
-                        findingsDocument.Children.Add(
-                            new Span("GPP NT Services") { Color = findingColor }, "\n",
-                            new Span("~~~~~~~~~~~~~~~") { Color = findingColor }
-                        );
-                        foreach (JProperty ntserviceFinding in cat.Value)
+                        if (cat.Key == "NTServices")
                         {
-                            findingsDocument.Children.Add(JsonToGrid(ntserviceFinding.Value, 0));
+                            findingsDocument.Children.Add(
+                                new Span("GPP NT Services") { Color = findingColor }, "\n",
+                                new Span("~~~~~~~~~~~~~~~") { Color = findingColor }
+                            );
+                            foreach (JProperty ntserviceFinding in cat.Value)
+                            {
+                                findingsDocument.Children.Add(JsonToGrid(ntserviceFinding.Value, 0));
+                            }
+                            continue;
                         }
-                        continue;
-                    }
-                    if (cat.Key == "Shortcuts")
-                    {
-                        findingsDocument.Children.Add(
-                            new Span("GPP Shortcuts") { Color = findingColor }, "\n",
-                            new Span("~~~~~~~~~~~~~") { Color = findingColor }
-                        );
-                        foreach (JProperty shortcutFinding in cat.Value)
+                        if (cat.Key == "Shortcuts")
                         {
-                            findingsDocument.Children.Add(JsonToGrid(shortcutFinding.Value, 0));
+                            findingsDocument.Children.Add(
+                                new Span("GPP Shortcuts") { Color = findingColor }, "\n",
+                                new Span("~~~~~~~~~~~~~") { Color = findingColor }
+                            );
+                            foreach (JProperty shortcutFinding in cat.Value)
+                            {
+                                findingsDocument.Children.Add(JsonToGrid(shortcutFinding.Value, 0));
+                            }
+                            continue;
                         }
-                        continue;
-                    }
-                    if (cat.Key == "System Access")
-                    {
-                        findingsDocument.Children.Add(
-                            new Span("System Access") { Color = findingColor }, "\n",
-                            new Span("~~~~~~~~~~~~~") { Color = findingColor }
-                        );
-                        Grid grid = new Grid
+                        if (cat.Key == "System Access")
                         {
-                            Color = ConsoleColor.White,
-                            Columns =
+                            findingsDocument.Children.Add(
+                                new Span("System Access") { Color = findingColor }, "\n",
+                                new Span("~~~~~~~~~~~~~") { Color = findingColor }
+                            );
+                            Grid grid = new Grid
+                            {
+                                Color = ConsoleColor.White,
+                                Columns =
                             {
                                 new Column { Width = GridLength.Auto, MinWidth = 25, MaxWidth = 40},
                                 new Column { Width = GridLength.Auto, MinWidth = 5, MaxWidth = 40}
                             },
-                            Stroke = LineThickness.Single,
-                            StrokeColor = ConsoleColor.Gray
-                        };
-                        foreach (JProperty jprop in cat.Value)
-                        {
-                            string name = jprop.Name;
-                            JToken value = jprop.Value;
-                            grid.Children.Add(new Cell(jprop.Name), new Cell(jprop.Value.ToString()));
-                        }
+                                Stroke = LineThickness.Single,
+                                StrokeColor = ConsoleColor.Gray
+                            };
+                            foreach (JProperty jprop in cat.Value)
+                            {
+                                string name = jprop.Name;
+                                JToken value = jprop.Value;
+                                grid.Children.Add(new Cell(jprop.Name), new Cell(jprop.Value.ToString()));
+                            }
 
-                        findingsDocument.Children.Add(grid);
-                        continue;
-                    }
-                    if (cat.Key == "Kerberos Policy")
-                    {
-                        findingsDocument.Children.Add(
-                            new Span("Kerberos Policy") { Color = findingColor }, "\n",
-                            new Span("~~~~~~~~~~~~~~~") { Color = findingColor }
-                        );
-                        Grid grid = new Grid
+                            findingsDocument.Children.Add(grid);
+                            continue;
+                        }
+                        if (cat.Key == "Kerberos Policy")
                         {
-                            Color = ConsoleColor.White,
-                            Columns =
+                            findingsDocument.Children.Add(
+                                new Span("Kerberos Policy") { Color = findingColor }, "\n",
+                                new Span("~~~~~~~~~~~~~~~") { Color = findingColor }
+                            );
+                            Grid grid = new Grid
+                            {
+                                Color = ConsoleColor.White,
+                                Columns =
                             {
                                 new Column { Width = GridLength.Auto, MinWidth = 25, MaxWidth = 40},
                                 new Column { Width = GridLength.Auto, MinWidth = 5, MaxWidth = 40}
                             },
-                            Stroke = LineThickness.Single,
-                            StrokeColor = ConsoleColor.Gray
-                        };
-                        foreach (JProperty jprop in cat.Value)
-                        {
-                            string name = jprop.Name;
-                            JToken value = jprop.Value;
-                            grid.Children.Add(new Cell(jprop.Name), new Cell(jprop.Value.ToString()));
-                        }
+                                Stroke = LineThickness.Single,
+                                StrokeColor = ConsoleColor.Gray
+                            };
+                            foreach (JProperty jprop in cat.Value)
+                            {
+                                string name = jprop.Name;
+                                JToken value = jprop.Value;
+                                grid.Children.Add(new Cell(jprop.Name), new Cell(jprop.Value.ToString()));
+                            }
 
-                        findingsDocument.Children.Add(grid);
-                        
-                        continue;
-                    }
-                    if (cat.Key == "Registry Values")
-                    {
-                        findingsDocument.Children.Add(
-                            new Span("Registry Values") { Color = findingColor }, "\n",
-                            new Span("~~~~~~~~~~~~~~~") { Color = findingColor }
-                        );
-                        Grid grid = new Grid
+                            findingsDocument.Children.Add(grid);
+
+                            continue;
+                        }
+                        if (cat.Key == "Registry Values")
                         {
-                            Color = ConsoleColor.White,
-                            Columns =
+                            findingsDocument.Children.Add(
+                                new Span("Registry Values") { Color = findingColor }, "\n",
+                                new Span("~~~~~~~~~~~~~~~") { Color = findingColor }
+                            );
+                            Grid grid = new Grid
+                            {
+                                Color = ConsoleColor.White,
+                                Columns =
                             {
                                 new Column { Width = GridLength.Auto, MinWidth = 25, MaxWidth = 60},
                                 new Column { Width = GridLength.Auto, MinWidth = 5, MaxWidth = 40}
                             },
-                            Stroke = LineThickness.Single,
-                            StrokeColor = ConsoleColor.Gray
-                        };
-                        grid.Children.Add(new Cell("Key"), new Cell("Value"));
-                        foreach (JProperty jprop in cat.Value)
-                        {
-                            string name = jprop.Name;
-                            JToken value = jprop.Value;
-                            grid.Children.Add(new Cell(jprop.Name), new Cell(jprop.Value.ToString().Trim('[',']').Trim()));
-                        }
-
-                        findingsDocument.Children.Add(grid);
-                        continue;
-                    }
-                    if (cat.Key == "RegistrySettings")
-                    {
-                        findingsDocument.Children.Add(
-                            new Span("GPP Registry Settings") { Color = findingColor }, "\n",
-                            new Span("~~~~~~~~~~~~~~~~~~~~~") { Color = findingColor }
-                        );
-                        
-                        foreach (JProperty regsetFindings in cat.Value)
-                        {
-                            foreach (JObject regsetFinding in regsetFindings)
+                                Stroke = LineThickness.Single,
+                                StrokeColor = ConsoleColor.Gray
+                            };
+                            grid.Children.Add(new Cell("Key"), new Cell("Value"));
+                            foreach (JProperty jprop in cat.Value)
                             {
-                                foreach (JToken thing in regsetFinding.Values())
+                                string name = jprop.Name;
+                                JToken value = jprop.Value;
+                                grid.Children.Add(new Cell(jprop.Name), new Cell(jprop.Value.ToString().Trim('[', ']').Trim()));
+                            }
+
+                            findingsDocument.Children.Add(grid);
+                            continue;
+                        }
+                        if (cat.Key == "RegistrySettings")
+                        {
+                            findingsDocument.Children.Add(
+                                new Span("GPP Registry Settings") { Color = findingColor }, "\n",
+                                new Span("~~~~~~~~~~~~~~~~~~~~~") { Color = findingColor }
+                            );
+
+                            foreach (JProperty regsetFindings in cat.Value)
+                            {
+                                foreach (JObject regsetFinding in regsetFindings)
                                 {
-                                    findingsDocument.Children.Add(JsonToGrid(thing, 0));
+                                    foreach (JToken thing in regsetFinding.Values())
+                                    {
+                                        findingsDocument.Children.Add(JsonToGrid(thing, 0));
+                                    }
                                 }
                             }
+                            continue;
                         }
-                        continue;
-                    }
-                    if (cat.Key == "Registry Keys")
-                    {
-                        findingsDocument.Children.Add(
-                            new Span("GPP Registry Keys") { Color = findingColor }, "\n",
-                            new Span("~~~~~~~~~~~~~~~~~") { Color = findingColor }
-                        );
-                        foreach (JProperty regKeyFinding in cat.Value)
+                        if (cat.Key == "Registry Keys")
                         {
-                            findingsDocument.Children.Add(JsonToGrid(regKeyFinding.Value, 0));
-                        }
-                        continue;
-                    }
-                    if (cat.Key == "EnvironmentVariables")
-                    {
-                        findingsDocument.Children.Add(
-                            new Span("GPP Env Vars") { Color = findingColor }, "\n",
-                            new Span("~~~~~~~~~~~~") { Color = findingColor }
-                        );
-                        foreach (JProperty envvarFinding in cat.Value)
-                        {
-                            findingsDocument.Children.Add(JsonToGrid(envvarFinding.Value, 0));
-                        }
-                        continue;
-                    }
-                    if (cat.Key == "IniFiles")
-                    {
-                        findingsDocument.Children.Add(
-                            new Span("GPP Ini Files") { Color = findingColor }, "\n",
-                            new Span("~~~~~~~~~~~~~") { Color = findingColor }
-                        );
-                        foreach (JProperty iniFileFinding in cat.Value)
-                        {
-                            findingsDocument.Children.Add(JsonToGrid(iniFileFinding.Value, 0));
-                        }
-                        continue;
-                    }
-                    if (cat.Key == "Scripts")
-                    {
-                        Console.WriteLine(cat.Value.ToString());
-                        findingsDocument.Children.Add(
-                            new Span("Scripts") { Color = findingColor }, "\n",
-                            new Span("~~~~~~~") { Color = findingColor }
-                        );
-                        Console.WriteLine(cat.Value["Scripts"]);
-                        foreach (JProperty scriptFindings in cat.Value["Scripts"])
-                        {
-                            foreach (JProperty scriptFinding in scriptFindings)
+                            findingsDocument.Children.Add(
+                                new Span("GPP Registry Keys") { Color = findingColor }, "\n",
+                                new Span("~~~~~~~~~~~~~~~~~") { Color = findingColor }
+                            );
+                            foreach (JProperty regKeyFinding in cat.Value)
                             {
-                                findingsDocument.Children.Add(JsonToGrid(scriptFinding.Value, 0));
+                                findingsDocument.Children.Add(JsonToGrid(regKeyFinding.Value, 0));
                             }
+                            continue;
                         }
-                        continue;
+                        if (cat.Key == "EnvironmentVariables")
+                        {
+                            findingsDocument.Children.Add(
+                                new Span("GPP Env Vars") { Color = findingColor }, "\n",
+                                new Span("~~~~~~~~~~~~") { Color = findingColor }
+                            );
+                            foreach (JProperty envvarFinding in cat.Value)
+                            {
+                                findingsDocument.Children.Add(JsonToGrid(envvarFinding.Value, 0));
+                            }
+                            continue;
+                        }
+                        if (cat.Key == "IniFiles")
+                        {
+                            findingsDocument.Children.Add(
+                                new Span("GPP Ini Files") { Color = findingColor }, "\n",
+                                new Span("~~~~~~~~~~~~~") { Color = findingColor }
+                            );
+                            foreach (JProperty iniFileFinding in cat.Value)
+                            {
+                                findingsDocument.Children.Add(JsonToGrid(iniFileFinding.Value, 0));
+                            }
+                            continue;
+                        }
+                        if (cat.Key == "Scripts")
+                        {
+                            findingsDocument.Children.Add(
+                                new Span("Scripts") { Color = findingColor }, "\n",
+                                new Span("~~~~~~~") { Color = findingColor }
+                            );
+                            Console.WriteLine(cat.Value[0]["Assessed Scripts"]);
+                            Console.WriteLine("####");
+                            foreach (JProperty scriptFindings in cat.Value[0]["Assessed Scripts"])
+                            {
+                                foreach (JProperty scriptFinding in scriptFindings)
+                                {
+                                    findingsDocument.Children.Add(JsonToGrid(scriptFinding.Value, 0));
+                                }
+                            }
+                            continue;
+                        }
                     }
-                    else
+                    catch (Exception e)
                     {
-                        findingsDocument.Children.Add(new Span(cat.Key + " wasn't properly prettified for output.\n") {Color= ConsoleColor.Red});
+                        findingsDocument.Children.Add(new Span(cat.Key + " wasn't properly prettified for output.\n") { Color = ConsoleColor.Red });
                     }
                 }
             }
