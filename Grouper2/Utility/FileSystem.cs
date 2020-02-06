@@ -688,36 +688,49 @@ namespace Grouper2.Utility
 
         public static bool CanIRead(string inPath)
         {
-            bool canRead = false;
-            if (!GlobalVar.OnlineChecks)
+            // this will return true if file read perm is available.
+            CurrentUserSecurity currentUserSecurity = new CurrentUserSecurity();
+
+            FileSystemRights[] fsRights = {
+                FileSystemRights.Read,
+                FileSystemRights.ReadAndExecute,
+                FileSystemRights.ReadData
+            };
+
+            FileAttributes attr = File.GetAttributes(inPath);
+            bool readRight = false;
+            foreach (FileSystemRights fsRight in fsRights)
             {
-                return false;
+                try
+                {
+                    if (attr.HasFlag(FileAttributes.Directory))
+                    {
+                        DirectoryInfo dirInfo = new DirectoryInfo(inPath);
+                        if (currentUserSecurity.HasAccess(dirInfo, fsRight))
+                        {
+                            readRight = true;
+                        }
+                    }
+                    else
+                    {
+                        FileInfo fileInfo = new FileInfo(inPath);
+                        if (currentUserSecurity.HasAccess(fileInfo, fsRight))
+                        {
+                            readRight = true;
+                        }
+                    }
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    return false;
+                }
             }
-            try
-            {
-                FileStream stream = File.OpenRead(inPath);
-                canRead = stream.CanRead;
-                stream.Close();
-            }
-            catch (UnauthorizedAccessException)
-            {
-                Utility.Output.DebugWrite("Tested read perms for " + inPath + " and couldn't read.");
-            }
-            catch (ArgumentException)
-            {
-                Utility.Output.DebugWrite("Tested read perms for " + inPath + " but it doesn't seem to be a valid file path.");
-            }
-            catch (Exception e)
-            {
-                Utility.Output.DebugWrite(e.ToString());
-            }
-            return canRead;
+            return readRight;
         }
 
         public static bool CanIWrite(string inPath)
         {
             // this will return true if write or modify or take ownership or any of those other good perms are available.
-            
             CurrentUserSecurity currentUserSecurity = new CurrentUserSecurity();
 
             FileSystemRights[] fsRights = {
@@ -732,34 +745,35 @@ namespace Grouper2.Utility
                 FileSystemRights.WriteData
             };
 
-            try
+            FileAttributes attr = File.GetAttributes(inPath);
+            bool writeRight = false;
+            foreach (FileSystemRights fsRight in fsRights)
             {
-                FileAttributes attr = File.GetAttributes(inPath);
-                foreach (FileSystemRights fsRight in fsRights)
+                try
                 {
                     if (attr.HasFlag(FileAttributes.Directory))
                     {
                         DirectoryInfo dirInfo = new DirectoryInfo(inPath);
-                        return currentUserSecurity.HasAccess(dirInfo, fsRight);
+                        if (currentUserSecurity.HasAccess(dirInfo, fsRight))
+                        {
+                            writeRight = true;
+                        }
                     }
-
-                    FileInfo fileInfo = new FileInfo(inPath);
-                    return currentUserSecurity.HasAccess(fileInfo, fsRight);
+                    else
+                    {
+                        FileInfo fileInfo = new FileInfo(inPath);
+                        if (currentUserSecurity.HasAccess(fileInfo, fsRight))
+                        {
+                            writeRight = true;
+                        }
+                    }
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    return false;
                 }
             }
-            catch (FileNotFoundException)
-            {
-                return false;
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return false;
-            }
-            catch (ArgumentNullException)
-            {
-                return false;
-            }
-            return false;
+            return writeRight;
         }
 
         public static JObject InvestigateFileContents(string inString)
