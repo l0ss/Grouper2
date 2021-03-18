@@ -269,6 +269,11 @@ namespace Grouper2
             // return the JObject
             return parsedXmlFileToJson;
         }
+
+        public static JObject ParseRegistryPol(string registryFile)
+        {
+            return RegistryPolParser.Read(registryFile);
+        }
     }
 }
  

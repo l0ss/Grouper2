@@ -7,6 +7,24 @@ namespace Grouper2
 {
     class AssessHandlers
     {
+        // Assesses the contents of a registry.pol
+        public static JObject AssessRegistryPol(JObject registryPolToAssess)
+        {
+            Dictionary<string, JObject> assessedRegistryPol = new Dictionary<string, JObject>();
+
+            if (registryPolToAssess != null)
+            {
+                JObject matchedRegValues = InfAssess.AssessInf.AssessRegValues(registryPolToAssess);
+                if (matchedRegValues != null)
+                {
+                    assessedRegistryPol.Add("Registry Values", matchedRegValues);
+                }
+            }
+
+            JObject assessedRegistryPolJson = (JObject)JToken.FromObject(assessedRegistryPol);
+            return assessedRegistryPolJson;
+        }
+
         // Assesses the contents of a GPTmpl
         public static JObject AssessGptmpl(JObject infToAssess)
         {

@@ -732,7 +732,9 @@ public class GlobalVar
                 string machinePolPath = Path.Combine(gpoPath, "Machine");
                 string userPolPath = Path.Combine(gpoPath, "User");
 
-                // Process Inf and Xml Policy data for machine and user
+                // Process Inf and Xml Policy data for machine and user                
+                JArray userRegistryPolResults = ProcessRegistryPol(userPolPath);
+                JArray machineRegistryPolResults = ProcessRegistryPol(machinePolPath);
                 JArray machinePolInfResults = ProcessInf(machinePolPath);
                 JArray userPolInfResults = ProcessInf(userPolPath);
                 JArray machinePolGppResults = ProcessGpXml(machinePolPath);
@@ -748,14 +750,16 @@ public class GlobalVar
                 {
                     machinePolInfResults,
                     machinePolGppResults,
-                    machinePolScriptResults
+                    machinePolScriptResults,
+                    machineRegistryPolResults
                 };
 
                 JArray[] allUserGpoResults =
                 {
                     userPolInfResults,
                     userPolGppResults,
-                    userPolScriptResults
+                    userPolScriptResults,
+                    userRegistryPolResults
                 };
 
                 foreach (JArray machineGpoResult in allMachineGpoResults)
@@ -811,6 +815,58 @@ public class GlobalVar
 
             return null;
         }
+
+        private static JArray ProcessRegistryPol(string path)
+        {
+            // find all the registry.pol files in subfolders.
+            List<string> registryPolFiles = new List<string>();
+            try
+            {
+                registryPolFiles = Directory.GetFiles(path, "registry.pol", SearchOption.AllDirectories).ToList();
+            }
+            catch (DirectoryNotFoundException e)
+            {
+                Utility.Output.DebugWrite(e.ToString());
+
+                return null;
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                Utility.Output.DebugWrite(e.ToString());
+
+                return null;
+            }
+
+            // JArray for the results
+            JArray processedRegistryPols = new JArray();
+            // We be iterating, fool
+            foreach (string registryPolFile in registryPolFiles)
+            {
+                JObject parsedRegistryPolFile = new JObject();
+                try
+                {
+                    parsedRegistryPolFile = Parsers.ParseRegistryPol(registryPolFile);
+                }
+                catch (UnauthorizedAccessException e)
+                {
+                    Utility.Output.DebugWrite(e.ToString());
+                }
+                catch (NotSupportedException e)
+                {
+                    Utility.Output.DebugWrite(e.ToString());
+                }
+
+                JObject assessedRegistryPol = AssessHandlers.AssessRegistryPol(parsedRegistryPolFile);
+
+                if (assessedRegistryPol.HasValues)
+                {
+                    processedRegistryPols.Add(assessedRegistryPol);
+                }
+            }
+
+            return processedRegistryPols;
+        }
+
 
         private static JArray ProcessInf(string path)
         {

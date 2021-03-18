@@ -104,6 +104,7 @@
     <Reference Include="mscorlib" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assess\InfAssess\AssessRegValues.cs" />
     <Compile Include="Utility\CurrentUserSecurity.cs" />
     <Compile Include="Utility\FileSystem.cs" />
     <Compile Include="Assess\GPPAssess\AssessGpp.cs" />
@@ -111,6 +112,7 @@
     <Compile Include="Utility\JUtil.cs" />
     <Compile Include="Utility\Output.cs" />
     <Compile Include="Assess\PackageAssess\PackageAssess.cs" />
+    <Compile Include="Utility\RegistryPolParser.cs" />
     <Compile Include="Utility\SddlParser\ParseSDDL.cs" />
     <Compile Include="Assess\ScriptsIniAssess\AssessScriptsIni.cs" />
     <Compile Include="Assess\GPPAssess\AssessDataSources.cs" />
@@ -130,7 +132,6 @@
     <Compile Include="Assess\InfAssess\AssessKerbPolicy.cs" />
     <Compile Include="Assess\InfAssess\AssessPrivRights.cs" />
     <Compile Include="Assess\InfAssess\AssessRegKeys.cs" />
-    <Compile Include="Assess\InfAssess\AssessRegValues.cs" />
     <Compile Include="Assess\InfAssess\AssessServiceGenSetting.cs" />
     <Compile Include="Assess\InfAssess\AssessSysAccess.cs" />
     <Compile Include="LDAPstuff.cs" />
