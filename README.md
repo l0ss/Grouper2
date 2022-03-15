@@ -1,3 +1,5 @@
+# GROUPER2 IS DEPRECATED, GOTO https://github.com/Group3r/Group3r INSTEAD
+
 ![A picture of the Grouper2 banner](./G2-banner.png)
 
 C# rewrite of Grouper - *WAY* better than the original.
